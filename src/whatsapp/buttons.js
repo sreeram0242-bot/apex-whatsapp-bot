@@ -122,7 +122,7 @@ export async function sendInteractiveButtons(sock, jid, {
 /**
  * Sends a generated UPI QR Code image to WhatsApp for instant customer payment
  */
-export async function sendUpiQrCode(sock, jid, { upiId, upiName, amount = 0, orderId = '', note = 'Service Order' }) {
+export async function sendUpiQrCode(sock, jid, { upiId, upiName, amount = 0, orderId = '', note = 'InstaPics Order' }) {
   let upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&tn=${encodeURIComponent(`${note} #${orderId}`)}`;
   if (amount > 0) {
     upiUri += `&am=${amount}&cu=INR`;
@@ -137,10 +137,12 @@ export async function sendUpiQrCode(sock, jid, { upiId, upiName, amount = 0, ord
     }
   });
 
+  const formattedAmount = amount > 0 ? `\n*Amount Payable:* *₹${amount.toLocaleString('en-IN')}*` : '';
+
   const caption = `📱 *Instant UPI Payment Details*\n\n` +
     `*Payee:* ${upiName}\n` +
-    `*UPI ID:* \`${upiId}\`\n` +
-    `*Project Ref:* #${orderId}\n\n` +
+    `*UPI ID:* \`${upiId}\`${formattedAmount}\n` +
+    `*Order Ref:* #${orderId}\n\n` +
     `Scan this QR Code using any UPI App (GPay, PhonePe, Paytm, BHIM) or copy the UPI ID above.\n` +
     `_After paying, reply here with the payment screenshot or transaction ID._`;
 

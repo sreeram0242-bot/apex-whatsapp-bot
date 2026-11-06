@@ -114,14 +114,15 @@ function renderOrdersTable(orders) {
         </td>
         <td>
           <strong>${escapeHtml(order.product_name)}</strong>
-          <div><span class="specs-badge">${escapeHtml(order.details || 'Standard')}</span></div>
+          <div><span class="specs-badge" style="white-space: pre-line; text-align: left; display: inline-block;">${escapeHtml(order.details || 'Standard')}</span></div>
         </td>
         <td>${photoButton}</td>
         <td style="max-width: 220px; font-size: 12px; color: var(--text-secondary);">
           ${escapeHtml(order.address || 'Pickup at Studio')}
         </td>
         <td>
-          <span style="font-size: 12px; font-weight: 500;">${escapeHtml(order.payment_type)}</span>
+          <div style="font-size: 13px; font-weight: 600; color: #16a34a;">${order.amount ? `₹${Number(order.amount).toLocaleString('en-IN')}` : ''}</div>
+          <span style="font-size: 11px; color: var(--text-muted);">${escapeHtml(order.payment_type)}</span>
         </td>
         <td>
           <select class="select-input" style="font-size: 12px; padding: 4px 6px;" onchange="updateOrderStatus('${order.id}', this.value)">
@@ -596,9 +597,20 @@ window.simClickProduct = function(prodId) {
   chatBody.scrollTop = chatBody.scrollHeight;
 };
 
+let simCart = [];
+
+function extractSimPrice(str) {
+  if (!str) return 0;
+  const match = str.match(/₹\s*([0-9,]+)/);
+  if (match) return parseInt(match[1].replace(/,/g, ''), 10) || 0;
+  const digits = str.replace(/[^0-9]/g, '');
+  return parseInt(digits, 10) || 0;
+}
+
 window.simClickStep1 = function(prodId, step1Choice) {
   const chatBody = document.getElementById('simulatorChatBody');
   const flow = (currentConfig?.product_flows || {})[prodId] || {};
+  const product = (currentConfig?.products || []).find(p => p.id === prodId) || { title: prodId };
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
@@ -621,56 +633,111 @@ window.simClickStep1 = function(prodId, step1Choice) {
         </div>
       </div>
     `;
-  } else if (flow.step2_prompt) {
-    chatBody.innerHTML += `
-      <div class="phone-msg-bubble incoming">
-        <span style="font-size: 12px; color: var(--text-secondary);">${escapeHtml(flow.step2_prompt)}</span>
-        <div class="phone-buttons-group">
-          <div class="phone-btn" onclick="simClickStep2('${prodId}', '${escapeHtml(step1Choice)}', 'Custom Text: Happy Birthday')">Add Note: "Happy Birthday"</div>
-          <div class="phone-btn" onclick="simClickStep2('${prodId}', '${escapeHtml(step1Choice)}', 'No Text')">Skip Note</div>
-        </div>
-      </div>
-    `;
+    chatBody.scrollTop = chatBody.scrollHeight;
   } else {
-    simShowPhotoStep(prodId, step1Choice, '');
+    const price = extractSimPrice(step1Choice) || extractSimPrice(product.price);
+    simCart.push({
+      productTitle: product.title,
+      option: step1Choice,
+      price: price
+    });
+    simShowCartReview();
   }
-
-  chatBody.scrollTop = chatBody.scrollHeight;
 };
 
 window.simClickStep2 = function(prodId, step1Choice, step2Choice) {
   const chatBody = document.getElementById('simulatorChatBody');
+  const product = (currentConfig?.products || []).find(p => p.id === prodId) || { title: prodId };
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
       Customization: ${escapeHtml(step2Choice)}
     </div>
   `;
-  simShowPhotoStep(prodId, step1Choice, step2Choice);
+  const price = extractSimPrice(step1Choice) || extractSimPrice(step2Choice) || extractSimPrice(product.price);
+  simCart.push({
+    productTitle: product.title,
+    option: `${step1Choice} • ${step2Choice}`,
+    price: price
+  });
+  simShowCartReview();
 };
 
-function simShowPhotoStep(prodId, step1Choice, step2Choice) {
+window.simShowCartReview = function() {
   const chatBody = document.getElementById('simulatorChatBody');
-  const flow = (currentConfig?.product_flows || {})[prodId] || {};
-  const photoPrompt = flow.photo_prompt || "📸 Please upload your photos here directly on WhatsApp, or send a Google Drive / Google Photos / iCloud link:";
+  const total = simCart.reduce((sum, i) => sum + (i.price || 0), 0);
+  const itemsListHtml = simCart.map((item, idx) => `
+    <div style="margin-bottom: 6px;">
+      ${idx + 1}. <strong>${escapeHtml(item.productTitle)}</strong><br>
+      <span style="font-size: 11px; color: var(--text-secondary);">&nbsp;&nbsp;• ${escapeHtml(item.option)}</span>
+    </div>
+  `).join('');
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble incoming">
+      <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">🛒 Your InstaPics Cart:</div>
+      ${itemsListHtml}
+      <div style="border-top: 1px dashed var(--border-light); margin: 8px 0; padding-top: 6px; font-weight: 600; color: #16a34a;">
+        💰 Cart Total: ₹${total.toLocaleString('en-IN')} (${simCart.length} item${simCart.length > 1 ? 's' : ''})
+      </div>
+      <div style="font-size: 12px; margin-bottom: 8px;">Would you like to add another item or proceed to order?</div>
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simShowMoreProducts()">➕ Add Another Item</div>
+        <div class="phone-btn" onclick="simShowPhotoStep()" style="background: var(--navy-dark); color: #fff; font-weight: 500;">📸 Upload Photos & Order</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simShowMoreProducts = function() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const products = currentConfig?.products || [];
+  const buttonsHtml = products.slice(0, 4).map(p => `
+    <div class="phone-btn" onclick="simClickProduct('${p.id}')">
+      ${escapeHtml(p.title)} ${p.price ? `(${escapeHtml(p.price)})` : ''}
+    </div>
+  `).join('');
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      ➕ Add Another Item
+    </div>
+    <div class="phone-msg-bubble incoming">
+      ✨ <strong>Add Another Item to Your Order</strong> 🛍️<br><br>
+      Select your next product from our collection below:
+      <div class="phone-buttons-group">
+        ${buttonsHtml}
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simShowPhotoStep = function() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const photoPrompt = "📸 *Step 1/3: Send Photos*\n\nPlease upload your photos directly here on WhatsApp, or send a *Google Drive / Google Photos / iCloud link* for high-resolution printing:";
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      📸 Upload Photos & Order
+    </div>
+    <div class="phone-msg-bubble incoming">
       <div style="white-space: pre-line;">${escapeHtml(photoPrompt)}</div>
       <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simUploadPhoto('${prodId}', 'https://drive.google.com/drive/folders/my-album-photos')">
-          📁 Share Google Drive Link: drive.google.com/...
+        <div class="phone-btn" onclick="simUploadPhoto('https://drive.google.com/drive/folders/sample-album')">
+          📁 Share Google Drive Link
         </div>
-        <div class="phone-btn" onclick="simUploadPhoto('${prodId}', 'Attached 40 High-Res Photos.zip')">
-          📷 Upload 40 Photos directly
+        <div class="phone-btn" onclick="simUploadPhoto('Attached 60 Photos')">
+          📷 Upload Photos Directly
         </div>
       </div>
     </div>
   `;
 
   chatBody.scrollTop = chatBody.scrollHeight;
-}
+};
 
-window.simUploadPhoto = function(prodId, sampleLink) {
+window.simUploadPhoto = function(sampleLink) {
   const chatBody = document.getElementById('simulatorChatBody');
 
   chatBody.innerHTML += `
@@ -680,6 +747,7 @@ window.simUploadPhoto = function(prodId, sampleLink) {
 
     <div class="phone-msg-bubble incoming">
       Photos received! ✨<br><br>
+      <strong>Step 2/3: Customer Name</strong><br>
       What is your <strong>Full Name</strong>?
       <div class="phone-buttons-group">
         <div class="phone-btn" onclick="simSendName()">Simulate Name: "Priya Sharma"</div>
@@ -700,6 +768,7 @@ window.simSendName = function() {
 
     <div class="phone-msg-bubble incoming">
       Thank you, Priya Sharma! 🏠<br><br>
+      <strong>Step 3/3: Delivery Address</strong><br>
       Please share your <strong>Delivery Address with Pincode</strong> for courier shipping:
       <div class="phone-buttons-group">
         <div class="phone-btn" onclick="simSendAddress()">Simulate: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040"</div>
@@ -712,6 +781,7 @@ window.simSendName = function() {
 
 window.simSendAddress = function() {
   const chatBody = document.getElementById('simulatorChatBody');
+  const total = simCart.reduce((sum, i) => sum + (i.price || 0), 0);
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
@@ -719,10 +789,11 @@ window.simSendAddress = function() {
     </div>
 
     <div class="phone-msg-bubble incoming">
+      Order Total: <strong>₹${total.toLocaleString('en-IN')}</strong><br><br>
       Please choose your preferred <strong>Payment Method</strong>:
       <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simFinishOrder('Instant UPI / QR')">📱 Instant UPI / QR</div>
-        <div class="phone-btn" onclick="simFinishOrder('Net Banking / Card')">💳 Net Banking / Card</div>
+        <div class="phone-btn" onclick="simFinishOrder('Instant UPI / Online QR')">📱 Instant UPI / QR</div>
+        <div class="phone-btn" onclick="simFinishOrder('Pay on Pickup / Delivery')">💵 Pay on Pickup / Delivery</div>
       </div>
     </div>
   `;
@@ -733,6 +804,8 @@ window.simSendAddress = function() {
 window.simFinishOrder = function(paymentType) {
   const chatBody = document.getElementById('simulatorChatBody');
   const orderId = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
+  const total = simCart.reduce((sum, i) => sum + (i.price || 0), 0);
+  const itemsSummary = simCart.map((i, idx) => `${idx + 1}. ${i.productTitle} (${i.option})`).join('<br>');
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
@@ -742,8 +815,10 @@ window.simFinishOrder = function(paymentType) {
     <div class="phone-msg-bubble incoming">
       🎉 <strong>Order Booked Successfully!</strong><br><br>
       <strong>Order ID:</strong> #${orderId}<br>
-      <strong>Customer:</strong> Priya Sharma<br>
-      <strong>Product:</strong> A4 Premium Photobook (40 Pages)<br>
+      <strong>Customer:</strong> Priya Sharma<br><br>
+      <strong>Items Ordered:</strong><br>
+      ${itemsSummary}<br><br>
+      <strong>Total Amount:</strong> <span style="color:#16a34a; font-weight:600;">₹${total.toLocaleString('en-IN')}</span><br>
       <strong>Shipping to:</strong> Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040<br>
       <strong>Payment Mode:</strong> ${paymentType}<br><br>
       ${paymentType.includes('UPI') ? '<em>[UPI QR Code generated automatically for instant payment]</em><br><br>' : ''}

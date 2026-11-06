@@ -18,6 +18,7 @@ db.exec(`
     address TEXT,
     payment_type TEXT,
     status TEXT DEFAULT 'Pending',
+    amount REAL DEFAULT 0,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
@@ -34,6 +35,12 @@ db.exec(`
     updated_at TEXT NOT NULL
   );
 `);
+
+try {
+  db.exec("ALTER TABLE orders ADD COLUMN amount REAL DEFAULT 0");
+} catch {
+  // column already exists
+}
 
 export const DEFAULT_CONFIG = {
   studio_name: "InstaPics Photobooks & Frames",
@@ -101,13 +108,13 @@ export const DEFAULT_CONFIG = {
       id: "prod_frames",
       title: "🖼️ Custom Photo Frames",
       description: "Crystal acrylic & wooden photo frames",
-      price: "From ₹499",
+      price: "From ₹599",
       step1_title: "🖼️ Choose Frame Style",
-      step1_prompt: "Select your *Frame Style & Placement*:",
+      step1_prompt: "Select your *Frame Style & Placement*:\n\n✨ *High-Gloss Crystal Acrylic & Premium Wooden Borders*",
       step1_options: [
-        { id: "frame_table", text: "🖼️ Tabletop Frame (8x10)" },
-        { id: "frame_wall", text: "🖼️ Wall Frame (12x18)" },
-        { id: "frame_collage", text: "🖼️ Family Collage Frame" }
+        { id: "frame_table", text: "🖼️ Tabletop (8x12) ₹599" },
+        { id: "frame_wall", text: "🖼️ Wall Frame (12x18) ₹999" },
+        { id: "frame_collage", text: "🖼️ Collage Frame ₹1,299" }
       ],
       photo_prompt: "📸 Please send the high-resolution photo(s) you would like printed in the frame:"
     },
@@ -131,7 +138,7 @@ export const DEFAULT_CONFIG = {
   prompt_name: "Photos noted! ✨\n\nWhat is your *Full Name*?",
   prompt_address: "Thank you, {name}! 🏠\n\nPlease share your *Delivery Address with Pincode* for courier shipping:",
   prompt_payment: "Please choose your preferred *Payment Method*:",
-  order_confirmed_message: "🎉 *Order Booked Successfully!*\n\n*Order ID:* #{order_id}\n*Customer:* {name}\n*Product:* {product}\n*Package / Pages:* {details}\n*Photos Received:* {photo_count} item(s)\n*Delivery Address:* {address}\n*Payment Mode:* {payment_type}\n\nOur design team has received your order and will share your digital album preview shortly! 📖✨",
+  order_confirmed_message: "🎉 *Order Booked Successfully!*\n\n*Order ID:* #{order_id}\n*Customer:* {name}\n*Items Ordered:*\n{details}\n\n💰 *Total Amount:* *₹{total_amount}*\n*Photos:* {photo_count}\n*Delivery Address:* {address}\n*Payment Mode:* {payment_type}\n\nOur design team has received your order and will share your digital album preview shortly! 📖✨",
   tracking_message: "📦 *Order Status Tracking*\n\n*Order ID:* #{order_id}\n*Product:* {product}\n*Current Status:* *{status}*\n\nFeel free to message us here for design preview updates! 📸"
 };
 
@@ -151,9 +158,9 @@ if (count === 0 || isOldDemo) {
     insertStmt.run(k, JSON.stringify(v));
   }
 } else {
-  // Ensure product_flows is present
+  // Ensure product_flows is present and has current pricing
   const checkFlows = db.prepare("SELECT value FROM bot_config WHERE key = 'product_flows'").get();
-  if (!checkFlows) {
+  if (!checkFlows || checkFlows.value.includes('(8x10)')) {
     insertStmt.run('product_flows', JSON.stringify(DEFAULT_CONFIG.product_flows));
   }
 }
@@ -243,8 +250,8 @@ export function getLatestOrderByPhone(phone) {
 export function createOrder(orderData) {
   const stmt = db.prepare(`
     INSERT INTO orders (
-      id, phone, customer_name, product_id, product_name, details, photos, address, payment_type, status, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      id, phone, customer_name, product_id, product_name, details, photos, address, payment_type, status, amount, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   const now = new Date().toISOString();
   stmt.run(
@@ -258,6 +265,7 @@ export function createOrder(orderData) {
     orderData.address || '',
     orderData.payment_type || '',
     orderData.status || 'Pending',
+    orderData.amount || 0,
     now,
     now
   );
