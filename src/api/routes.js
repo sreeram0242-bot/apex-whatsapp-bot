@@ -3,6 +3,10 @@ import {
   getOrders,
   getOrderById,
   updateOrderStatus,
+  getAllOrdersByPhone,
+  getRevenueStats,
+  approveOrder,
+  rejectOrder,
   getAllConfig,
   updateAllConfig,
   updateConfig,
@@ -210,6 +214,94 @@ router.patch('/orders/:id/status', async (req, res) => {
     order: updatedOrder,
     notificationSent
   });
+});
+
+// Approve Order Endpoint (Admin Action: "orders will place only if i approve")
+router.post('/orders/:id/approve', async (req, res) => {
+  const { id } = req.params;
+  const updatedOrder = approveOrder(id);
+  if (!updatedOrder) return res.status(404).json({ error: 'Order not found' });
+
+  let notificationSent = false;
+  if (updatedOrder.phone) {
+    try {
+      const config = getAllConfig();
+      const studioName = config.studio_name || 'InstaPics Photobooks & Frames';
+      const msg = `🎉 *Order Approved by InstaPics!* 📸✨\n\n` +
+        `Hi *${updatedOrder.customer_name || 'Customer'}*, your order *#${updatedOrder.id}* has been *APPROVED* by our studio!\n\n` +
+        `• *Items:* ${updatedOrder.product_name}\n` +
+        `• *Specs / Pages:* ${updatedOrder.details}\n` +
+        `• *Amount:* ₹${Number(updatedOrder.amount || 0).toLocaleString('en-IN')}\n` +
+        `• *Status:* *APPROVED & DESIGNING* 🎨\n\n` +
+        `Our album designers are preparing your digital preview now. Thank you for choosing ${studioName}!`;
+      await sendCustomerNotification(updatedOrder.phone, msg);
+      notificationSent = true;
+    } catch (err) {
+      console.warn('[API] Could not send WhatsApp approval notice:', err.message);
+    }
+  }
+
+  res.json({
+    success: true,
+    message: `Order #${id} approved!`,
+    order: updatedOrder,
+    notificationSent
+  });
+});
+
+// Reject Order Endpoint
+router.post('/orders/:id/reject', async (req, res) => {
+  const { id } = req.params;
+  const { reason, notifyCustomer } = req.body || {};
+  const updatedOrder = rejectOrder(id);
+  if (!updatedOrder) return res.status(404).json({ error: 'Order not found' });
+
+  let notificationSent = false;
+  if (notifyCustomer && updatedOrder.phone) {
+    try {
+      const config = getAllConfig();
+      const studioName = config.studio_name || 'InstaPics Photobooks & Frames';
+      const msg = `📢 *Order Update - #${updatedOrder.id}*\n\n` +
+        `Hi *${updatedOrder.customer_name || 'Customer'}*, your order *#${updatedOrder.id}* could not be approved at this time.\n\n` +
+        `${reason ? `*Reason:* ${reason}\n\n` : ''}` +
+        `Please message us here or call ${config.studio_phone || '+91 6369134270'} if you have questions. Thank you!`;
+      await sendCustomerNotification(updatedOrder.phone, msg);
+      notificationSent = true;
+    } catch (err) {
+      console.warn('[API] Could not send WhatsApp rejection notice:', err.message);
+    }
+  }
+
+  res.json({
+    success: true,
+    message: `Order #${id} cancelled`,
+    order: updatedOrder,
+    notificationSent
+  });
+});
+
+// Customer Order History Endpoint
+router.get('/orders/history/:phone', (req, res) => {
+  const { phone } = req.params;
+  const orders = getAllOrdersByPhone(phone);
+  const totalSpend = orders.reduce((s, o) => s + (Number(o.amount) || 0), 0);
+  res.json({
+    success: true,
+    phone,
+    totalOrders: orders.length,
+    totalSpend,
+    orders
+  });
+});
+
+// Revenue & Analytics Stats Endpoint
+router.get('/revenue', (req, res) => {
+  try {
+    const stats = getRevenueStats();
+    res.json({ success: true, stats });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // 3. Flow & Bot Configuration Editor

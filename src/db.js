@@ -165,15 +165,20 @@ if (count === 0 || isOldDemo) {
   }
 }
 
-// Seed initial sample InstaPics orders if database is brand new
+// Seed initial sample InstaPics orders if database is brand new or lacks sample revenue
 try {
-  const orderCount = db.prepare("SELECT COUNT(*) AS count FROM orders").get().count;
-  if (orderCount === 0) {
-    const now = new Date().toISOString();
+  const zeroAmtCount = db.prepare("SELECT COUNT(*) AS count FROM orders WHERE amount > 0").get().count;
+  if (zeroAmtCount === 0) {
+    // Clear old 0-amount placeholders
+    db.prepare("DELETE FROM orders WHERE amount = 0").run();
+
+    const now = new Date();
     const insertOrderStmt = db.prepare(`
       INSERT INTO orders (id, phone, customer_name, product_id, product_name, details, photos, address, payment_type, status, amount, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
+
+    // 1. Pending Approval order
     insertOrderStmt.run(
       "ORD-98421",
       "919629661668",
@@ -184,11 +189,13 @@ try {
       JSON.stringify(["assets/products/photobook_a4.jpg"]),
       "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
       "Instant UPI / Online QR",
-      "Designing",
+      "Pending Approval",
       1750,
-      now,
-      now
+      new Date(now.getTime() - 25 * 60 * 1000).toISOString(),
+      new Date(now.getTime() - 25 * 60 * 1000).toISOString()
     );
+
+    // 2. Approved & Designing order
     insertOrderStmt.run(
       "ORD-87142",
       "916369134270",
@@ -199,10 +206,44 @@ try {
       JSON.stringify(["assets/products/photobook_a3.jpg", "assets/products/photo_frame.jpg"]),
       "12 Gandhi Road, Karur - 639002",
       "Instant UPI / Online QR",
-      "Printing",
+      "Approved & Designing",
       4299,
-      now,
-      now
+      new Date(now.getTime() - 2 * 3600 * 1000).toISOString(),
+      new Date(now.getTime() - 1 * 3600 * 1000).toISOString()
+    );
+
+    // 3. Printing order
+    insertOrderStmt.run(
+      "ORD-76519",
+      "919840123456",
+      "Ananya Iyer",
+      "prod_photobook_a4",
+      "📖 A4 Premium Photobook",
+      "1. 📖 A4 Premium Photobook (60 Pgs / 100 Photos) — ₹2,150",
+      JSON.stringify(["assets/products/photobook_a4.jpg"]),
+      "45 TTK Road, Alwarpet, Chennai - 600018",
+      "Pay on Pickup / Delivery",
+      "Printing",
+      2150,
+      new Date(now.getTime() - 6 * 3600 * 1000).toISOString(),
+      new Date(now.getTime() - 3 * 3600 * 1000).toISOString()
+    );
+
+    // 4. Completed order
+    insertOrderStmt.run(
+      "ORD-65201",
+      "919629661668",
+      "Priya Sharma",
+      "prod_frames",
+      "🖼️ Custom Photo Frames",
+      "1. 🖼️ Crystal Acrylic Wall Frame (12x18) — ₹999",
+      JSON.stringify(["assets/products/photo_frame.jpg"]),
+      "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
+      "Instant UPI / Online QR",
+      "Completed",
+      999,
+      new Date(now.getTime() - 48 * 3600 * 1000).toISOString(),
+      new Date(now.getTime() - 24 * 3600 * 1000).toISOString()
     );
   }
 } catch (e) {
@@ -282,12 +323,113 @@ export function getOrderById(id) {
 
 export function getLatestOrderByPhone(phone) {
   const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const searchPattern = cleanPhone.length >= 10 ? cleanPhone.slice(-10) : cleanPhone;
   const stmt = db.prepare("SELECT * FROM orders WHERE phone LIKE ? ORDER BY created_at DESC LIMIT 1");
-  const row = stmt.get(`%${cleanPhone}%`);
+  const row = stmt.get(`%${searchPattern}%`);
   if (!row) return null;
   return {
     ...row,
     photos: row.photos ? JSON.parse(row.photos) : []
+  };
+}
+
+export function getAllOrdersByPhone(phone) {
+  if (!phone) return [];
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const searchPattern = cleanPhone.length >= 10 ? cleanPhone.slice(-10) : cleanPhone;
+  const stmt = db.prepare("SELECT * FROM orders WHERE phone LIKE ? ORDER BY created_at DESC");
+  const rows = stmt.all(`%${searchPattern}%`);
+  return rows.map(r => ({
+    ...r,
+    photos: r.photos ? (typeof r.photos === 'string' ? JSON.parse(r.photos) : r.photos) : []
+  }));
+}
+
+export function approveOrder(id) {
+  const stmt = db.prepare("UPDATE orders SET status = 'Approved & Designing', updated_at = ? WHERE id = ?");
+  stmt.run(new Date().toISOString(), id);
+  return getOrderById(id);
+}
+
+export function rejectOrder(id) {
+  const stmt = db.prepare("UPDATE orders SET status = 'Cancelled', updated_at = ? WHERE id = ?");
+  stmt.run(new Date().toISOString(), id);
+  return getOrderById(id);
+}
+
+export function getRevenueStats() {
+  const allOrders = db.prepare("SELECT * FROM orders ORDER BY created_at DESC").all();
+
+  let totalRevenue = 0;
+  let pendingApprovalValue = 0;
+  let totalOrdersCount = allOrders.length;
+  let pendingApprovalCount = 0;
+  let approvedCount = 0;
+  let completedCount = 0;
+  let cancelledCount = 0;
+
+  const paymentModes = {
+    upi: { count: 0, amount: 0, label: "Instant UPI / Online QR" },
+    cod: { count: 0, amount: 0, label: "Pay on Pickup / Delivery" }
+  };
+
+  const productBreakdown = {};
+
+  for (const ord of allOrders) {
+    const amt = Number(ord.amount) || 0;
+    const st = (ord.status || 'Pending').toLowerCase();
+
+    if (st.includes('pending') || st.includes('awaiting')) {
+      pendingApprovalValue += amt;
+      pendingApprovalCount++;
+    } else if (st.includes('cancelled') || st.includes('reject')) {
+      cancelledCount++;
+    } else {
+      totalRevenue += amt;
+      approvedCount++;
+      if (st.includes('complete') || st.includes('deliver')) {
+        completedCount++;
+      }
+    }
+
+    // Payment modes
+    const pay = (ord.payment_type || '').toLowerCase();
+    if (pay.includes('upi') || pay.includes('qr') || pay.includes('online')) {
+      paymentModes.upi.count++;
+      paymentModes.upi.amount += amt;
+    } else {
+      paymentModes.cod.count++;
+      paymentModes.cod.amount += amt;
+    }
+
+    // Product breakdown
+    const pName = ord.product_name || 'Other Products';
+    if (!productBreakdown[pName]) {
+      productBreakdown[pName] = { count: 0, revenue: 0 };
+    }
+    productBreakdown[pName].count++;
+    productBreakdown[pName].revenue += amt;
+  }
+
+  const aov = approvedCount > 0
+    ? Math.round(totalRevenue / approvedCount)
+    : (totalOrdersCount > 0 ? Math.round((totalRevenue + pendingApprovalValue) / totalOrdersCount) : 0);
+
+  return {
+    totalRevenue,
+    pendingApprovalValue,
+    totalOrdersCount,
+    pendingApprovalCount,
+    approvedCount,
+    completedCount,
+    cancelledCount,
+    aov,
+    paymentModes,
+    productBreakdown,
+    recentOrders: allOrders.slice(0, 50).map(r => ({
+      ...r,
+      photos: r.photos ? (typeof r.photos === 'string' ? JSON.parse(r.photos) : r.photos) : []
+    }))
   };
 }
 

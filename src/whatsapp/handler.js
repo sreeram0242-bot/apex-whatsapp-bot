@@ -5,7 +5,8 @@ import {
   setSession,
   clearSession,
   createOrder,
-  getLatestOrderByPhone
+  getLatestOrderByPhone,
+  getAllOrdersByPhone
 } from '../db.js';
 import { sendInteractiveButtons, sendUpiQrCode, sendCarouselMessage } from './buttons.js';
 
@@ -200,9 +201,24 @@ export async function handleIncomingMessage(sock, msg) {
     return;
   }
 
-  // 2. Check for Order Tracking Request
-  if (buttonId === 'btn_track' || lowerText === 'track' || lowerText === 'status' || lowerText.includes('order status')) {
-    await handleOrderTracking(sock, jid, phone, config);
+  // 2. Check for Payment Info Request
+  const isPaymentCmd =
+    buttonId === 'btn_payment_info' ||
+    ['payment', 'payments', 'upi', 'pay', 'bank', 'account', 'qr', 'gpay', 'phonepe'].some(k => lowerText === k || lowerText.includes(k + ' info') || lowerText.includes(k + ' details'));
+
+  if (isPaymentCmd && !productInfo && !orderInfo) {
+    await sendPaymentInfoMessage(sock, jid, config);
+    return;
+  }
+
+  // 3. Check for Order Tracking & History Request
+  const isTrackCmd =
+    buttonId === 'btn_track' ||
+    buttonId === 'btn_history' ||
+    ['track', 'status', 'history', 'my orders', 'order history', 'orders'].some(k => lowerText === k || lowerText.includes(k));
+
+  if (isTrackCmd && !productInfo && !orderInfo) {
+    await handleOrderHistory(sock, jid, phone, config);
     return;
   }
 
@@ -515,7 +531,7 @@ export async function handleIncomingMessage(sock, msg) {
       // Generate Order ID
       const orderId = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
 
-      // Save order to Database
+      // Save order to Database with 'Pending Approval' status (admin approval required)
       createOrder({
         id: orderId,
         phone: phone,
@@ -527,7 +543,7 @@ export async function handleIncomingMessage(sock, msg) {
         address: draft.address,
         payment_type: draft.payment_type,
         amount: cartTotal,
-        status: 'Pending'
+        status: 'Pending Approval'
       });
 
       // Clear Session
@@ -548,9 +564,9 @@ export async function handleIncomingMessage(sock, msg) {
         ? `Cloud Link: ${draft.photos_link}`
         : ((draft.photos || []).length > 0 ? `${(draft.photos || []).length} photo(s) uploaded` : 'Pending / Share after booking');
 
-      // Format Order Confirmation Template
+      // Format Order Confirmation Template (Awaiting Studio Approval)
       const confirmationText = 
-        `🎉 *Order Booked Successfully!*\n\n` +
+        `🎉 *Order Request Received!* ⏳\n\n` +
         `*Order ID:* #${orderId}\n` +
         `*Customer:* ${draft.customer_name}\n\n` +
         `*Items Ordered:*\n${itemsList}\n\n` +
@@ -559,16 +575,17 @@ export async function handleIncomingMessage(sock, msg) {
         `━━━━━━━━━━━━━━━━━━━━\n` +
         `*Photos:* ${photoStatus}\n` +
         `*Delivery Address:* ${draft.address}\n` +
-        `*Payment Mode:* ${paymentType}\n\n` +
-        `Our design team has received your order and will share your digital album preview shortly! 📖✨`;
+        `*Payment Mode:* ${paymentType}\n` +
+        `*Current Status:* 🟡 *PENDING STUDIO APPROVAL*\n\n` +
+        `Our studio manager is reviewing your order details & photos. We will notify you here with an approval confirmation once accepted! 📸✨`;
 
       await sendInteractiveButtons(sock, jid, {
-        title: "✅ Order Confirmed",
+        title: "⏳ Order Awaiting Approval",
         body: confirmationText,
         footer: config.studio_name || "InstaPics Custom Print Studio",
         buttons: [
-          { type: 'quick_reply', text: '📊 Track Order', id: 'btn_track' },
-          { type: 'call', text: '📞 Call Studio', phone: config.studio_phone || '+916369134270' },
+          { type: 'quick_reply', text: '📦 Track My Orders', id: 'btn_track' },
+          { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' },
           { type: 'quick_reply', text: '🛍️ Shop More', id: 'menu' }
         ]
       });
@@ -754,36 +771,71 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
   }
 }
 
-async function handleOrderTracking(sock, jid, phone, config) {
-  const order = getLatestOrderByPhone(phone);
-  if (!order) {
+async function handleOrderHistory(sock, jid, phone, config) {
+  const orders = getAllOrdersByPhone(phone);
+  if (!orders || orders.length === 0) {
     await sendInteractiveButtons(sock, jid, {
-      title: "📦 Order Tracking",
-      body: "We couldn't find any recent orders placed from this WhatsApp number.\n\nWould you like to explore our photobooks & frames?",
+      title: "📦 Order History & Tracking",
+      body: `We couldn't find any orders placed from your number (*+${phone}*).\n\nWould you like to browse our premium non-tearable photobooks & frames?`,
       buttons: [
-        { type: 'quick_reply', text: '📖 Explore Products', id: 'menu' },
+        { type: 'quick_reply', text: '📖 Our Products', id: 'menu' },
+        { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' },
         { type: 'call', text: '📞 Call Studio', phone: config.studio_phone || '+916369134270' }
       ]
     });
     return;
   }
 
-  const template = config.tracking_message ||
-    "📦 *Order Status Tracking*\n\n*Order ID:* #{order_id}\n*Items:* {product}\n*Current Status:* *{status}*\n\nFeel free to message us here for design preview updates! 📸";
+  const orderLines = orders.slice(0, 3).map((o, idx) => {
+    const formattedDate = new Date(o.created_at || Date.now()).toLocaleDateString([], {
+      month: 'short', day: 'numeric', year: 'numeric'
+    });
+    const statusEmoji = o.status.includes('Pending') ? '🟡' : (o.status.includes('Approved') || o.status.includes('Designing') ? '🎨' : (o.status.includes('Printing') ? '🖨️' : '✅'));
+    return `${idx + 1}. *Order #${o.id}*\n   • Items: ${o.product_name}\n   • Amount: *₹${Number(o.amount || 0).toLocaleString('en-IN')}*\n   • Status: ${statusEmoji} *${o.status.toUpperCase()}*\n   • Date: ${formattedDate}`;
+  }).join('\n\n');
 
-  const msg = template
-    .replace('{order_id}', order.id)
-    .replace('{product}', order.product_name)
-    .replace('{status}', order.status.toUpperCase());
+  const historyBody = `📜 *Your InstaPics Order History:*\n\n${orderLines}\n\n━━━━━━━━━━━━━━━━━━━━\nTotal Orders Placed: *${orders.length}*\n━━━━━━━━━━━━━━━━━━━━\n\nTap below for more options or message us anytime!`;
 
   await sendInteractiveButtons(sock, jid, {
-    title: `📦 Order #${order.id}`,
-    body: msg,
-    footer: `Booked on: ${new Date(order.created_at).toLocaleDateString()}`,
+    title: "📦 Orders & Status",
+    body: historyBody,
+    footer: config.studio_name || "InstaPics Custom Print Studio",
     buttons: [
-      { type: 'quick_reply', text: '🔄 Refresh Status', id: 'btn_track' },
-      { type: 'call', text: '📞 Call Studio', phone: config.studio_phone || '+916369134270' },
-      { type: 'quick_reply', text: '📖 New Order', id: 'menu' }
+      { type: 'quick_reply', text: '🛍️ New Order', id: 'menu' },
+      { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' },
+      { type: 'quick_reply', text: '🔄 Refresh Status', id: 'btn_track' }
+    ]
+  });
+}
+
+async function sendPaymentInfoMessage(sock, jid, config) {
+  const upiId = config.upi_id || '6369134270@okbizaxis';
+  const studioName = config.studio_name || 'InstaPics Photobooks & Frames';
+  const phone = config.studio_phone || '+91 6369134270';
+
+  const bodyText = `💳 *${studioName} — Payment Details*\n\n` +
+    `• *Official UPI ID:* *${upiId}*\n` +
+    `• *Account Name:* ${config.upi_name || studioName}\n` +
+    `• *Support Phone:* ${phone}\n\n` +
+    `📱 *Accepted Payment Apps:*\n` +
+    `• Google Pay (GPay)\n` +
+    `• PhonePe\n` +
+    `• Paytm\n` +
+    `• BHIM UPI / Cred\n\n` +
+    `💡 *How to Pay:*\n` +
+    `1. Open Google Pay or PhonePe\n` +
+    `2. Pay to UPI ID: *${upiId}*\n` +
+    `3. Share your payment screenshot or UTR reference number right here on WhatsApp!\n\n` +
+    `💵 *Pay on Pickup:* You can also choose to pay cash or UPI upon collecting your album at our studio.`;
+
+  await sendInteractiveButtons(sock, jid, {
+    title: "💳 Payment Information",
+    body: bodyText,
+    footer: "InstaPics Secure Payment Portal",
+    buttons: [
+      { type: 'quick_reply', text: '📖 View Products', id: 'menu' },
+      { type: 'quick_reply', text: '📦 Track My Orders', id: 'btn_track' },
+      { type: 'call', text: '📞 Call Studio', phone: phone.replace(/[^0-9+]/g, '') }
     ]
   });
 }

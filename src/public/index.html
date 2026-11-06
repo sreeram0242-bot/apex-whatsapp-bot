@@ -55,17 +55,17 @@ body {
 }
 
 /* ==========================================================================
-   TOPBAR & NAVIGATION
+   HEADER & NAVIGATION
    ========================================================================== */
-.topbar {
-  background-color: var(--bg-page);
+.header {
   border-bottom: 1px solid var(--border-light);
+  background-color: #FFFFFF;
   position: sticky;
   top: 0;
   z-index: 50;
 }
 
-.topbar-inner {
+.header-inner {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 20px;
@@ -75,52 +75,56 @@ body {
   justify-content: space-between;
 }
 
-.brand {
+.brand-section {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
-  font-size: 15px;
 }
 
 .brand-badge {
-  background: #000;
-  color: #fff;
-  padding: 2px 7px;
-  border-radius: 4px;
+  background-color: var(--navy-dark);
+  color: #FFFFFF;
   font-size: 11px;
   font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.brand-title {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
 }
 
 .brand-divider {
   color: var(--border-light);
+  font-weight: 300;
 }
 
 .brand-sub {
   color: var(--text-muted);
   font-size: 13px;
-  font-weight: 400;
 }
 
 .nav-tabs {
   display: flex;
-  gap: 4px;
-  background: var(--bg-ash);
-  padding: 3px;
-  border-radius: 8px;
+  gap: 2px;
 }
 
 .nav-tab {
   background: transparent;
   border: none;
-  font-family: var(--font-sans);
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-secondary);
-  padding: 6px 14px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
+  padding: 16px 14px;
   transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
 }
 
 .nav-tab:hover {
@@ -128,23 +132,32 @@ body {
 }
 
 .nav-tab.active {
-  background-color: #FFFFFF;
+  border-bottom-color: var(--navy-dark);
   color: var(--text-primary);
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* Status Pill */
+.badge-count {
+  background: #EF4444;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 6px;
+}
+
 .device-pill {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
   border-radius: 20px;
-  border: 1px solid var(--border-light);
   font-size: 12px;
-  font-family: var(--font-mono);
-  background-color: var(--bg-subtle);
+  font-weight: 500;
+  border: 1px solid var(--border-light);
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
 }
 
 .status-dot {
@@ -218,13 +231,11 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  text-decoration: none;
 }
 
 .btn-primary {
   background-color: var(--navy-dark);
   color: #FFFFFF;
-  border-color: var(--navy-dark);
 }
 
 .btn-primary:hover {
@@ -232,91 +243,67 @@ body {
 }
 
 .btn-secondary {
-  background-color: var(--bg-page);
-  color: var(--text-primary);
+  background-color: #FFFFFF;
   border-color: var(--border-light);
+  color: var(--text-primary);
 }
 
 .btn-secondary:hover {
   background-color: var(--bg-ash);
-  border-color: #D4D4D8;
-}
-
-.btn-success {
-  background-color: #16A34A;
-  color: #FFFFFF;
-  border-color: #16A34A;
-}
-
-.btn-success:hover {
-  background-color: #15803D;
 }
 
 .btn-danger {
-  background-color: #EF4444;
-  color: #FFFFFF;
-  border-color: #EF4444;
+  background-color: #FEF2F2;
+  border-color: #FCA5A5;
+  color: #B91C1C;
 }
 
 .btn-danger:hover {
-  background-color: #DC2626;
+  background-color: #FEE2E2;
+}
+
+.btn-approve {
+  background-color: #16A34A !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
+}
+
+.btn-approve:hover {
+  background-color: #15803D !important;
 }
 
 .btn-sm {
-  font-size: 12px;
   padding: 4px 10px;
+  font-size: 12px;
 }
 
 .select-input, .text-input, .textarea-input {
   font-family: var(--font-sans);
   font-size: 13px;
-  color: var(--text-primary);
-  background-color: var(--bg-page);
+  padding: 7px 10px;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  padding: 7px 10px;
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+  outline: none;
   transition: border-color 0.15s ease;
-  width: 100%;
 }
 
 .select-input:focus, .text-input:focus, .textarea-input:focus {
-  outline: none;
-  border-color: var(--navy-slate);
-  box-shadow: 0 0 0 1px var(--navy-slate);
+  border-color: var(--navy-dark);
 }
 
-.select-input {
-  width: auto;
-  cursor: pointer;
+.text-input {
+  width: 100%;
 }
 
 .textarea-input {
+  width: 100%;
   resize: vertical;
-  line-height: 1.4;
-}
-
-.card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-}
-
-.card-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.card-subtitle {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 16px;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .form-group label {
@@ -324,7 +311,7 @@ body {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .form-row {
@@ -334,8 +321,70 @@ body {
 }
 
 .field-hint {
-  display: block;
   font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  display: block;
+}
+
+/* ==========================================================================
+   CARDS & GRIDS
+   ========================================================================== */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+/* ==========================================================================
+   KPI & REVENUE GRIDS
+   ========================================================================== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.kpi-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-top: 6px;
+  font-feature-settings: 'tnum';
+}
+
+.kpi-sub {
+  font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
 }
@@ -346,35 +395,34 @@ body {
 .product-pills-nav {
   display: flex;
   gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-  margin-bottom: 16px;
   border-bottom: 1px solid var(--border-light);
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  flex-wrap: wrap;
 }
 
 .product-pill {
-  background: var(--bg-ash);
-  border: 1px solid var(--border-light);
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-size: 13px;
+  background-color: var(--bg-ash);
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
   font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
   cursor: pointer;
-  white-space: nowrap;
   transition: all 0.15s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  white-space: nowrap;
 }
 
 .product-pill:hover {
-  background: var(--bg-ash-hover);
+  background-color: var(--bg-ash-hover);
+  color: var(--text-primary);
 }
 
 .product-pill.active {
-  background: var(--navy-dark);
+  background-color: var(--navy-dark);
   color: #FFFFFF;
-  border-color: var(--navy-dark);
   font-weight: 600;
 }
 
@@ -382,35 +430,31 @@ body {
   width: 100%;
   border-collapse: collapse;
   margin-top: 8px;
-  margin-bottom: 12px;
+  font-size: 12px;
 }
 
 .options-builder-table th {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  padding: 6px 10px;
   text-align: left;
-  font-size: 11px;
-  text-transform: uppercase;
-  color: var(--text-muted);
   font-weight: 600;
-  padding: 6px 8px;
-  background: var(--bg-ash);
-  border-top: 1px solid var(--border-light);
-  border-bottom: 1px solid var(--border-light);
+  color: var(--text-secondary);
 }
 
 .options-builder-table td {
+  border: 1px solid var(--border-light);
   padding: 6px 8px;
-  border-bottom: 1px solid var(--border-light);
   vertical-align: middle;
 }
 
-.options-builder-table tr:hover {
-  background: var(--bg-subtle);
-}
-
+/* ==========================================================================
+   SIMULATOR LAYOUT
+   ========================================================================== */
 .simulator-layout-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 20px;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
   align-items: start;
 }
 
@@ -420,21 +464,23 @@ body {
   }
 }
 
-/* Phone Mockup */
 .phone-frame {
-  background: #111;
-  border-radius: 28px;
-  padding: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
-  max-width: 380px;
+  width: 100%;
+  max-width: 360px;
   margin: 0 auto;
+  border: 10px solid #1E293B;
+  border-radius: 36px;
+  background-color: #EFEAE2;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: 580px;
 }
 
 .phone-topbar {
-  background: #075E54;
-  color: #fff;
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
+  background-color: #075E54;
+  color: #FFFFFF;
   padding: 10px 14px;
   display: flex;
   align-items: center;
@@ -442,14 +488,18 @@ body {
 }
 
 .phone-avatar {
-  width: 32px;
-  height: 32px;
-  background: #fff;
+  width: 34px;
+  height: 34px;
+  background-color: #128C7E;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 14px;
+}
+
+.phone-contact {
+  flex: 1;
 }
 
 .phone-contact-name {
@@ -460,71 +510,62 @@ body {
 
 .phone-contact-status {
   font-size: 10px;
-  color: #c8e6c9;
-  display: block;
+  opacity: 0.85;
 }
 
 .phone-chat-body {
-  background-color: #EFEAE2;
-  background-image: radial-gradient(#d4cdb7 0.75px, transparent 0.75px);
-  background-size: 12px 12px;
-  height: 480px;
-  overflow-y: auto;
+  flex: 1;
   padding: 12px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
 .phone-footer {
-  background: #F0F2F5;
-  border-bottom-left-radius: 18px;
-  border-bottom-right-radius: 18px;
-  padding: 10px;
+  padding: 8px 12px;
+  background: #f0f2f5;
+  border-top: 1px solid #e2e8f0;
   text-align: center;
 }
 
 .phone-msg-bubble {
   max-width: 88%;
-  padding: 8px 12px;
+  padding: 8px 11px;
   border-radius: 8px;
   font-size: 12px;
   line-height: 1.4;
-  position: relative;
-  word-break: break-word;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 .phone-msg-bubble.incoming {
-  background: #FFFFFF;
+  background-color: #FFFFFF;
   align-self: flex-start;
-  border-top-left-radius: 0;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+  border-top-left-radius: 2px;
 }
 
 .phone-msg-bubble.outgoing {
-  background: #D9FDD3;
+  background-color: #D9FDD3;
   align-self: flex-end;
-  border-top-right-radius: 0;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+  border-top-right-radius: 2px;
 }
 
 .phone-btn {
-  background: #FFFFFF;
-  border: 1px solid #D1D5DB;
+  background-color: #FFFFFF;
+  color: #008069;
+  border: 1px solid #E2E8F0;
+  padding: 7px 10px;
   border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  color: #1F2937;
   text-align: center;
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
   margin-top: 4px;
   transition: all 0.1s ease;
 }
 
 .phone-btn:hover {
-  background: #F3F4F6;
-  border-color: #9CA3AF;
+  background-color: #F8FAFC;
 }
 
 .phone-buttons-group {
@@ -535,7 +576,7 @@ body {
 }
 
 /* ==========================================================================
-   DATA TABLE (ORDERS)
+   DATA TABLE (ORDERS & PAYMENTS)
    ========================================================================== */
 .table-container {
   border: 1px solid var(--border-light);
@@ -582,6 +623,7 @@ body {
   background: var(--bg-ash);
   padding: 2px 6px;
   border-radius: 4px;
+  display: inline-block;
 }
 
 .badge-amount {
@@ -599,6 +641,52 @@ body {
   padding: 30px !important;
   color: var(--text-muted);
   font-style: italic;
+}
+
+/* ==========================================================================
+   MODAL (CUSTOMER HISTORY)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  max-width: 820px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 14px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
 }
 
 /* Toast */
@@ -648,21 +736,19 @@ body {
 
 .qr-image {
   max-width: 220px;
-  height: auto;
-  border-radius: var(--radius-sm);
 }
 
 .pairing-box {
-  background: var(--bg-ash);
-  padding: 14px;
-  border-radius: var(--radius-md);
   margin-top: 14px;
+  padding: 14px;
+  background-color: var(--bg-subtle);
+  border-radius: var(--radius-md);
   text-align: center;
 }
 
 .pairing-code {
   font-family: var(--font-mono);
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: 4px;
   color: var(--navy-dark);
@@ -673,10 +759,10 @@ body {
 
 <body>
 
-  <!-- Top Navigation Bar -->
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
+  <!-- Top Global Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand-section">
         <span class="brand-badge">INSTAPICS</span>
         <span class="brand-title">Photobooks & Frames</span>
         <span class="brand-divider">/</span>
@@ -684,10 +770,21 @@ body {
       </div>
 
       <nav class="nav-tabs">
-        <button class="nav-tab active" id="tabBtn-orders" onclick="switchTab('orders')">Orders & Inquiries</button>
-        <button class="nav-tab" id="tabBtn-product-flows" onclick="switchTab('product-flows')">Product Flows & Live Preview</button>
-        <button class="nav-tab" id="tabBtn-settings" onclick="switchTab('settings')">Studio Settings</button>
-        <button class="nav-tab" id="tabBtn-device" onclick="switchTab('device')">WhatsApp Device</button>
+        <button class="nav-tab active" id="tabBtn-orders" onclick="switchTab('orders')">
+          Orders & Inquiries <span id="pendingApprovalBadge" class="badge-count hidden">0</span>
+        </button>
+        <button class="nav-tab" id="tabBtn-revenue" onclick="switchTab('revenue')">
+          💰 Revenue & Payments
+        </button>
+        <button class="nav-tab" id="tabBtn-product-flows" onclick="switchTab('product-flows')">
+          Product Flows & Live Preview
+        </button>
+        <button class="nav-tab" id="tabBtn-settings" onclick="switchTab('settings')">
+          Studio Settings
+        </button>
+        <button class="nav-tab" id="tabBtn-device" onclick="switchTab('device')">
+          WhatsApp Device
+        </button>
       </nav>
 
       <div style="display: flex; align-items: center; gap: 8px;">
@@ -706,36 +803,36 @@ body {
     <section id="tab-orders" class="tab-content active">
       <div class="section-header">
         <div>
-          <h1 class="page-title">Customer Orders</h1>
-          <p class="page-desc">Real-time incoming orders captured directly via WhatsApp interactive bot.</p>
+          <h1 class="page-title">Customer Orders & Approvals</h1>
+          <p class="page-desc">Real-time incoming orders captured via WhatsApp. Orders require your approval before printing.</p>
         </div>
         <div class="header-actions">
           <select id="orderStatusFilter" class="select-input" onchange="fetchOrders()">
             <option value="ALL">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="Designing">Designing Digital Preview</option>
-            <option value="Printing">Printing & Binding</option>
-            <option value="Ready for Pickup">Ready for Pickup</option>
-            <option value="Dispatched">Dispatched</option>
-            <option value="Completed">Completed</option>
+            <option value="Pending Approval">🟡 Pending Approval</option>
+            <option value="Approved & Designing">🎨 Approved & Designing</option>
+            <option value="Printing">🖨️ Printing & Binding</option>
+            <option value="Ready for Pickup">📦 Ready for Pickup</option>
+            <option value="Dispatched">🚚 Dispatched</option>
+            <option value="Completed">✅ Completed</option>
+            <option value="Cancelled">❌ Cancelled</option>
           </select>
-          <button class="btn btn-secondary" onclick="fetchOrders()">Refresh</button>
+          <button class="btn btn-secondary btn-sm" onclick="fetchOrders()">Refresh</button>
         </div>
       </div>
 
-      <!-- Orders Table -->
       <div class="table-container">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Order Ref</th>
-              <th>Customer</th>
+              <th style="width: 120px;">Order Ref</th>
+              <th style="width: 180px;">Customer</th>
               <th>Items & Specs</th>
-              <th>Photos</th>
-              <th>Delivery Address</th>
-              <th>Payment & Total</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th style="width: 110px;">Photos</th>
+              <th style="width: 180px;">Delivery Address</th>
+              <th style="width: 130px;">Amount & Mode</th>
+              <th style="width: 170px;">Status</th>
+              <th style="width: 180px;">Actions</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody">
@@ -747,7 +844,106 @@ body {
       </div>
     </section>
 
-    <!-- 2. PRODUCT FLOWS & LIVE SIMULATOR -->
+    <!-- 2. REVENUE & PAYMENTS ANALYTICS VIEW -->
+    <section id="tab-revenue" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h1 class="page-title">Revenue & Payments Analytics</h1>
+          <p class="page-desc">Comprehensive breakdown of all studio collections, approved revenue, and pending payments.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary btn-sm" onclick="fetchRevenue()">🔄 Refresh Stats</button>
+        </div>
+      </div>
+
+      <!-- Top KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-left: 4px solid #16A34A;">
+          <div class="kpi-label">Total Approved Revenue</div>
+          <div class="kpi-value" id="statTotalRevenue" style="color: #16A34A;">₹0</div>
+          <div class="kpi-sub" id="statApprovedOrdersSub">0 orders approved</div>
+        </div>
+
+        <div class="kpi-card" style="border-left: 4px solid #F59E0B;">
+          <div class="kpi-label">Pending Approval Value</div>
+          <div class="kpi-value" id="statPendingValue" style="color: #D97706;">₹0</div>
+          <div class="kpi-sub">Awaiting your approval to start printing</div>
+        </div>
+
+        <div class="kpi-card" style="border-left: 4px solid #0F172A;">
+          <div class="kpi-label">Total Orders Placed</div>
+          <div class="kpi-value" id="statTotalOrders">0 Orders</div>
+          <div class="kpi-sub">Lifetime orders captured via WhatsApp</div>
+        </div>
+
+        <div class="kpi-card" style="border-left: 4px solid #3B82F6;">
+          <div class="kpi-label">Average Order Value (AOV)</div>
+          <div class="kpi-value" id="statAov" style="color: #2563EB;">₹0</div>
+          <div class="kpi-sub">Average cart value per approved order</div>
+        </div>
+      </div>
+
+      <!-- Breakdown Grid: Payment Modes & Product Revenue -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+        <!-- Payment Methods Card -->
+        <div class="card">
+          <h2 class="card-title">Collections by Payment Mode</h2>
+          <p class="card-subtitle">Real-time breakdown between Online UPI and Cash/Pickup collections.</p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px;">
+              <span style="font-size: 12px; font-weight: 600; color: #166534;">📱 Instant Online UPI</span>
+              <div id="statUpiAmount" style="font-size: 22px; font-weight: 700; color: #15803D; margin: 4px 0;">₹0</div>
+              <span id="statUpiCount" style="font-size: 11px; color: #166534;">0 payments</span>
+            </div>
+
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px;">
+              <span style="font-size: 12px; font-weight: 600; color: #334155;">💵 Pay on Pickup / Delivery</span>
+              <div id="statCodAmount" style="font-size: 22px; font-weight: 700; color: #0F172A; margin: 4px 0;">₹0</div>
+              <span id="statCodCount" style="font-size: 11px; color: #64748B;">0 payments</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue by Product Card -->
+        <div class="card">
+          <h2 class="card-title">Revenue by Product Category</h2>
+          <p class="card-subtitle">Contribution of Photobooks, Frames and Special Offers to total sales.</p>
+          <div id="productRevenueList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Payments Ledger Table -->
+      <div class="card">
+        <h2 class="card-title" style="margin-bottom: 6px;">Payments & Transactions Ledger</h2>
+        <p class="card-subtitle">Complete ledger of all customer payments and approval states.</p>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 140px;">Order Ref & Date</th>
+                <th style="width: 180px;">Customer</th>
+                <th>Product Purchased</th>
+                <th style="width: 180px;">Payment Method</th>
+                <th style="width: 120px;">Amount (₹)</th>
+                <th style="width: 130px;">Approval Status</th>
+                <th style="width: 110px;">Customer</th>
+              </tr>
+            </thead>
+            <tbody id="paymentsLedgerBody">
+              <tr>
+                <td colspan="7" class="empty-state">Loading payments ledger...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. PRODUCT FLOWS & LIVE SIMULATOR -->
     <section id="tab-product-flows" class="tab-content">
       <div class="section-header">
         <div>
@@ -881,12 +1077,12 @@ body {
       </div>
     </section>
 
-    <!-- 3. STUDIO SETTINGS -->
+    <!-- 4. STUDIO SETTINGS -->
     <section id="tab-settings" class="tab-content">
       <div class="section-header">
         <div>
-          <h1 class="page-title">Studio & Messaging Settings</h1>
-          <p class="page-desc">Configure business profile, contact number, UPI payment ID, and automated WhatsApp templates.</p>
+          <h1 class="page-title">Studio & Business Settings</h1>
+          <p class="page-desc">Configure business profile details, UPI account, and custom WhatsApp message templates.</p>
         </div>
         <div class="header-actions">
           <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
@@ -894,49 +1090,60 @@ body {
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- Studio Info -->
         <div class="card">
-          <h2 class="card-title">Studio Profile & Contact</h2>
+          <h2 class="card-title">Business & Payment Identity</h2>
+          <p class="card-subtitle">Used across all invoices, order confirmations, and QR payment slips.</p>
+
           <div class="form-group">
-            <label for="cfgStudioName">Studio Brand Name</label>
-            <input type="text" id="cfgStudioName" class="text-input" placeholder="InstaPics Photobooks & Frames">
+            <label for="cfgStudioName">Studio Name</label>
+            <input type="text" id="cfgStudioName" class="text-input">
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cfgStudioPhone">Phone Number (Click-to-Call)</label>
-              <input type="text" id="cfgStudioPhone" class="text-input" placeholder="+916369134270">
-            </div>
-            <div class="form-group">
-              <label for="cfgUpiId">UPI ID (for Dynamic Payment QR)</label>
-              <input type="text" id="cfgUpiId" class="text-input" placeholder="6369134270@okbizaxis">
-            </div>
-          </div>
+
           <div class="form-group">
-            <label for="cfgStudioAddress">Studio / Delivery Address</label>
-            <input type="text" id="cfgStudioAddress" class="text-input" placeholder="InstaPics Custom Print Studio">
+            <label for="cfgStudioPhone">Official Phone Number</label>
+            <input type="text" id="cfgStudioPhone" class="text-input">
           </div>
+
           <div class="form-group">
-            <label for="cfgWelcomeMessage">Opening WhatsApp Greeting</label>
-            <textarea id="cfgWelcomeMessage" class="textarea-input" rows="4"></textarea>
+            <label for="cfgStudioAddress">Physical Studio Address</label>
+            <input type="text" id="cfgStudioAddress" class="text-input">
+          </div>
+
+          <div class="form-group">
+            <label for="cfgUpiId">Official UPI ID for QR Code & Instant Payments</label>
+            <input type="text" id="cfgUpiId" class="text-input">
+            <span class="field-hint">e.g. 6369134270@okbizaxis (GPay / PhonePe / Paytm / BHIM)</span>
           </div>
         </div>
 
+        <!-- WhatsApp Messages -->
         <div class="card">
-          <h2 class="card-title">Checkout Questions & Confirmation Templates</h2>
+          <h2 class="card-title">WhatsApp Bot Message Templates</h2>
+          <p class="card-subtitle">Customize message copy dispatched to customers during order booking.</p>
+
           <div class="form-group">
-            <label for="cfgPromptName">Customer Name Question</label>
-            <input type="text" id="cfgPromptName" class="text-input">
+            <label for="cfgWelcomeMessage">Welcome Greeting Message</label>
+            <textarea id="cfgWelcomeMessage" class="textarea-input" rows="3"></textarea>
           </div>
+
           <div class="form-group">
-            <label for="cfgPromptAddress">Delivery Address Question</label>
+            <label for="cfgPromptName">Name Prompt Template</label>
+            <textarea id="cfgPromptName" class="textarea-input" rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="cfgPromptAddress">Address Prompt Template</label>
             <textarea id="cfgPromptAddress" class="textarea-input" rows="2"></textarea>
           </div>
+
           <div class="form-group">
             <label for="cfgOrderConfirmedMessage">Order Confirmation Template</label>
-            <textarea id="cfgOrderConfirmedMessage" class="textarea-input" rows="5"></textarea>
-            <span class="field-hint">Variables: {order_id}, {name}, {details}, {total_amount}, {photo_count}, {address}, {payment_type}</span>
+            <textarea id="cfgOrderConfirmedMessage" class="textarea-input" rows="3"></textarea>
           </div>
+
           <div class="form-group">
-            <label for="cfgTrackingMessage">Order Tracking Template</label>
+            <label for="cfgTrackingMessage">Order Status Tracking Template</label>
             <textarea id="cfgTrackingMessage" class="textarea-input" rows="3"></textarea>
             <span class="field-hint">Variables: {order_id}, {product}, {status}</span>
           </div>
@@ -944,7 +1151,7 @@ body {
       </div>
     </section>
 
-    <!-- 4. WHATSAPP DEVICE VIEW -->
+    <!-- 5. WHATSAPP DEVICE VIEW -->
     <section id="tab-device" class="tab-content">
       <div class="section-header">
         <div>
@@ -1002,13 +1209,48 @@ body {
 
   </main>
 
+  <!-- Customer Order History Modal -->
+  <div id="customerHistoryModal" class="modal-backdrop hidden" onclick="if(event.target===this) closeCustomerHistoryModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="historyModalCustomerName">Customer Order History</h2>
+          <span class="modal-subtitle" id="historyModalCustomerPhone">+91 XXXXXXXXXX</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="closeCustomerHistoryModal()">✕ Close</button>
+      </div>
+
+      <div id="historyModalStats" style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Order Ref</th>
+              <th>Items & Specs</th>
+              <th style="width: 100px;">Amount</th>
+              <th style="width: 130px;">Payment</th>
+              <th style="width: 120px;">Status</th>
+              <th style="width: 110px;">Date</th>
+            </tr>
+          </thead>
+          <tbody id="historyModalTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast hidden"></div>
 
-  <!-- Main JavaScript Engine (v3.2 Single Source of Truth) -->
+  <!-- Main JavaScript Engine (v4.0 Inlined Single Source of Truth) -->
   <script>
 // ==========================================================================
-// INSTAPICS PHOTOBOOKS & FRAMES — ADMIN CONSOLE JAVASCRIPT ENGINE (v3.1)
+// INSTAPICS PHOTOBOOKS & FRAMES — ADMIN CONSOLE & REVENUE ENGINE (v4.0)
 // ==========================================================================
 
 const DEFAULT_FALLBACK_CONFIG = {
@@ -1035,7 +1277,7 @@ const DEFAULT_FALLBACK_CONFIG = {
       id: "prod_frames",
       title: "🖼️ Custom Photo Frames",
       description: "Crystal acrylic & wooden photo frames for wall & tabletop display.",
-      price: "From ₹599"
+      price: "From ₹499"
     },
     {
       id: "prod_price_list",
@@ -1077,7 +1319,7 @@ const DEFAULT_FALLBACK_CONFIG = {
       id: "prod_frames",
       title: "🖼️ Custom Photo Frames",
       description: "Crystal acrylic & wooden photo frames",
-      price: "From ₹599",
+      price: "From ₹499",
       step1_title: "🖼️ Choose Frame Style",
       step1_prompt: "Select your *Frame Style & Placement*:\n\n✨ *High-Gloss Crystal Acrylic & Premium Wooden Borders*",
       step1_options: [
@@ -1093,7 +1335,7 @@ const DEFAULT_FALLBACK_CONFIG = {
       description: "View all photobook sizes, page counts, and offer prices",
       price: "Special Offers",
       step1_title: "🏷️ Photobook Offers",
-      step1_prompt: "Here are our current offer prices for Non-Tearable Photobooks & Frames. Tap below to choose your item:",
+      step1_prompt: "Here are our current offer prices:\n\n📘 *A4 Premium Photobooks:*\n• 40 Pgs (60 Photos): *₹1,750* (was ₹3,600)\n• 60 Pgs (100 Photos): *₹2,150* (was ₹4,500)\n• 80 Pgs (140 Photos): *₹2,500* (was ₹5,200)\n\n📚 *A3 Jumbo Photobooks:*\n• 40 Pgs (130 Photos): *₹2,500* (was ₹5,000)\n• 60 Pgs (220 Photos): *₹3,300* (was ₹6,500)\n• 80 Pgs (300 Photos): *₹4,200* (was ₹8,500)\n\nTap below to start your order:",
       step1_options: [
         { id: "order_a4", text: "📘 Order A4 Book", price: 1750 },
         { id: "order_a3", text: "📚 Order A3 Jumbo", price: 2500 },
@@ -1115,8 +1357,8 @@ const SAMPLE_FALLBACK_ORDERS = [
     address: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
     payment_type: "Instant UPI / Online QR",
     amount: 1750,
-    status: "Designing",
-    created_at: new Date(Date.now() - 3600000).toISOString()
+    status: "Pending Approval",
+    created_at: new Date(Date.now() - 1500000).toISOString()
   },
   {
     id: "ORD-87142",
@@ -1128,29 +1370,58 @@ const SAMPLE_FALLBACK_ORDERS = [
     address: "12 Gandhi Road, Karur - 639002",
     payment_type: "Instant UPI / Online QR",
     amount: 4299,
-    status: "Printing",
+    status: "Approved & Designing",
     created_at: new Date(Date.now() - 7200000).toISOString()
+  },
+  {
+    id: "ORD-76519",
+    phone: "919840123456",
+    customer_name: "Ananya Iyer",
+    product_name: "📖 A4 Premium Photobook",
+    details: "1. 📖 A4 Premium Photobook (60 Pgs / 100 Photos) — ₹2,150",
+    photos: ["assets/products/photobook_a4.jpg"],
+    address: "45 TTK Road, Alwarpet, Chennai - 600018",
+    payment_type: "Pay on Pickup / Delivery",
+    amount: 2150,
+    status: "Printing",
+    created_at: new Date(Date.now() - 21600000).toISOString()
+  },
+  {
+    id: "ORD-65201",
+    phone: "919629661668",
+    customer_name: "Priya Sharma",
+    product_name: "🖼️ Custom Photo Frames",
+    details: "1. 🖼️ Crystal Acrylic Wall Frame (12x18) — ₹999",
+    photos: ["assets/products/photo_frame.jpg"],
+    address: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
+    payment_type: "Instant UPI / Online QR",
+    amount: 999,
+    status: "Completed",
+    created_at: new Date(Date.now() - 86400000).toISOString()
   }
 ];
 
 // Initialize with instantaneous in-memory defaults
 let currentConfig = { ...DEFAULT_FALLBACK_CONFIG };
 let currentOrders = [...SAMPLE_FALLBACK_ORDERS];
+let currentRevenueStats = null;
 let statusPollInterval = null;
 let activeProductFlowId = 'prod_photobook_a4';
 let simCart = [];
 
 // Instantaneous synchronous render (zero latency, zero blank screen)
 function bootConsole() {
-  console.log('[Console] Booting InstaPics Admin Console...');
+  console.log('[Console] Booting InstaPics Admin Console v4.0...');
   try { populateSettingsFields(currentConfig); } catch (e) {}
   try { renderProductFlowTabs(currentConfig.products, currentConfig.product_flows); } catch (e) {}
   try { renderSimulator(); } catch (e) {}
   try { renderOrdersTable(currentOrders); } catch (e) {}
+  try { renderRevenueDashboard(computeOfflineRevenue(currentOrders)); } catch (e) {}
 
   // Fetch live updates from API
   fetchOrders();
   fetchConfig();
+  fetchRevenue();
   fetchDeviceStatus();
 
   if (!statusPollInterval) {
@@ -1181,10 +1452,21 @@ window.switchTab = function(tabId) {
   if (activeBtn) activeBtn.classList.add('active');
 
   if (tabId === 'orders') fetchOrders();
+  if (tabId === 'revenue') fetchRevenue();
   if (tabId === 'product-flows') fetchConfig();
   if (tabId === 'settings') fetchConfig();
   if (tabId === 'device') fetchDeviceStatus();
 };
+
+function initTabs() {
+  const navBtns = document.querySelectorAll('.nav-tab');
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.id.replace('tabBtn-', '');
+      if (target) window.switchTab(target);
+    });
+  });
+}
 
 // --------------------------------------------------------------------------
 // 2. CONFIGURATION & PRODUCT FLOW EDITOR
@@ -1262,61 +1544,68 @@ function renderActiveProductFlow(prodId, productFlows) {
 
   // Render options table rows
   const tbody = document.getElementById('optionsTableBody');
-  if (tbody) {
-    const options = flow.step1_options || [];
-    if (options.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No options defined yet. Click '+ Add Option' above.</td></tr>`;
-    } else {
-      tbody.innerHTML = options.map((opt, idx) => `
-        <tr class="option-row" data-index="${idx}">
-          <td>
-            <input type="text" class="text-input opt-text" value="${escapeHtml(opt.text)}" placeholder="e.g. 📘 40 Pgs (60 Photos) ₹1,750">
-          </td>
-          <td>
-            <input type="number" class="text-input opt-price" value="${escapeHtml(opt.price || extractPrice(opt.text) || '')}" placeholder="₹ Price">
-          </td>
-          <td>
-            <input type="text" class="text-input opt-id" value="${escapeHtml(opt.id || `${prodId}_opt_${idx + 1}`)}" placeholder="opt_id">
-          </td>
-          <td style="text-align: center;">
-            <button type="button" class="btn btn-secondary btn-sm" style="color: #ef4444; padding: 4px 8px;" onclick="removeOptionRow(this)">&times;</button>
-          </td>
-        </tr>
-      `).join('');
-    }
+  if (!tbody) return;
+
+  const options = flow.step1_options || [];
+  if (options.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center text-muted" style="padding: 16px; font-size: 12px;">
+          No options yet. Click "+ Add Option" to add page counts or variants with prices.
+        </td>
+      </tr>
+    `;
+    return;
   }
+
+  tbody.innerHTML = options.map((opt, idx) => `
+    <tr data-index="${idx}">
+      <td>
+        <input type="text" class="text-input opt-text" value="${escapeHtml(opt.text)}" placeholder="e.g. 📘 40 Pgs (60 Photos) ₹1,750">
+      </td>
+      <td>
+        <input type="number" class="text-input opt-price" value="${opt.price || extractPrice(opt.text)}" placeholder="1750" style="font-family: var(--font-mono);">
+      </td>
+      <td>
+        <input type="text" class="text-input opt-id" value="${escapeHtml(opt.id || ('opt_' + idx))}" placeholder="opt_id">
+      </td>
+      <td style="text-align: center;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="removeOptionRow(${idx})" title="Remove option" style="padding: 4px 8px; color: #ef4444;">✕</button>
+      </td>
+    </tr>
+  `).join('');
 }
 
 window.addOptionRow = function() {
   const tbody = document.getElementById('optionsTableBody');
   if (!tbody) return;
 
-  const emptyState = tbody.querySelector('.empty-state');
-  if (emptyState) emptyState.parentElement.remove();
+  const productFlows = currentConfig.product_flows || DEFAULT_FALLBACK_CONFIG.product_flows;
+  const flow = productFlows[activeProductFlowId];
+  if (!flow) return;
 
-  const count = tbody.querySelectorAll('.option-row').length + 1;
-  const newRow = document.createElement('tr');
-  newRow.className = 'option-row';
-  newRow.innerHTML = `
-    <td>
-      <input type="text" class="text-input opt-text" value="Option ${count} ₹1,000" placeholder="Button text & price">
-    </td>
-    <td>
-      <input type="number" class="text-input opt-price" value="1000" placeholder="1000">
-    </td>
-    <td>
-      <input type="text" class="text-input opt-id" value="${activeProductFlowId}_opt_${count}" placeholder="id">
-    </td>
-    <td style="text-align: center;">
-      <button type="button" class="btn btn-secondary btn-sm" style="color: #ef4444; padding: 4px 8px;" onclick="removeOptionRow(this)">&times;</button>
-    </td>
-  `;
-  tbody.appendChild(newRow);
+  if (!Array.isArray(flow.step1_options)) {
+    flow.step1_options = [];
+  }
+
+  const newIdx = flow.step1_options.length + 1;
+  flow.step1_options.push({
+    id: `${activeProductFlowId}_opt${newIdx}`,
+    text: `📘 Option ${newIdx} ₹1,999`,
+    price: 1999
+  });
+
+  renderActiveProductFlow(activeProductFlowId, productFlows);
+  showToast("Added new option row. Don't forget to click Save!");
 };
 
-window.removeOptionRow = function(btn) {
-  const row = btn.closest('.option-row');
-  if (row) row.remove();
+window.removeOptionRow = function(index) {
+  const productFlows = currentConfig.product_flows || DEFAULT_FALLBACK_CONFIG.product_flows;
+  const flow = productFlows[activeProductFlowId];
+  if (!flow || !Array.isArray(flow.step1_options)) return;
+
+  flow.step1_options.splice(index, 1);
+  renderActiveProductFlow(activeProductFlowId, productFlows);
 };
 
 window.saveActiveProductFlow = async function() {
@@ -1324,56 +1613,49 @@ window.saveActiveProductFlow = async function() {
 
   const title = getVal('flowTitleInput');
   const price = getVal('flowPriceInput');
-  const description = getVal('flowDescInput');
-  const step1_prompt = getVal('flowStep1PromptInput');
-  const photo_prompt = getVal('flowPhotoPromptInput');
+  const desc = getVal('flowDescInput');
+  const prompt = getVal('flowStep1PromptInput');
+  const photoPrompt = getVal('flowPhotoPromptInput');
 
-  // Gather options
-  const optionRows = document.querySelectorAll('#optionsTableBody .option-row');
-  const step1_options = [];
-  optionRows.forEach((row, i) => {
-    const text = row.querySelector('.opt-text')?.value.trim();
-    const optPriceRaw = row.querySelector('.opt-price')?.value.trim();
-    const optPrice = parseInt(optPriceRaw, 10) || extractPrice(text) || 0;
-    const optId = row.querySelector('.opt-id')?.value.trim() || `${activeProductFlowId}_opt_${i + 1}`;
+  // Read options from table
+  const tbody = document.getElementById('optionsTableBody');
+  const rows = tbody ? tbody.querySelectorAll('tr[data-index]') : [];
+  const options = [];
+
+  rows.forEach(r => {
+    const text = r.querySelector('.opt-text')?.value.trim();
+    const priceVal = parseInt(r.querySelector('.opt-price')?.value, 10) || extractPrice(text);
+    const id = r.querySelector('.opt-id')?.value.trim() || ('opt_' + Math.random().toString(36).slice(2, 7));
     if (text) {
-      step1_options.push({ id: optId, text, price: optPrice });
+      options.push({ id, text, price: priceVal });
     }
   });
 
-  const updatedFlow = {
+  // Update in memory
+  const prod = currentConfig.products.find(p => p.id === activeProductFlowId);
+  if (prod) {
+    prod.title = title || prod.title;
+    prod.price = price || prod.price;
+    prod.description = desc || prod.description;
+  }
+
+  if (!currentConfig.product_flows) currentConfig.product_flows = {};
+  currentConfig.product_flows[activeProductFlowId] = {
     id: activeProductFlowId,
     title: title || activeProductFlowId,
-    description: description,
-    price: price,
-    step1_title: title || "Product Options",
-    step1_prompt: step1_prompt,
-    step1_options: step1_options,
-    photo_prompt: photo_prompt
+    price: price || '',
+    description: desc || '',
+    step1_title: title || activeProductFlowId,
+    step1_prompt: prompt || 'Please select your desired option:',
+    step1_options: options,
+    photo_prompt: photoPrompt || '📸 Please upload your photos here on WhatsApp:'
   };
 
-  const updatedFlows = { ...(currentConfig?.product_flows || {}) };
-  updatedFlows[activeProductFlowId] = updatedFlow;
-
-  const updatedProducts = (currentConfig?.products || []).map(p => {
-    if (p.id === activeProductFlowId) {
-      return { ...p, title, price, description };
-    }
-    return p;
-  });
-
-  currentConfig = {
-    ...currentConfig,
-    products: updatedProducts,
-    product_flows: updatedFlows
-  };
-
-  // Re-render immediately in UI
   renderProductFlowTabs(currentConfig.products, currentConfig.product_flows);
   renderSimulator();
-  showToast(`Flow for "${title || activeProductFlowId}" saved!`);
+  showToast(`Saved flow for "${title}"!`);
 
-  // Persist to server
+  // Persist to Server API
   try {
     const res = await fetch('/api/config', {
       method: 'PUT',
@@ -1489,6 +1771,11 @@ function renderSimulator() {
       <div style="white-space: pre-line;">${escapeHtml(welcomeText)}</div>
       <div style="margin-top: 6px; font-weight: 600; font-size: 11px; color: #475569;">◄ Swipe Cards / Choose Product ►</div>
       ${cardsHtml}
+
+      <div style="margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+        <div class="phone-btn" onclick="simShowMyOrders()">📦 Track My Orders / History</div>
+        <div class="phone-btn" onclick="simShowPaymentInfo()">💳 UPI & Payment Info</div>
+      </div>
     </div>
   `;
 
@@ -1534,7 +1821,14 @@ window.simClickProduct = function(prodId) {
 
 window.simChooseOption = function(prodId, optionText, price) {
   const chatBody = document.getElementById('simulatorChatBody');
-  const product = (currentConfig?.products || DEFAULT_FALLBACK_CONFIG.products).find(p => p.id === prodId) || { title: prodId };
+  const product = (currentConfig?.products || DEFAULT_FALLBACK_CONFIG.products).find(p => p.id === prodId) || { title: "Photobook" };
+
+  simCart.push({
+    productId: prodId,
+    productName: product.title,
+    option: optionText,
+    price: price || extractPrice(optionText)
+  });
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
@@ -1542,29 +1836,17 @@ window.simChooseOption = function(prodId, optionText, price) {
     </div>
   `;
 
-  const cleanPrice = price || extractPrice(optionText) || 1500;
-  simCart.push({
-    productTitle: product.title,
-    option: optionText,
-    price: cleanPrice
-  });
-
-  const cartTotal = simCart.reduce((sum, item) => sum + (item.price || 0), 0);
-  const cartLines = simCart.map((item, idx) => `
-    <div style="margin-bottom: 6px;">
-      ${idx + 1}. <strong>${escapeHtml(item.productTitle)}</strong><br>
-      <span style="font-size: 11px; color: #64748b;">&nbsp;&nbsp;• ${escapeHtml(item.option)}</span>
-    </div>
-  `).join('');
+  const cartTotal = simCart.reduce((s, i) => s + (i.price || 0), 0);
+  const cartLines = simCart.map((i, idx) => `${idx + 1}. *${escapeHtml(i.productName)}*\n   • ${escapeHtml(i.option)}`).join('\n\n');
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble incoming">
-      <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">🛒 Your InstaPics Cart:</div>
-      ${cartLines}
-      <div style="border-top: 1px dashed #cbd5e1; margin: 8px 0; padding-top: 6px; font-weight: 600; color: #16a34a;">
-        💰 Cart Total: ₹${cartTotal.toLocaleString('en-IN')} (${simCart.length} item${simCart.length > 1 ? 's' : ''})
-      </div>
-      <div style="font-size: 11px; margin-bottom: 6px;">Would you like to add another item or proceed to order?</div>
+      🛒 *Your InstaPics Cart (${simCart.length} item${simCart.length > 1 ? 's' : ''}):*\n\n
+      ${cartLines}\n\n
+      ━━━━━━━━━━━━━━━━━━━━\n
+      💰 *Total Cart Amount:* *₹${cartTotal.toLocaleString('en-IN')}*\n
+      ━━━━━━━━━━━━━━━━━━━━\n\n
+      Would you like to add another product, or upload photos & checkout?
       <div class="phone-buttons-group">
         <div class="phone-btn" onclick="simAddAnotherItem()">➕ Add Another Item</div>
         <div class="phone-btn" onclick="simStartCheckout()" style="background: #0f172a; color: #fff; font-weight: 500;">📸 Upload Photos & Order</div>
@@ -1583,18 +1865,24 @@ window.simAddAnotherItem = function() {
     <div class="phone-msg-bubble outgoing">
       ➕ Add Another Item
     </div>
-    <div class="phone-msg-bubble incoming">
-      ✨ <strong>Add Another Item to Your Order</strong> 🛍️<br><br>
-      Select your next product from our collection below:
-      <div class="phone-buttons-group">
-        ${products.slice(0, 4).map(p => `
-          <div class="phone-btn" onclick="simClickProduct('${p.id}')">
-            ${escapeHtml(p.title)} (${escapeHtml(p.price || '')})
-          </div>
-        `).join('')}
+  `;
+
+  const cardsHtml = products.slice(0, 4).map(p => `
+    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; margin-top: 4px;">
+      <div style="font-weight: 600; font-size: 12px;">${escapeHtml(p.title)}</div>
+      <div class="phone-btn" onclick="simClickProduct('${p.id}')">
+        Select: ${escapeHtml(p.title.split(' ')[1] || p.title)} (${escapeHtml(p.price || '')})
       </div>
     </div>
+  `).join('');
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble incoming">
+      ✨ *Choose Next Item to Add:*
+      ${cardsHtml}
+    </div>
   `;
+
   chatBody.scrollTop = chatBody.scrollHeight;
 };
 
@@ -1605,8 +1893,8 @@ window.simStartCheckout = function() {
       📸 Upload Photos & Order
     </div>
     <div class="phone-msg-bubble incoming">
-      📸 <strong>Step 1/3: Send Photos</strong> ✨<br><br>
-      Please upload your photos directly here on WhatsApp, or send a <strong>Google Drive / iCloud link</strong>:
+      📸 *Step 1/3: Send Photos* ✨<br><br>
+      Please upload your photos directly here on WhatsApp, or send a <strong>Google Drive / iCloud link</strong>.<br><br>
       <div class="phone-buttons-group">
         <div class="phone-btn" onclick="simSendPhotos('https://drive.google.com/drive/folders/sample-photos')">📁 Share Google Drive Link</div>
         <div class="phone-btn" onclick="simSendPhotos('Uploaded 60 High-Res Photos.zip')">📷 Upload Photos Directly</div>
@@ -1620,10 +1908,10 @@ window.simSendPhotos = function(link) {
   const chatBody = document.getElementById('simulatorChatBody');
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
-      ${link}
+      ${escapeHtml(link)}
     </div>
     <div class="phone-msg-bubble incoming">
-      Photos received! ✨<br><br>
+      Photos noted! ✨<br><br>
       <strong>Step 2/3: Customer Name</strong><br>
       What is your <strong>Full Name</strong>?
       <div class="phone-buttons-group">
@@ -1638,15 +1926,15 @@ window.simSendCustomerName = function(name) {
   const chatBody = document.getElementById('simulatorChatBody');
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
-      ${name}
+      ${escapeHtml(name)}
     </div>
     <div class="phone-msg-bubble incoming">
-      Thank you, ${name}! 🏠<br><br>
+      Thank you, ${escapeHtml(name)}! 🏠<br><br>
       <strong>Step 3/3: Delivery Address</strong><br>
       Please share your complete <strong>Delivery Address with Pincode</strong> for courier shipping:
       <div class="phone-buttons-group">
         <div class="phone-btn" onclick="simSendDeliveryAddress('Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040')">
-          Simulate: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040"
+          Simulate: Chennai Address
         </div>
       </div>
     </div>
@@ -1656,15 +1944,16 @@ window.simSendCustomerName = function(name) {
 
 window.simSendDeliveryAddress = function(addr) {
   const chatBody = document.getElementById('simulatorChatBody');
-  const total = simCart.reduce((sum, item) => sum + (item.price || 0), 0);
+  const cartTotal = simCart.reduce((s, i) => s + (i.price || 0), 0) || 1750;
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
-      ${addr}
+      ${escapeHtml(addr)}
     </div>
     <div class="phone-msg-bubble incoming">
-      Order Total: <strong>₹${total.toLocaleString('en-IN')}</strong><br><br>
-      Please choose your preferred <strong>Payment Method</strong>:
+      💳 <strong>Payment Method</strong><br><br>
+      Order Total: <strong>₹${cartTotal.toLocaleString('en-IN')}</strong><br><br>
+      Please choose your payment option:
       <div class="phone-buttons-group">
         <div class="phone-btn" onclick="simCompleteOrder('Instant UPI / Online QR')">📱 Instant UPI / QR Code</div>
         <div class="phone-btn" onclick="simCompleteOrder('Pay on Pickup / Delivery')">💵 Pay on Pickup / Delivery</div>
@@ -1677,27 +1966,88 @@ window.simSendDeliveryAddress = function(addr) {
 window.simCompleteOrder = function(paymentType) {
   const chatBody = document.getElementById('simulatorChatBody');
   const orderId = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
-  const total = simCart.reduce((sum, item) => sum + (item.price || 0), 0);
-  const itemsText = simCart.map((i, idx) => `${idx + 1}. ${i.productTitle} (${i.option})`).join('<br>');
+  const cartTotal = simCart.reduce((s, i) => s + (i.price || 0), 0) || 1750;
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
-      Payment Choice: ${paymentType}
+      Payment: ${escapeHtml(paymentType)}
+    </div>
+    <div class="phone-msg-bubble incoming" style="border-left: 4px solid #f59e0b;">
+      🎉 <strong>Order Request Received!</strong> ⏳<br><br>
+      <strong>Order ID:</strong> #${orderId}<br>
+      <strong>Status:</strong> 🟡 <strong>PENDING STUDIO APPROVAL</strong><br>
+      <strong>Amount:</strong> ₹${cartTotal.toLocaleString('en-IN')}<br><br>
+      Our studio manager is reviewing your order details & photos. We will notify you here with an approval confirmation once accepted! 📸✨
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simShowMyOrders()">📦 Track Order Status</div>
+        <div class="phone-btn" onclick="simShowPaymentInfo()">💳 View Payment Info</div>
+        <div class="phone-btn" onclick="restartSimulator()">🛍️ Shop More</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+
+  // Add order to orders list and refresh view
+  const newOrder = {
+    id: orderId,
+    phone: "919629661668",
+    customer_name: "Priya Sharma",
+    product_name: simCart.map(i => i.productName).join(' + ') || "📖 A4 Premium Photobook",
+    details: simCart.map((i, idx) => `${idx+1}. ${i.productName} (${i.option})`).join('\n') || "A4 40 Pgs (60 Photos)",
+    photos: ["assets/products/photobook_a4.jpg"],
+    address: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
+    payment_type: paymentType,
+    amount: cartTotal,
+    status: "Pending Approval",
+    created_at: new Date().toISOString()
+  };
+
+  currentOrders.unshift(newOrder);
+  renderOrdersTable(currentOrders);
+  renderRevenueDashboard(computeOfflineRevenue(currentOrders));
+  showToast(`Simulated new order #${orderId} waiting for studio approval!`);
+};
+
+window.simShowMyOrders = function() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      📦 Track My Orders / History
     </div>
     <div class="phone-msg-bubble incoming">
-      🎉 <strong>Order Booked Successfully!</strong><br><br>
-      <strong>Order ID:</strong> #${orderId}<br>
-      <strong>Customer:</strong> Priya Sharma<br><br>
-      <strong>Items Ordered:</strong><br>
-      ${itemsText}<br><br>
-      <strong>Total Order Value:</strong> <span style="color:#16a34a; font-weight:700;">₹${total.toLocaleString('en-IN')}</span><br>
-      <strong>Delivery to:</strong> Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040<br>
-      <strong>Payment Mode:</strong> ${paymentType}<br><br>
-      ${paymentType.includes('UPI') ? '<em>[Dynamic UPI QR Code generated for ₹' + total.toLocaleString('en-IN') + ']</em><br><br>' : ''}
-      Our design team has received your order and will share your digital album preview shortly! 📖✨
+      📜 <strong>Your InstaPics Order History:</strong><br><br>
+      1. <strong>Order #ORD-98421</strong><br>
+         • Items: 📖 A4 Premium Photobook<br>
+         • Amount: ₹1,750<br>
+         • Status: 🟡 <strong>PENDING APPROVAL</strong><br><br>
+      2. <strong>Order #ORD-65201</strong><br>
+         • Items: 🖼️ Custom Photo Frames<br>
+         • Amount: ₹999<br>
+         • Status: ✅ <strong>COMPLETED</strong><br><br>
       <div class="phone-buttons-group">
-        <div class="phone-btn">📦 Track Order Status</div>
-        <div class="phone-btn">📞 Call Studio Support</div>
+        <div class="phone-btn" onclick="restartSimulator()">🛍️ New Order</div>
+        <div class="phone-btn" onclick="simShowPaymentInfo()">💳 Payment Info</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simShowPaymentInfo = function() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      💳 UPI & Payment Info
+    </div>
+    <div class="phone-msg-bubble incoming">
+      💳 <strong>InstaPics Payment Details:</strong><br><br>
+      • <strong>UPI ID:</strong> 6369134270@okbizaxis<br>
+      • <strong>Studio Name:</strong> InstaPics Photobooks<br>
+      • <strong>Accepted Apps:</strong> GPay, PhonePe, Paytm, BHIM<br><br>
+      💡 Pay to the UPI ID above and share your screenshot here!<br>
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="restartSimulator()">📖 Browse Products</div>
+        <div class="phone-btn" onclick="simShowMyOrders()">📦 Track Orders</div>
       </div>
     </div>
   `;
@@ -1705,7 +2055,7 @@ window.simCompleteOrder = function(paymentType) {
 };
 
 // --------------------------------------------------------------------------
-// 4. ORDERS MANAGEMENT
+// 4. ORDERS & APPROVAL MANAGEMENT
 // --------------------------------------------------------------------------
 async function fetchOrders() {
   const filter = document.getElementById('orderStatusFilter')?.value || 'ALL';
@@ -1731,7 +2081,32 @@ function renderOrdersTable(orders) {
 
   const validOrders = (orders && orders.length > 0) ? orders : SAMPLE_FALLBACK_ORDERS;
 
-  tbody.innerHTML = validOrders.map(order => {
+  // Filter based on dropdown
+  const filter = document.getElementById('orderStatusFilter')?.value || 'ALL';
+  const filteredOrders = filter === 'ALL' ? validOrders : validOrders.filter(o => o.status === filter);
+
+  // Update Pending Approval Badge
+  const pendingCount = validOrders.filter(o => (o.status || '').toLowerCase().includes('pending')).length;
+  const badge = document.getElementById('pendingApprovalBadge');
+  if (badge) {
+    if (pendingCount > 0) {
+      badge.textContent = pendingCount;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  if (filteredOrders.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="empty-state">No orders found matching filter "${escapeHtml(filter)}".</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filteredOrders.map(order => {
     const photoCount = order.photos ? order.photos.length : 0;
     const formattedDate = new Date(order.created_at || Date.now()).toLocaleString([], {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -1739,53 +2114,97 @@ function renderOrdersTable(orders) {
 
     const photoCell = photoCount > 0
       ? `<span class="badge-amount" style="background:#e0f2fe; color:#0369a1;">📷 ${photoCount} Photo(s)</span>`
-      : `<span style="color: var(--text-muted); font-size: 11px;">None / Link</span>`;
+      : `<span style="color: var(--text-muted); font-size: 11px;">None / Cloud Link</span>`;
 
     const cleanPhone = (order.phone || '').replace(/[^0-9]/g, '');
+    const isPending = (order.status || '').toLowerCase().includes('pending');
+
+    const statusBadgeColor = isPending ? '#FEF3C7; color: #92400E; border: 1px solid #FCD34D;' :
+      (order.status === 'Completed' ? '#DCFCE7; color: #166534;' : '#F1F5F9; color: #1E293B;');
 
     return `
-      <tr>
+      <tr style="${isPending ? 'background-color: #FFFDF5;' : ''}">
         <td>
           <div class="order-badge">#${escapeHtml(order.id)}</div>
           <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">${formattedDate}</span>
         </td>
         <td>
           <div style="font-weight: 600;">${escapeHtml(order.customer_name || 'Customer')}</div>
-          <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" style="font-size: 12px; color: #0284c7; text-decoration: none;">
-            +${escapeHtml(order.phone)} ↗
-          </a>
+          <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+            <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" style="font-size: 12px; color: #0284c7; text-decoration: none;">
+              +${escapeHtml(order.phone)} ↗
+            </a>
+            <button class="btn btn-secondary btn-sm" style="padding: 1px 6px; font-size: 10px;" onclick="showCustomerHistory('${order.phone}', '${escapeHtml(order.customer_name || 'Customer')}')">
+              📜 History
+            </button>
+          </div>
         </td>
         <td>
           <div style="font-weight: 600; margin-bottom: 2px;">${escapeHtml(order.product_name)}</div>
           <div style="font-size: 12px; color: #475569; white-space: pre-line;">${escapeHtml(order.details || 'Standard')}</div>
         </td>
         <td>${photoCell}</td>
-        <td style="max-width: 200px; font-size: 12px; color: var(--text-secondary);">
+        <td style="max-width: 180px; font-size: 12px; color: var(--text-secondary);">
           ${escapeHtml(order.address || 'Pickup at Studio')}
         </td>
         <td>
-          <div class="badge-amount">${order.amount ? `₹${Number(order.amount).toLocaleString('en-IN')}` : '₹0'}</div>
+          <div class="badge-amount">${order.amount ? '₹' + Number(order.amount).toLocaleString('en-IN') : '₹0'}</div>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${escapeHtml(order.payment_type || 'UPI')}</div>
         </td>
         <td>
-          <select class="select-input" style="font-size: 11px; padding: 4px 6px;" onchange="updateOrderStatus('${order.id}', this.value)">
-            <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-            <option value="Designing" ${order.status === 'Designing' ? 'selected' : ''}>Designing Preview</option>
-            <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>Printing & Binding</option>
-            <option value="Ready for Pickup" ${order.status === 'Ready for Pickup' ? 'selected' : ''}>Ready for Pickup</option>
-            <option value="Dispatched" ${order.status === 'Dispatched' ? 'selected' : ''}>Dispatched</option>
-            <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+          <select class="select-input" style="font-size: 11px; padding: 4px 6px; background:${statusBadgeColor}" onchange="updateOrderStatus('${order.id}', this.value)">
+            <option value="Pending Approval" ${order.status === 'Pending Approval' ? 'selected' : ''}>🟡 Pending Approval</option>
+            <option value="Approved & Designing" ${order.status === 'Approved & Designing' ? 'selected' : ''}>🎨 Approved & Designing</option>
+            <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>🖨️ Printing & Binding</option>
+            <option value="Ready for Pickup" ${order.status === 'Ready for Pickup' ? 'selected' : ''}>📦 Ready for Pickup</option>
+            <option value="Dispatched" ${order.status === 'Dispatched' ? 'selected' : ''}>🚚 Dispatched</option>
+            <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>✅ Completed</option>
+            <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>❌ Cancelled</option>
           </select>
         </td>
         <td>
-          <button class="btn btn-secondary btn-sm" onclick="notifyOrderUpdate('${order.id}', '${order.status}')">
-            WhatsApp Notify
-          </button>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            ${isPending ? `
+              <button class="btn btn-sm btn-approve" onclick="approveOrderAction('${order.id}')">
+                ✅ Approve Order
+              </button>
+            ` : ''}
+            <button class="btn btn-secondary btn-sm" onclick="notifyOrderUpdate('${order.id}', '${order.status}')">
+              📱 WhatsApp Notify
+            </button>
+          </div>
         </td>
       </tr>
     `;
   }).join('');
 }
+
+window.approveOrderAction = async function(id) {
+  try {
+    showToast(`Approving order #${id}...`);
+    const res = await fetch(`/api/orders/${encodeURIComponent(id)}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`🎉 Order #${id} Approved! WhatsApp notification sent to customer.`);
+      fetchOrders();
+      fetchRevenue();
+    } else {
+      showToast(`Error: ${data.error || 'Failed to approve'}`);
+    }
+  } catch (err) {
+    // Offline local fallback
+    const ord = currentOrders.find(o => o.id === id);
+    if (ord) {
+      ord.status = 'Approved & Designing';
+      renderOrdersTable(currentOrders);
+      renderRevenueDashboard(computeOfflineRevenue(currentOrders));
+    }
+    showToast(`Order #${id} marked Approved (offline sync)`);
+  }
+};
 
 window.updateOrderStatus = async function(id, newStatus) {
   try {
@@ -1796,10 +2215,15 @@ window.updateOrderStatus = async function(id, newStatus) {
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`Order #${id} status updated to ${newStatus}`);
+      showToast(`Order #${id} status updated to "${newStatus}"`);
+      fetchOrders();
+      fetchRevenue();
     }
   } catch (err) {
-    showToast(`Status updated in view`);
+    const ord = currentOrders.find(o => o.id === id);
+    if (ord) ord.status = newStatus;
+    renderOrdersTable(currentOrders);
+    showToast(`Status updated locally to "${newStatus}"`);
   }
 };
 
@@ -1814,7 +2238,7 @@ window.notifyOrderUpdate = async function(id, status) {
     if (data.notificationSent) {
       showToast(`WhatsApp status notification sent for #${id}!`);
     } else {
-      showToast(`Notification queued for #${id}`);
+      showToast(`Notice: WhatsApp notification queued for #${id}`);
     }
   } catch (err) {
     showToast(`Notice: ${err.message}`);
@@ -1822,7 +2246,247 @@ window.notifyOrderUpdate = async function(id, status) {
 };
 
 // --------------------------------------------------------------------------
-// 5. STUDIO SETTINGS
+// 5. REVENUE & PAYMENTS ANALYTICS
+// --------------------------------------------------------------------------
+async function fetchRevenue() {
+  try {
+    const res = await fetch('/api/revenue', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.stats) {
+      currentRevenueStats = data.stats;
+      renderRevenueDashboard(currentRevenueStats);
+      return;
+    }
+  } catch (err) {
+    console.warn('[Revenue] API sync note:', err.message);
+  }
+
+  // Fallback: Compute offline from currentOrders
+  renderRevenueDashboard(computeOfflineRevenue(currentOrders));
+}
+
+function computeOfflineRevenue(orders) {
+  let totalRevenue = 0;
+  let pendingApprovalValue = 0;
+  let totalOrdersCount = orders.length;
+  let pendingApprovalCount = 0;
+  let approvedCount = 0;
+  let completedCount = 0;
+  let cancelledCount = 0;
+
+  const paymentModes = {
+    upi: { count: 0, amount: 0, label: "Instant UPI / Online QR" },
+    cod: { count: 0, amount: 0, label: "Pay on Pickup / Delivery" }
+  };
+
+  const productBreakdown = {};
+
+  orders.forEach(ord => {
+    const amt = Number(ord.amount) || 0;
+    const st = (ord.status || 'Pending').toLowerCase();
+
+    if (st.includes('pending') || st.includes('awaiting')) {
+      pendingApprovalValue += amt;
+      pendingApprovalCount++;
+    } else if (st.includes('cancelled') || st.includes('reject')) {
+      cancelledCount++;
+    } else {
+      totalRevenue += amt;
+      approvedCount++;
+      if (st.includes('complete') || st.includes('deliver')) {
+        completedCount++;
+      }
+    }
+
+    const pay = (ord.payment_type || '').toLowerCase();
+    if (pay.includes('upi') || pay.includes('qr') || pay.includes('online')) {
+      paymentModes.upi.count++;
+      paymentModes.upi.amount += amt;
+    } else {
+      paymentModes.cod.count++;
+      paymentModes.cod.amount += amt;
+    }
+
+    const pName = ord.product_name || 'Other Products';
+    if (!productBreakdown[pName]) {
+      productBreakdown[pName] = { count: 0, revenue: 0 };
+    }
+    productBreakdown[pName].count++;
+    productBreakdown[pName].revenue += amt;
+  });
+
+  const aov = approvedCount > 0 ? Math.round(totalRevenue / approvedCount) : 0;
+
+  return {
+    totalRevenue,
+    pendingApprovalValue,
+    totalOrdersCount,
+    pendingApprovalCount,
+    approvedCount,
+    completedCount,
+    cancelledCount,
+    aov,
+    paymentModes,
+    productBreakdown,
+    recentOrders: orders
+  };
+}
+
+function renderRevenueDashboard(stats) {
+  if (!stats) return;
+
+  // KPI Metrics
+  setElText('statTotalRevenue', '₹' + Number(stats.totalRevenue || 0).toLocaleString('en-IN'));
+  setElText('statPendingValue', '₹' + Number(stats.pendingApprovalValue || 0).toLocaleString('en-IN'));
+  setElText('statTotalOrders', (stats.totalOrdersCount || 0) + ' Orders');
+  setElText('statAov', '₹' + Number(stats.aov || 0).toLocaleString('en-IN'));
+
+  setElText('statApprovedOrdersSub', `${stats.approvedCount || 0} approved • ${stats.pendingApprovalCount || 0} pending`);
+
+  // Payment Modes Cards
+  setElText('statUpiAmount', '₹' + Number(stats.paymentModes?.upi?.amount || 0).toLocaleString('en-IN'));
+  setElText('statUpiCount', (stats.paymentModes?.upi?.count || 0) + ' payments');
+
+  setElText('statCodAmount', '₹' + Number(stats.paymentModes?.cod?.amount || 0).toLocaleString('en-IN'));
+  setElText('statCodCount', (stats.paymentModes?.cod?.count || 0) + ' payments');
+
+  // Product Revenue Breakdown
+  const productContainer = document.getElementById('productRevenueList');
+  if (productContainer && stats.productBreakdown) {
+    const totalRev = stats.totalRevenue + stats.pendingApprovalValue || 1;
+    productContainer.innerHTML = Object.entries(stats.productBreakdown).map(([name, data]) => {
+      const pct = Math.min(100, Math.round((data.revenue / totalRev) * 100));
+      return `
+        <div style="margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 4px;">
+            <span>${escapeHtml(name)} (${data.count} orders)</span>
+            <span style="font-weight: 700; color: #0f172a;">₹${Number(data.revenue).toLocaleString('en-IN')}</span>
+          </div>
+          <div style="background: #e2e8f0; height: 7px; border-radius: 4px; overflow: hidden;">
+            <div style="background: #0f172a; width: ${pct}%; height: 100%; border-radius: 4px;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Payments Ledger Table
+  const ledgerTbody = document.getElementById('paymentsLedgerBody');
+  if (ledgerTbody) {
+    const orders = stats.recentOrders || currentOrders;
+    ledgerTbody.innerHTML = orders.map(ord => {
+      const formattedDate = new Date(ord.created_at || Date.now()).toLocaleDateString([], {
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      const isPending = (ord.status || '').toLowerCase().includes('pending');
+      const badgeStyle = isPending
+        ? 'background: #FEF3C7; color: #92400E;'
+        : (ord.status === 'Completed' ? 'background: #DCFCE7; color: #166534;' : 'background: #E0F2FE; color: #0369A1;');
+
+      return `
+        <tr>
+          <td>
+            <div class="order-badge">#${escapeHtml(ord.id)}</div>
+            <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">${formattedDate}</span>
+          </td>
+          <td>
+            <div style="font-weight: 600;">${escapeHtml(ord.customer_name || 'Customer')}</div>
+            <span style="font-size: 11px; color: var(--text-muted);">+${escapeHtml(ord.phone)}</span>
+          </td>
+          <td>${escapeHtml(ord.product_name)}</td>
+          <td>
+            <span style="font-size: 12px; font-weight: 500;">${escapeHtml(ord.payment_type || 'UPI')}</span>
+          </td>
+          <td>
+            <span style="font-size: 13px; font-weight: 700; color: #047857;">
+              ${ord.amount ? '₹' + Number(ord.amount).toLocaleString('en-IN') : '₹0'}
+            </span>
+          </td>
+          <td>
+            <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; ${badgeStyle}">
+              ${escapeHtml(ord.status)}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="showCustomerHistory('${ord.phone}', '${escapeHtml(ord.customer_name || 'Customer')}')">
+              📜 History
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+}
+
+// --------------------------------------------------------------------------
+// 6. CUSTOMER HISTORY MODAL
+// --------------------------------------------------------------------------
+window.showCustomerHistory = async function(phone, customerName) {
+  const modal = document.getElementById('customerHistoryModal');
+  if (!modal) return;
+
+  setElText('historyModalCustomerName', customerName || 'Customer Order History');
+  setElText('historyModalCustomerPhone', '+' + (phone || ''));
+
+  const statsContainer = document.getElementById('historyModalStats');
+  const tbody = document.getElementById('historyModalTableBody');
+
+  modal.classList.remove('hidden');
+
+  let historyOrders = [];
+  try {
+    const res = await fetch(`/api/orders/history/${encodeURIComponent(phone)}`, { cache: 'no-store' });
+    const data = await res.json();
+    if (data.orders) historyOrders = data.orders;
+  } catch (err) {
+    historyOrders = currentOrders.filter(o => (o.phone || '').includes(phone));
+  }
+
+  const totalSpent = historyOrders.reduce((s, o) => s + (Number(o.amount) || 0), 0);
+
+  if (statsContainer) {
+    statsContainer.innerHTML = `
+      <div class="kpi-card" style="padding: 10px 14px; flex: 1;">
+        <div class="kpi-label">Lifetime Spend</div>
+        <div style="font-size: 18px; font-weight: 700; color: #047857;">₹${totalSpent.toLocaleString('en-IN')}</div>
+      </div>
+      <div class="kpi-card" style="padding: 10px 14px; flex: 1;">
+        <div class="kpi-label">Total Orders Placed</div>
+        <div style="font-size: 18px; font-weight: 700;">${historyOrders.length}</div>
+      </div>
+    `;
+  }
+
+  if (tbody) {
+    if (historyOrders.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No past orders found for this customer.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = historyOrders.map(ord => `
+      <tr>
+        <td><div class="order-badge">#${escapeHtml(ord.id)}</div></td>
+        <td>
+          <div style="font-weight: 600;">${escapeHtml(ord.product_name)}</div>
+          <div style="font-size: 11px; color: #475569;">${escapeHtml(ord.details || '')}</div>
+        </td>
+        <td><strong>₹${Number(ord.amount || 0).toLocaleString('en-IN')}</strong></td>
+        <td>${escapeHtml(ord.payment_type || 'UPI')}</td>
+        <td><span class="badge-amount" style="background:#f1f5f9; color:#0f172a;">${escapeHtml(ord.status)}</span></td>
+        <td>${new Date(ord.created_at || Date.now()).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+  }
+};
+
+window.closeCustomerHistoryModal = function() {
+  const modal = document.getElementById('customerHistoryModal');
+  if (modal) modal.classList.add('hidden');
+};
+
+// --------------------------------------------------------------------------
+// 7. STUDIO SETTINGS
 // --------------------------------------------------------------------------
 function populateSettingsFields(cfg) {
   setVal('cfgStudioName', cfg.studio_name);
@@ -1851,28 +2515,33 @@ window.saveSettings = async function() {
   };
 
   currentConfig = config;
-  renderSimulator();
-  showToast('Studio settings saved successfully!');
+  showToast('Settings saved!');
 
   try {
-    await fetch('/api/config', {
+    const res = await fetch('/api/config', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ config })
     });
+    const data = await res.json();
+    if (data.config) {
+      currentConfig = data.config;
+    }
   } catch (err) {
     console.warn('[Settings] Offline save note:', err.message);
   }
 };
 
 // --------------------------------------------------------------------------
-// 6. WHATSAPP DEVICE MANAGEMENT
+// 8. WHATSAPP DEVICE CONNECTION
 // --------------------------------------------------------------------------
 window.restartWhatsAppSocket = async function() {
   try {
-    await fetch('/api/restart', { method: 'POST' });
-    showToast('WhatsApp socket restart initiated...');
-    setTimeout(fetchDeviceStatus, 2000);
+    showToast('Restarting WhatsApp bot socket...');
+    const res = await fetch('/api/restart', { method: 'POST' });
+    const data = await res.json();
+    showToast(data.message || 'Restart initiated. Checking status...');
+    setTimeout(fetchDeviceStatus, 1500);
   } catch (err) {
     showToast(`Error: ${err.message}`);
   }
@@ -2029,7 +2698,7 @@ async function fetchDeviceStatus() {
 }
 
 // --------------------------------------------------------------------------
-// 7. UTILITY HELPERS
+// 9. UTILITY HELPERS
 // --------------------------------------------------------------------------
 function setVal(id, val) {
   const el = document.getElementById(id);
@@ -2074,7 +2743,7 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-</script>
+  </script>
 </body>
 
 </html>
