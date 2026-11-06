@@ -192,10 +192,12 @@ router.patch('/orders/:id/status', async (req, res) => {
   let notificationSent = false;
   if (notifyCustomer && updatedOrder.phone) {
     try {
+      const config = getAllConfig();
+      const studioName = config.studio_name || 'InstaPics Photobooks & Frames';
       const msg = `📢 *Order Status Update*\n\n` +
         `Hi *${updatedOrder.customer_name || 'Customer'}*, your order *#${updatedOrder.id}* (${updatedOrder.product_name}) has been updated:\n\n` +
         `*New Status:* *${status.toUpperCase()}*\n\n` +
-        `Thank you for choosing Lumina Photo Studio! 📸`;
+        `Thank you for choosing ${studioName}! 📸`;
       await sendCustomerNotification(updatedOrder.phone, msg);
       notificationSent = true;
     } catch (err) {

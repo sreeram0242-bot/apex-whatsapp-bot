@@ -5,13 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>InstaPics — Photobooks & Frames WhatsApp Console</title>
-  <link rel="stylesheet" href="/style.css?v=2.2">
   <style>
 /* ==========================================================================
    MINIMALIST HIGH-TASTE DESIGN SYSTEM (VERCEL / LEISURE SWISS MONOCHROME)
-   Palette: Pure White, Pitch Black, Muted Ash Grey, Hairline Slate, Deep Navy
    ========================================================================== */
-
 :root {
   --bg-page: #FFFFFF;
   --bg-subtle: #FAFAFA;
@@ -31,8 +28,11 @@
   --navy-slate: #1E293B;
   --navy-subtle: #F1F5F9;
 
-  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: 'Geist Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --green-badge: #16A34A;
+  --green-badge-bg: #DCFCE7;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -52,13 +52,11 @@ body {
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ==========================================================================
-   TOPBAR
+   TOPBAR & NAVIGATION
    ========================================================================== */
-
 .topbar {
   background-color: var(--bg-page);
   border-bottom: 1px solid var(--border-light);
@@ -70,8 +68,8 @@ body {
 .topbar-inner {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
-  height: 56px;
+  padding: 0 20px;
+  height: 54px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -81,23 +79,27 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-weight: 600;
+  font-size: 15px;
 }
 
-.brand-title {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--text-primary);
+.brand-badge {
+  background: #000;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .brand-divider {
   color: var(--border-light);
-  font-weight: 300;
 }
 
 .brand-sub {
-  font-size: 13px;
   color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 400;
 }
 
 .nav-tabs {
@@ -105,8 +107,7 @@ body {
   gap: 4px;
   background: var(--bg-ash);
   padding: 3px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-light);
+  border-radius: 8px;
 }
 
 .nav-tab {
@@ -115,9 +116,9 @@ body {
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
-  padding: 5px 14px;
-  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -127,8 +128,9 @@ body {
 }
 
 .nav-tab.active {
-  background-color: var(--bg-page);
-  color: var(--navy-dark);
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+  font-weight: 600;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
@@ -136,41 +138,33 @@ body {
 .device-pill {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 4px 10px;
-  border-radius: 9999px;
-  background-color: var(--bg-ash);
+  border-radius: 20px;
   border: 1px solid var(--border-light);
   font-size: 12px;
   font-family: var(--font-mono);
-  color: var(--text-secondary);
+  background-color: var(--bg-subtle);
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background-color: var(--text-faint);
+  background-color: #EAB308;
 }
 
 .device-pill.connected .status-dot {
-  background-color: var(--navy-dark);
-}
-
-.device-pill.connected {
-  background-color: var(--navy-subtle);
-  border-color: #CBD5E1;
-  color: var(--navy-dark);
+  background-color: #22C55E;
 }
 
 /* ==========================================================================
-   CONTAINER & LAYOUT
+   LAYOUT CONTAINERS
    ========================================================================== */
-
 .main-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 32px 24px 64px 24px;
+  padding: 24px 20px 60px 20px;
 }
 
 .tab-content {
@@ -183,24 +177,23 @@ body {
 
 .section-header {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .page-title {
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin-bottom: 4px;
 }
 
 .page-desc {
   font-size: 13px;
   color: var(--text-muted);
+  margin-top: 2px;
 }
 
 .header-actions {
@@ -212,7 +205,6 @@ body {
 /* ==========================================================================
    BUTTONS & INPUTS
    ========================================================================== */
-
 .btn {
   font-family: var(--font-sans);
   font-size: 13px;
@@ -225,6 +217,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   text-decoration: none;
 }
 
@@ -249,21 +242,29 @@ body {
   border-color: #D4D4D8;
 }
 
+.btn-success {
+  background-color: #16A34A;
+  color: #FFFFFF;
+  border-color: #16A34A;
+}
+
+.btn-success:hover {
+  background-color: #15803D;
+}
+
+.btn-danger {
+  background-color: #EF4444;
+  color: #FFFFFF;
+  border-color: #EF4444;
+}
+
+.btn-danger:hover {
+  background-color: #DC2626;
+}
+
 .btn-sm {
   font-size: 12px;
   padding: 4px 10px;
-}
-
-.btn-icon {
-  background: transparent;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: var(--text-muted);
-}
-
-.btn-icon:hover {
-  color: var(--text-primary);
 }
 
 .select-input, .text-input, .textarea-input {
@@ -294,164 +295,10 @@ body {
   line-height: 1.4;
 }
 
-/* ==========================================================================
-   ORDERS TABLE
-   ========================================================================== */
-
-.table-container {
-  background-color: var(--bg-page);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.data-table th {
-  background-color: var(--bg-subtle);
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-light);
-}
-
-.data-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border-light);
-  vertical-align: middle;
-  font-size: 13px;
-}
-
-.data-table tr:last-child td {
-  border-bottom: none;
-}
-
-.data-table tr:hover td {
-  background-color: #FAFAFA;
-}
-
-.order-id {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--navy-dark);
-}
-
-.order-phone {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-muted);
-  display: block;
-  margin-top: 2px;
-}
-
-.customer-name {
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.specs-badge {
-  font-size: 12px;
-  color: var(--text-secondary);
-  background: var(--bg-ash);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  display: inline-block;
-  margin-top: 3px;
-}
-
-.photo-thumb-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--bg-ash);
-  border: 1px solid var(--border-light);
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  cursor: pointer;
-  color: var(--text-secondary);
-}
-
-.photo-thumb-btn:hover {
-  background: var(--bg-ash-hover);
-  color: var(--text-primary);
-}
-
-/* Status Pill in Table */
-.status-tag {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  display: inline-block;
-  background: var(--bg-ash);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-light);
-}
-
-.status-tag.pending {
-  background: #F4F4F5;
-  color: #3F3F46;
-}
-
-.status-tag.printing {
-  background: #E2E8F0;
-  color: var(--navy-slate);
-  border-color: #CBD5E1;
-}
-
-.status-tag.ready {
-  background: #0F172A;
-  color: #FFFFFF;
-  border-color: #0F172A;
-}
-
-.status-tag.dispatched {
-  background: #334155;
-  color: #F8FAFC;
-}
-
-.status-tag.completed {
-  background: #18181B;
-  color: #E4E4E7;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 48px !important;
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-/* ==========================================================================
-   FLOW EDITOR & CARDS
-   ========================================================================== */
-
-.editor-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 24px;
-}
-
-.device-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
 .card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: 20px;
 }
 
@@ -465,13 +312,6 @@ body {
 .card-subtitle {
   font-size: 12px;
   color: var(--text-muted);
-  margin-bottom: 16px;
-}
-
-.card-header-flex {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   margin-bottom: 16px;
 }
 
@@ -500,303 +340,101 @@ body {
   margin-top: 4px;
 }
 
-/* Product Item Cards */
-.products-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.product-item-card {
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 12px;
-  background-color: var(--bg-subtle);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.product-item-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.product-item-header input {
-  font-weight: 500;
-}
-
-.delete-product-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 16px;
-  padding: 0 4px;
-}
-
-.delete-product-btn:hover {
-  color: var(--text-primary);
-}
-
 /* ==========================================================================
-   QR & DEVICE
+   PRODUCT FLOWS EDITOR
    ========================================================================== */
-
-.qr-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 260px;
-  background: var(--bg-ash);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  margin: 16px 0;
-  padding: 20px;
-}
-
-.qr-image {
-  max-width: 220px;
-  height: auto;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.qr-placeholder {
-  font-size: 13px;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
-.connected-banner {
-  padding: 24px;
-  text-align: center;
-  background: var(--navy-subtle);
-  border: 1px solid #CBD5E1;
-  border-radius: var(--radius-sm);
-}
-
-.banner-badge {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  background: var(--navy-dark);
-  color: #FFFFFF;
-  margin-bottom: 8px;
-}
-
-.connected-phone {
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--navy-dark);
-  margin-bottom: 4px;
-}
-
-.connected-desc {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.pairing-box {
-  margin-top: 16px;
-  padding: 16px;
-  background: var(--bg-ash);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  text-align: center;
-}
-
-.pairing-label {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.pairing-code {
-  font-family: var(--font-mono);
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  color: var(--navy-dark);
-  margin: 8px 0;
-}
-
-/* ==========================================================================
-   MODAL & TOAST
-   ========================================================================== */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(9, 9, 11, 0.4);
-  backdrop-filter: blur(2px);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background-color: var(--bg-page);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  width: 90%;
-  max-width: 600px;
-  max-height: 85vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-.modal-header {
-  padding: 16px;
-  border-bottom: 1px solid var(--border-light);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.modal-title {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.modal-body-gallery {
-  padding: 16px;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
-}
-
-.modal-gallery-img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-light);
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.modal-gallery-img:hover {
-  opacity: 0.85;
-}
-
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background-color: var(--navy-dark);
-  color: #FFFFFF;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 10px 18px;
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 200;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
 .product-pills-nav {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
   margin-bottom: 16px;
-  padding-bottom: 12px;
   border-bottom: 1px solid var(--border-light);
 }
 
 .product-pill {
   background: var(--bg-ash);
   border: 1px solid var(--border-light);
-  font-family: var(--font-sans);
-  font-size: 12px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
   font-weight: 500;
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: var(--text-secondary);
+  white-space: nowrap;
   transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .product-pill:hover {
   background: var(--bg-ash-hover);
-  color: var(--text-primary);
 }
 
 .product-pill.active {
   background: var(--navy-dark);
   color: #FFFFFF;
   border-color: var(--navy-dark);
-}
-
-.product-flow-details {
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.product-flow-section-title {
-  font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
 }
 
-.options-preview-box {
-  background: var(--bg-page);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  font-size: 12px;
-  color: var(--text-secondary);
+.options-builder-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+.options-builder-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 6px 8px;
+  background: var(--bg-ash);
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.options-builder-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.options-builder-table tr:hover {
+  background: var(--bg-subtle);
 }
 
 .simulator-layout-grid {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
-  gap: 24px;
+  gap: 20px;
+  align-items: start;
 }
 
-.settings-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+@media (max-width: 1024px) {
+  .simulator-layout-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* Phone Simulator */
-.phone-simulator-card {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg-card);
-}
-
+/* Phone Mockup */
 .phone-frame {
-  background-color: #F8FAFC;
-  border: 1px solid var(--border-light);
-  border-radius: 16px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 620px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  background: #111;
+  border-radius: 28px;
+  padding: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  max-width: 380px;
+  margin: 0 auto;
 }
 
 .phone-topbar {
-  background-color: #FFFFFF;
-  border-bottom: 1px solid var(--border-light);
+  background: #075E54;
+  color: #fff;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
   padding: 10px 14px;
   display: flex;
   align-items: center;
@@ -804,117 +442,233 @@ body {
 }
 
 .phone-avatar {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
+  background: #fff;
   border-radius: 50%;
-  background-color: var(--bg-ash);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  border: 1px solid var(--border-light);
-}
-
-.phone-contact {
-  display: flex;
-  flex-direction: column;
+  font-size: 18px;
 }
 
 .phone-contact-name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary);
+  display: block;
 }
 
 .phone-contact-status {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 10px;
+  color: #c8e6c9;
+  display: block;
 }
 
 .phone-chat-body {
-  flex: 1;
-  padding: 16px;
+  background-color: #EFEAE2;
+  background-image: radial-gradient(#d4cdb7 0.75px, transparent 0.75px);
+  background-size: 12px 12px;
+  height: 480px;
   overflow-y: auto;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background-color: #F8FAFC;
+  gap: 10px;
+}
+
+.phone-footer {
+  background: #F0F2F5;
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  padding: 10px;
+  text-align: center;
 }
 
 .phone-msg-bubble {
-  max-width: 90%;
-  padding: 10px 12px;
+  max-width: 88%;
+  padding: 8px 12px;
   border-radius: 8px;
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 12px;
+  line-height: 1.4;
   position: relative;
   word-break: break-word;
 }
 
 .phone-msg-bubble.incoming {
+  background: #FFFFFF;
   align-self: flex-start;
-  background-color: #FFFFFF;
-  border: 1px solid var(--border-light);
-  color: var(--text-primary);
-  border-top-left-radius: 2px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  border-top-left-radius: 0;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
 }
 
 .phone-msg-bubble.outgoing {
+  background: #D9FDD3;
   align-self: flex-end;
-  background-color: var(--navy-dark);
-  color: #FFFFFF;
-  border-top-right-radius: 2px;
-}
-
-.phone-buttons-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
+  border-top-right-radius: 0;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
 }
 
 .phone-btn {
-  background-color: #FFFFFF;
-  border: 1px solid var(--border-light);
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
   border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 12px;
+  padding: 6px 10px;
+  font-size: 11px;
   font-weight: 500;
-  color: var(--navy-dark);
+  color: #1F2937;
   text-align: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  margin-top: 4px;
+  transition: all 0.1s ease;
 }
 
 .phone-btn:hover {
-  background-color: var(--bg-ash);
-  border-color: #CBD5E1;
+  background: #F3F4F6;
+  border-color: #9CA3AF;
 }
 
-.phone-footer {
-  background-color: #FFFFFF;
-  border-top: 1px solid var(--border-light);
-  padding: 10px 14px;
-  text-align: center;
+.phone-buttons-group {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.phone-footer-hint {
+/* ==========================================================================
+   DATA TABLE (ORDERS)
+   ========================================================================== */
+.table-container {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  background: #FFFFFF;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-light);
+  padding: 10px 12px;
   font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
   color: var(--text-muted);
+}
+
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: top;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover {
+  background-color: var(--bg-subtle);
+}
+
+.order-badge {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 12px;
+  background: var(--bg-ash);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.badge-amount {
+  font-weight: 600;
+  color: var(--green-badge);
+  background: var(--green-badge-bg);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px !important;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--navy-dark);
+  color: #FFFFFF;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .hidden {
   display: none !important;
 }
 
+/* Device Tab */
+.device-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
 
+@media (max-width: 768px) {
+  .device-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qr-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  background: var(--bg-subtle);
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius-md);
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.qr-image {
+  max-width: 220px;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.pairing-box {
+  background: var(--bg-ash);
+  padding: 14px;
+  border-radius: var(--radius-md);
+  margin-top: 14px;
+  text-align: center;
+}
+
+.pairing-code {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--navy-dark);
+  margin: 8px 0;
+}
   </style>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
 </head>
 
 <body>
@@ -923,22 +677,21 @@ body {
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <span class="brand-title">InstaPics</span>
+        <span class="brand-badge">INSTAPICS</span>
+        <span class="brand-title">Photobooks & Frames</span>
         <span class="brand-divider">/</span>
-        <span class="brand-sub">Photobooks & Frames Console</span>
+        <span class="brand-sub">Admin Console</span>
       </div>
 
       <nav class="nav-tabs">
-        <button class="nav-tab active" data-tab="orders">Orders & Inquiries</button>
-        <button class="nav-tab" data-tab="product-flows">Product Flows & Live Preview</button>
-        <button class="nav-tab" data-tab="settings">Studio Settings</button>
-        <button class="nav-tab" data-tab="device">WhatsApp Device</button>
+        <button class="nav-tab active" id="tabBtn-orders" onclick="switchTab('orders')">Orders & Inquiries</button>
+        <button class="nav-tab" id="tabBtn-product-flows" onclick="switchTab('product-flows')">Product Flows & Live Preview</button>
+        <button class="nav-tab" id="tabBtn-settings" onclick="switchTab('settings')">Studio Settings</button>
+        <button class="nav-tab" id="tabBtn-device" onclick="switchTab('device')">WhatsApp Device</button>
       </nav>
 
       <div style="display: flex; align-items: center; gap: 8px;">
-        <button id="sendTestMenuBtn" class="btn btn-secondary"
-          style="font-size: 12px; padding: 6px 12px; height: 32px; border-radius: 6px; font-weight: 500;">📲 Test on My
-          Phone</button>
+        <button id="sendTestMenuBtn" class="btn btn-secondary btn-sm" onclick="sendTestMenuToPhone()">📲 Test on My Phone</button>
         <div class="device-pill" id="deviceStatusPill">
           <span class="status-dot"></span>
           <span class="status-text">Checking...</span>
@@ -957,36 +710,37 @@ body {
           <p class="page-desc">Real-time incoming orders captured directly via WhatsApp interactive bot.</p>
         </div>
         <div class="header-actions">
-          <select id="orderStatusFilter" class="select-input">
+          <select id="orderStatusFilter" class="select-input" onchange="fetchOrders()">
             <option value="ALL">All Statuses</option>
             <option value="Pending">Pending</option>
-            <option value="Printing">Printing</option>
+            <option value="Designing">Designing Digital Preview</option>
+            <option value="Printing">Printing & Binding</option>
             <option value="Ready for Pickup">Ready for Pickup</option>
             <option value="Dispatched">Dispatched</option>
             <option value="Completed">Completed</option>
           </select>
-          <button id="refreshOrdersBtn" class="btn btn-secondary">Refresh</button>
+          <button class="btn btn-secondary" onclick="fetchOrders()">Refresh</button>
         </div>
       </div>
 
-      <!-- Orders Table Container -->
+      <!-- Orders Table -->
       <div class="table-container">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Order ID</th>
+              <th>Order Ref</th>
               <th>Customer</th>
-              <th>Product & Specs</th>
-              <th>Uploaded Photos</th>
+              <th>Items & Specs</th>
+              <th>Photos</th>
               <th>Delivery Address</th>
-              <th>Payment</th>
+              <th>Payment & Total</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody">
             <tr>
-              <td colspan="8" class="empty-state">Loading orders...</td>
+              <td colspan="8" class="empty-state">Loading customer orders...</td>
             </tr>
           </tbody>
         </table>
@@ -998,77 +752,129 @@ body {
       <div class="section-header">
         <div>
           <h1 class="page-title">Individual Product Chatflows & Live Simulator</h1>
-          <p class="page-desc">Customize distinct options, questions, and buttons for each product, and test them lively
-            in the WhatsApp simulator.</p>
+          <p class="page-desc">Configure distinct options, questions, prices, and photo instructions for each product separately.</p>
         </div>
         <div class="header-actions">
-          <button id="resetSimulatorBtn" class="btn btn-secondary btn-sm">↺ Restart Simulator</button>
-          <button id="saveProductFlowsBtn" class="btn btn-primary">Save Product Flows</button>
+          <button class="btn btn-secondary btn-sm" onclick="restartSimulator()">↺ Restart Simulator</button>
+          <button class="btn btn-primary" onclick="saveActiveProductFlow()">💾 Save Current Flow</button>
         </div>
       </div>
 
       <div class="simulator-layout-grid">
         <!-- Left: Product Flow Editor -->
-        <div class="card">
-          <div class="card-header-flex">
-            <div>
-              <h2 class="card-title">Select Product to Edit Flow</h2>
-              <p class="card-subtitle">Choose any product below to configure its unique WhatsApp questions & buttons.
-              </p>
+        <div>
+          <!-- Product Selector Pills Nav -->
+          <div class="card" style="margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <span style="font-size: 13px; font-weight: 600;">Choose Product to Configure Flow:</span>
+              <button class="btn btn-secondary btn-sm" onclick="addNewProductPrompt()">+ Add New Product</button>
             </div>
-            <button id="addProductBtn" class="btn btn-secondary btn-sm">+ Add Product</button>
+            <div id="productFlowTabs" class="product-pills-nav" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
+              <!-- Populated by JS -->
+            </div>
           </div>
 
-          <!-- Product Selector Sub-Nav -->
-          <div id="productFlowTabs" class="product-pills-nav">
-            <!-- Populated via JS -->
-          </div>
-
-          <!-- Active Product Flow Details -->
-          <div id="activeProductFlowEditor" class="product-flow-details">
-            <!-- Populated via JS -->
-          </div>
-
-          <!-- Main Menu Products List -->
-          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-light);">
-            <div class="card-header-flex">
+          <!-- Active Product Flow Details Card -->
+          <div class="card" id="flowEditorCard">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 16px;">
               <div>
-                <h3 class="card-title" style="font-size: 13px;">Welcome Menu Products</h3>
-                <p class="card-subtitle" style="margin-bottom: 8px;">These products appear as clickable buttons in the
-                  opening WhatsApp greeting.</p>
+                <h2 class="card-title" id="editorProductTitle">Product Configuration</h2>
+                <span class="card-subtitle" id="editorProductId" style="font-family: var(--font-mono); margin-bottom: 0;">prod_id</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="testCurrentProductInSim()">📱 Test in Simulator</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteCurrentProduct()">🗑️ Delete</button>
               </div>
             </div>
-            <div id="productsList" class="products-list">
-              <!-- Populated via JS -->
+
+            <!-- 1. Presentation & Carousel -->
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--navy-dark);">1. Product Presentation & Carousel Card</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Product Display Title</label>
+                  <input type="text" id="flowTitleInput" class="text-input" placeholder="e.g. 📖 A4 Premium Photobook">
+                </div>
+                <div class="form-group">
+                  <label>Starting Price Label</label>
+                  <input type="text" id="flowPriceInput" class="text-input" placeholder="e.g. From ₹1,750">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Card Description (Benefits / Photo Capacity)</label>
+                <textarea id="flowDescInput" class="textarea-input" rows="2" placeholder="e.g. Non-tearable, waterproof pages with lifetime durability. Up to 140 photos."></textarea>
+              </div>
+            </div>
+
+            <!-- 2. Step 1 Options & Pricing -->
+            <div style="margin-bottom: 20px; border-top: 1px solid var(--border-light); padding-top: 16px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <h3 style="font-size: 13px; font-weight: 600; color: var(--navy-dark);">2. Step 1: Package / Page Count Options & Pricing</h3>
+                <button class="btn btn-secondary btn-sm" onclick="addOptionRow()">+ Add Option</button>
+              </div>
+              <div class="form-group">
+                <label>WhatsApp Prompt Question to Customer</label>
+                <textarea id="flowStep1PromptInput" class="textarea-input" rows="2" placeholder="e.g. Select your desired A4 Photobook Page Count:"></textarea>
+                <span class="field-hint">Sent as message body above the interactive selection buttons.</span>
+              </div>
+
+              <!-- Options Table -->
+              <table class="options-builder-table">
+                <thead>
+                  <tr>
+                    <th>Button Display Text (with price)</th>
+                    <th style="width: 110px;">Price (₹)</th>
+                    <th style="width: 120px;">Button ID</th>
+                    <th style="width: 40px;"></th>
+                  </tr>
+                </thead>
+                <tbody id="optionsTableBody">
+                  <!-- Rows populated by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 3. Photo Instructions -->
+            <div style="border-top: 1px solid var(--border-light); padding-top: 16px; margin-bottom: 20px;">
+              <h3 style="font-size: 13px; font-weight: 600; color: var(--navy-dark); margin-bottom: 8px;">3. Photo Upload Instructions</h3>
+              <div class="form-group">
+                <label>Prompt Question When Requesting Photos</label>
+                <textarea id="flowPhotoPromptInput" class="textarea-input" rows="2" placeholder="e.g. Please upload your photos here on WhatsApp, or send a Google Drive link:"></textarea>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+              <button class="btn btn-secondary" onclick="fetchConfig()">Cancel Changes</button>
+              <button class="btn btn-primary" onclick="saveActiveProductFlow()">💾 Save This Product Flow</button>
             </div>
           </div>
         </div>
 
-        <!-- Right: Live WhatsApp Chat Simulator (See Products Lively) -->
+        <!-- Right: Live WhatsApp Chat Simulator -->
         <div class="card phone-simulator-card">
           <div class="card-header-flex" style="margin-bottom: 12px;">
             <div>
               <h2 class="card-title">Live WhatsApp Simulator</h2>
-              <p class="card-subtitle">Interactive preview of how your customer experiences this bot lively.</p>
+              <p class="card-subtitle">Test how customers experience your products, page choices & cart live.</p>
             </div>
           </div>
 
           <!-- Phone Mockup Container -->
           <div class="phone-frame">
             <div class="phone-topbar">
-              <div class="phone-avatar">🚀</div>
+              <div class="phone-avatar">📸</div>
               <div class="phone-contact">
-                <span id="simPhoneTitle" class="phone-contact-name">Software & Digital Agency</span>
+                <span id="simPhoneTitle" class="phone-contact-name">InstaPics Photobooks</span>
                 <span class="phone-contact-status">online • WhatsApp Business</span>
               </div>
             </div>
 
             <div id="simulatorChatBody" class="phone-chat-body">
-              <!-- Populated lively by JS -->
+              <!-- Populated by JS -->
             </div>
 
             <div class="phone-footer">
-              <span class="phone-footer-hint">Tap any button above to test the chat flow</span>
+              <span class="field-hint" style="color: var(--text-muted); font-size: 11px;">Tap any button in the phone to test the live chatflow</span>
             </div>
           </div>
         </div>
@@ -1080,69 +886,57 @@ body {
       <div class="section-header">
         <div>
           <h1 class="page-title">Studio & Messaging Settings</h1>
-          <p class="page-desc">Manage studio contact info, UPI payment details, opening greeting, and order confirmation
-            templates.</p>
+          <p class="page-desc">Configure business profile, contact number, UPI payment ID, and automated WhatsApp templates.</p>
         </div>
         <div class="header-actions">
-          <button id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
+          <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
         </div>
       </div>
 
-      <div class="settings-grid">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div class="card">
-          <h2 class="card-title">Studio Profile & Contact Info</h2>
-
+          <h2 class="card-title">Studio Profile & Contact</h2>
           <div class="form-group">
-            <label for="cfgStudioName">Studio Name</label>
-            <input type="text" id="cfgStudioName" class="text-input" placeholder="e.g. Lumina Photo Studio">
+            <label for="cfgStudioName">Studio Brand Name</label>
+            <input type="text" id="cfgStudioName" class="text-input" placeholder="InstaPics Photobooks & Frames">
           </div>
-
           <div class="form-row">
             <div class="form-group">
-              <label for="cfgStudioPhone">Studio Phone (for Click-to-Call button)</label>
-              <input type="text" id="cfgStudioPhone" class="text-input" placeholder="+919876543210">
+              <label for="cfgStudioPhone">Phone Number (Click-to-Call)</label>
+              <input type="text" id="cfgStudioPhone" class="text-input" placeholder="+916369134270">
             </div>
             <div class="form-group">
-              <label for="cfgUpiId">UPI ID (for Instant Payment QR)</label>
-              <input type="text" id="cfgUpiId" class="text-input" placeholder="studiolumina@okhdfcbank">
+              <label for="cfgUpiId">UPI ID (for Dynamic Payment QR)</label>
+              <input type="text" id="cfgUpiId" class="text-input" placeholder="6369134270@okbizaxis">
             </div>
           </div>
-
           <div class="form-group">
-            <label for="cfgStudioAddress">Studio Address (for One-tap Copy button)</label>
-            <input type="text" id="cfgStudioAddress" class="text-input" placeholder="42 Creative Plaza, Art District">
+            <label for="cfgStudioAddress">Studio / Delivery Address</label>
+            <input type="text" id="cfgStudioAddress" class="text-input" placeholder="InstaPics Custom Print Studio">
           </div>
-
           <div class="form-group">
-            <label for="cfgWelcomeMessage">Welcome Greeting Message</label>
+            <label for="cfgWelcomeMessage">Opening WhatsApp Greeting</label>
             <textarea id="cfgWelcomeMessage" class="textarea-input" rows="4"></textarea>
-            <span class="field-hint">Supports WhatsApp formatting (*bold*, _italic_). Use {name} for customer
-              name.</span>
           </div>
         </div>
 
         <div class="card">
           <h2 class="card-title">Checkout Questions & Confirmation Templates</h2>
-
           <div class="form-group">
             <label for="cfgPromptName">Customer Name Question</label>
-            <input type="text" id="cfgPromptName" class="text-input" placeholder="What is your Full Name?">
+            <input type="text" id="cfgPromptName" class="text-input">
           </div>
-
           <div class="form-group">
             <label for="cfgPromptAddress">Delivery Address Question</label>
             <textarea id="cfgPromptAddress" class="textarea-input" rows="2"></textarea>
           </div>
-
           <div class="form-group">
-            <label for="cfgOrderConfirmedMessage">Order Confirmation Message</label>
-            <textarea id="cfgOrderConfirmedMessage" class="textarea-input" rows="4"></textarea>
-            <span class="field-hint">Variables: {order_id}, {name}, {product}, {details}, {photo_count}, {address},
-              {payment_type}</span>
+            <label for="cfgOrderConfirmedMessage">Order Confirmation Template</label>
+            <textarea id="cfgOrderConfirmedMessage" class="textarea-input" rows="5"></textarea>
+            <span class="field-hint">Variables: {order_id}, {name}, {details}, {total_amount}, {photo_count}, {address}, {payment_type}</span>
           </div>
-
           <div class="form-group">
-            <label for="cfgTrackingMessage">Order Status Tracking Message</label>
+            <label for="cfgTrackingMessage">Order Tracking Template</label>
             <textarea id="cfgTrackingMessage" class="textarea-input" rows="3"></textarea>
             <span class="field-hint">Variables: {order_id}, {product}, {status}</span>
           </div>
@@ -1158,57 +952,49 @@ body {
           <p class="page-desc">Connect or pair your studio WhatsApp account via QR Code or 8-digit Pairing Code.</p>
         </div>
         <div class="header-actions">
-          <button id="restartBotBtn" class="btn btn-secondary">Restart Bot Socket</button>
+          <button class="btn btn-secondary" onclick="restartWhatsAppSocket()">Restart Bot Socket</button>
         </div>
       </div>
 
       <div class="device-grid">
-        <!-- Connection Status & QR Code -->
+        <!-- Live QR Code -->
         <div class="card">
           <h2 class="card-title">Live QR Scanner</h2>
           <p class="card-subtitle">Open WhatsApp on your phone → Linked Devices → Link a device.</p>
-
           <div id="qrCodeContainer" class="qr-container">
-            <div class="qr-placeholder">Waiting for QR Code...</div>
+            <div class="field-hint">Waiting for QR Code...</div>
           </div>
-
-          <div id="connectedBanner" class="connected-banner hidden">
-            <div class="banner-badge">CONNECTED</div>
-            <h3 id="connectedPhoneText" class="connected-phone">+91 00000 00000</h3>
-            <p class="connected-desc">WhatsApp bot is active and replying to customer messages.</p>
+          <div id="connectedBanner" class="pairing-box hidden" style="background: #ECFDF5; border: 1px solid #A7F3D0;">
+            <span style="color: #065F46; font-weight: 700; font-size: 14px;">DEVICE CONNECTED & ONLINE</span>
+            <div id="connectedPhoneText" style="font-size: 18px; font-weight: 600; color: #047857; margin-top: 4px;">+91 63691 34270</div>
+            <p style="font-size: 12px; color: #065F46; margin-top: 4px;">Your WhatsApp bot is active and replying to customer messages.</p>
           </div>
         </div>
 
-        <!-- Alternative: 8-digit Pairing Code -->
+        <!-- 8-Digit Pairing Code -->
         <div class="card">
           <h2 class="card-title">Link with Phone Number (Pairing Code)</h2>
-          <p class="card-subtitle">Prefer not to scan? Enter your phone number to receive an 8-digit code.</p>
-
+          <p class="card-subtitle">Prefer not to scan? Enter your WhatsApp phone number to receive an 8-digit code.</p>
           <div class="form-group">
             <label for="pairingPhoneInput">WhatsApp Phone Number with Country Code</label>
-            <input type="text" id="pairingPhoneInput" class="text-input" placeholder="e.g. 919876543210">
+            <input type="text" id="pairingPhoneInput" class="text-input" placeholder="e.g. 916369134270">
             <span class="field-hint">Include country code without '+' or spaces (e.g. 91 for India).</span>
           </div>
-
-          <button id="requestPairingBtn" class="btn btn-primary">Generate 8-Digit Pairing Code</button>
-
+          <button class="btn btn-primary" onclick="requestPairingCode()">Generate 8-Digit Pairing Code</button>
           <div id="pairingCodeDisplay" class="pairing-box hidden">
-            <span class="pairing-label">Your WhatsApp Pairing Code:</span>
+            <span style="font-size: 12px; color: var(--text-muted);">Your WhatsApp Pairing Code:</span>
             <div id="pairingCodeValue" class="pairing-code">---- ----</div>
             <span class="field-hint">Open WhatsApp → Linked Devices → Link with phone number → Enter this code.</span>
           </div>
         </div>
 
-        <!-- Send Welcome Message to Customer -->
+        <!-- Send Direct Welcome Message -->
         <div class="card" style="grid-column: span 2;">
-          <h2 class="card-title">Send Interactive Welcome Message to Any Customer</h2>
-          <p class="card-subtitle">Initiate contact by sending your interactive catalogue & service buttons to any
-            WhatsApp number.</p>
-
+          <h2 class="card-title">Send Interactive Carousel to Any Phone</h2>
+          <p class="card-subtitle">Test or initiate contact by sending the InstaPics swipeable carousel and buttons to any WhatsApp number.</p>
           <div style="display: flex; gap: 10px; margin-top: 14px; align-items: center; flex-wrap: wrap;">
-            <input type="text" id="targetCustomerPhoneInput" class="text-input"
-              placeholder="e.g. 9629661668 or 919629661668" style="max-width: 320px;">
-            <button id="sendCustomerWelcomeBtn" class="btn btn-primary">Send Welcome Message & Buttons</button>
+            <input type="text" id="targetCustomerPhoneInput" class="text-input" placeholder="e.g. 9629661668 or 919629661668" style="max-width: 320px;">
+            <button class="btn btn-primary" onclick="sendWelcomeToCustomPhone()">Send Welcome Message & Carousel</button>
           </div>
         </div>
       </div>
@@ -1216,23 +1002,961 @@ body {
 
   </main>
 
-  <!-- Photo Preview Modal -->
-  <div id="photoModal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Customer Uploaded Photos</h3>
-        <button id="closePhotoModalBtn" class="btn-icon">&times;</button>
-      </div>
-      <div id="photoModalBody" class="modal-body-gallery">
-        <!-- Rendered images -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Notification Container -->
+  <!-- Toast Notification -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/app.js?v=2.2"></script>
+  <!-- Main JavaScript Engine (Dual load: Standalone + Script file) -->
+  <script>
+// ==========================================================================
+// INSTAPICS PHOTOBOOKS & FRAMES — ADMIN CONSOLE JAVASCRIPT ENGINE (v3.0)
+// ==========================================================================
+
+let currentConfig = null;
+let currentOrders = [];
+let statusPollInterval = null;
+let activeProductFlowId = 'prod_photobook_a4';
+let simCart = [];
+
+// Self-invoking bootloader (immune to DOMContentLoaded race conditions)
+function bootConsole() {
+  console.log('[Console] Booting InstaPics Admin Console...');
+  try { initTabs(); } catch (e) { console.error('initTabs:', e); }
+  try { fetchOrders(); } catch (e) { console.error('fetchOrders:', e); }
+  try { fetchConfig(); } catch (e) { console.error('fetchConfig:', e); }
+  try { fetchDeviceStatus(); } catch (e) { console.error('fetchDeviceStatus:', e); }
+
+  if (!statusPollInterval) {
+    statusPollInterval = setInterval(fetchDeviceStatus, 3000);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootConsole);
+} else {
+  bootConsole();
+}
+
+// --------------------------------------------------------------------------
+// 1. TABS MANAGEMENT
+// --------------------------------------------------------------------------
+window.switchTab = function(tabId) {
+  const tabs = document.querySelectorAll('.tab-content');
+  const navBtns = document.querySelectorAll('.nav-tab');
+
+  tabs.forEach(t => t.classList.remove('active'));
+  navBtns.forEach(b => b.classList.remove('active'));
+
+  const activeContent = document.getElementById(`tab-${tabId}`);
+  const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+
+  if (activeContent) activeContent.classList.add('active');
+  if (activeBtn) activeBtn.classList.add('active');
+
+  if (tabId === 'orders') fetchOrders();
+  if (tabId === 'product-flows') fetchConfig();
+  if (tabId === 'settings') fetchConfig();
+  if (tabId === 'device') fetchDeviceStatus();
+};
+
+function initTabs() {
+  const navBtns = document.querySelectorAll('.nav-tab');
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const target = btn.getAttribute('data-tab') || btn.id.replace('tabBtn-', '');
+      if (target) window.switchTab(target);
+    });
+  });
+}
+
+// --------------------------------------------------------------------------
+// 2. CONFIGURATION & PRODUCT FLOW EDITOR
+// --------------------------------------------------------------------------
+async function fetchConfig() {
+  try {
+    const res = await fetch('/api/config');
+    const data = await res.json();
+    currentConfig = data.config || {};
+    populateSettingsFields(currentConfig);
+    renderProductFlowTabs(currentConfig.products || [], currentConfig.product_flows || {});
+    renderSimulator();
+  } catch (err) {
+    console.error('[Config] Failed to load config:', err);
+  }
+}
+
+function renderProductFlowTabs(products, productFlows) {
+  const container = document.getElementById('productFlowTabs');
+  if (!container) return;
+
+  if (!products.some(p => p.id === activeProductFlowId) && products.length > 0) {
+    activeProductFlowId = products[0].id;
+  }
+
+  container.innerHTML = products.map(p => `
+    <button type="button" class="product-pill ${p.id === activeProductFlowId ? 'active' : ''}" onclick="selectProductFlow('${p.id}')">
+      ${escapeHtml(p.title)}
+    </button>
+  `).join('');
+
+  renderActiveProductFlow(activeProductFlowId, productFlows);
+}
+
+window.selectProductFlow = function(prodId) {
+  activeProductFlowId = prodId;
+
+  const pills = document.querySelectorAll('.product-pill');
+  pills.forEach(p => {
+    p.classList.toggle('active', p.textContent.includes(prodId) || p.getAttribute('onclick')?.includes(prodId));
+  });
+
+  const productFlows = currentConfig?.product_flows || {};
+  renderActiveProductFlow(prodId, productFlows);
+};
+
+function renderActiveProductFlow(prodId, productFlows) {
+  const flow = productFlows[prodId] || {
+    id: prodId,
+    title: prodId,
+    description: "",
+    price: "",
+    step1_title: "Product Options",
+    step1_prompt: "Please select an option:",
+    step1_options: [],
+    photo_prompt: "Please upload your photos:"
+  };
+
+  const product = (currentConfig?.products || []).find(p => p.id === prodId) || {};
+
+  setElText('editorProductTitle', flow.title || product.title || prodId);
+  setElText('editorProductId', prodId);
+
+  setVal('flowTitleInput', product.title || flow.title || '');
+  setVal('flowPriceInput', product.price || flow.price || '');
+  setVal('flowDescInput', product.description || flow.description || '');
+
+  setVal('flowStep1PromptInput', flow.step1_prompt || '');
+  setVal('flowPhotoPromptInput', flow.photo_prompt || '');
+
+  // Render options table rows
+  const tbody = document.getElementById('optionsTableBody');
+  if (tbody) {
+    const options = flow.step1_options || [];
+    if (options.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No options defined yet. Click '+ Add Option' above.</td></tr>`;
+    } else {
+      tbody.innerHTML = options.map((opt, idx) => `
+        <tr class="option-row" data-index="${idx}">
+          <td>
+            <input type="text" class="text-input opt-text" value="${escapeHtml(opt.text)}" placeholder="e.g. 📘 40 Pgs (60 Photos) ₹1,750">
+          </td>
+          <td>
+            <input type="number" class="text-input opt-price" value="${escapeHtml(opt.price || extractPrice(opt.text) || '')}" placeholder="₹ Price">
+          </td>
+          <td>
+            <input type="text" class="text-input opt-id" value="${escapeHtml(opt.id || `${prodId}_opt_${idx + 1}`)}" placeholder="opt_id">
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn btn-secondary btn-sm" style="color: #ef4444; padding: 4px 8px;" onclick="removeOptionRow(this)">&times;</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+}
+
+window.addOptionRow = function() {
+  const tbody = document.getElementById('optionsTableBody');
+  if (!tbody) return;
+
+  const emptyState = tbody.querySelector('.empty-state');
+  if (emptyState) emptyState.parentElement.remove();
+
+  const count = tbody.querySelectorAll('.option-row').length + 1;
+  const newRow = document.createElement('tr');
+  newRow.className = 'option-row';
+  newRow.innerHTML = `
+    <td>
+      <input type="text" class="text-input opt-text" value="Option ${count} ₹1,000" placeholder="Button text & price">
+    </td>
+    <td>
+      <input type="number" class="text-input opt-price" value="1000" placeholder="1000">
+    </td>
+    <td>
+      <input type="text" class="text-input opt-id" value="${activeProductFlowId}_opt_${count}" placeholder="id">
+    </td>
+    <td style="text-align: center;">
+      <button type="button" class="btn btn-secondary btn-sm" style="color: #ef4444; padding: 4px 8px;" onclick="removeOptionRow(this)">&times;</button>
+    </td>
+  `;
+  tbody.appendChild(newRow);
+};
+
+window.removeOptionRow = function(btn) {
+  const row = btn.closest('.option-row');
+  if (row) row.remove();
+};
+
+window.saveActiveProductFlow = async function() {
+  if (!activeProductFlowId) return;
+
+  const title = getVal('flowTitleInput');
+  const price = getVal('flowPriceInput');
+  const description = getVal('flowDescInput');
+  const step1_prompt = getVal('flowStep1PromptInput');
+  const photo_prompt = getVal('flowPhotoPromptInput');
+
+  // Gather options
+  const optionRows = document.querySelectorAll('#optionsTableBody .option-row');
+  const step1_options = [];
+  optionRows.forEach((row, i) => {
+    const text = row.querySelector('.opt-text')?.value.trim();
+    const optPriceRaw = row.querySelector('.opt-price')?.value.trim();
+    const optPrice = parseInt(optPriceRaw, 10) || extractPrice(text) || 0;
+    const optId = row.querySelector('.opt-id')?.value.trim() || `${activeProductFlowId}_opt_${i + 1}`;
+    if (text) {
+      step1_options.push({ id: optId, text, price: optPrice });
+    }
+  });
+
+  const updatedFlow = {
+    id: activeProductFlowId,
+    title: title || activeProductFlowId,
+    description: description,
+    price: price,
+    step1_title: title || "Product Options",
+    step1_prompt: step1_prompt,
+    step1_options: step1_options,
+    photo_prompt: photo_prompt
+  };
+
+  const updatedFlows = { ...(currentConfig?.product_flows || {}) };
+  updatedFlows[activeProductFlowId] = updatedFlow;
+
+  // Update in products list
+  const updatedProducts = (currentConfig?.products || []).map(p => {
+    if (p.id === activeProductFlowId) {
+      return { ...p, title, price, description };
+    }
+    return p;
+  });
+
+  const newConfig = {
+    ...currentConfig,
+    products: updatedProducts,
+    product_flows: updatedFlows
+  };
+
+  try {
+    const res = await fetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: newConfig })
+    });
+    const data = await res.json();
+    if (data.success) {
+      currentConfig = data.config;
+      renderProductFlowTabs(currentConfig.products || [], currentConfig.product_flows || {});
+      renderSimulator();
+      showToast(`Flow for "${title || activeProductFlowId}" saved successfully!`);
+    } else {
+      showToast(`Error: ${data.error || 'Failed to save'}`);
+    }
+  } catch (err) {
+    showToast(`Save error: ${err.message}`);
+  }
+};
+
+window.addNewProductPrompt = function() {
+  const name = prompt("Enter the new Product Title (e.g. 🎁 Magic Photo Mug):");
+  if (!name || !name.trim()) return;
+
+  const id = 'prod_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 20) + '_' + Math.floor(Math.random() * 1000);
+  const price = prompt("Enter Starting Price (e.g. From ₹399):", "From ₹399") || "₹399";
+  const desc = prompt("Enter short description:", "Custom printed with lifetime photo durability.") || "";
+
+  const newProd = { id, title: name.trim(), price: price.trim(), description: desc.trim() };
+  const newFlow = {
+    id: id,
+    title: name.trim(),
+    price: price.trim(),
+    description: desc.trim(),
+    step1_title: name.trim(),
+    step1_prompt: `Please select your preferred option for ${name.trim()}:`,
+    step1_options: [
+      { id: `${id}_opt1`, text: "Standard Size ₹399", price: 399 },
+      { id: `${id}_opt2`, text: "Premium Size ₹599", price: 599 }
+    ],
+    photo_prompt: "📸 Please upload your photo for printing:"
+  };
+
+  const updatedProducts = [...(currentConfig?.products || []), newProd];
+  const updatedFlows = { ...(currentConfig?.product_flows || {}), [id]: newFlow };
+
+  const newConfig = { ...currentConfig, products: updatedProducts, product_flows: updatedFlows };
+
+  fetch('/api/config', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config: newConfig })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      currentConfig = data.config;
+      activeProductFlowId = id;
+      renderProductFlowTabs(currentConfig.products, currentConfig.product_flows);
+      showToast(`Added product "${name}"!`);
+    }
+  })
+  .catch(e => showToast(`Error: ${e.message}`));
+};
+
+window.deleteCurrentProduct = function() {
+  if (!activeProductFlowId) return;
+  if (!confirm(`Are you sure you want to delete product "${activeProductFlowId}"?`)) return;
+
+  const updatedProducts = (currentConfig?.products || []).filter(p => p.id !== activeProductFlowId);
+  const updatedFlows = { ...(currentConfig?.product_flows || {}) };
+  delete updatedFlows[activeProductFlowId];
+
+  const newConfig = { ...currentConfig, products: updatedProducts, product_flows: updatedFlows };
+
+  fetch('/api/config', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config: newConfig })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      currentConfig = data.config;
+      activeProductFlowId = currentConfig.products[0]?.id || '';
+      renderProductFlowTabs(currentConfig.products, currentConfig.product_flows);
+      showToast('Product deleted!');
+    }
+  })
+  .catch(e => showToast(`Delete failed: ${e.message}`));
+};
+
+window.testCurrentProductInSim = function() {
+  restartSimulator();
+  setTimeout(() => {
+    simClickProduct(activeProductFlowId);
+  }, 200);
+};
+
+// --------------------------------------------------------------------------
+// 3. LIVE WHATSAPP PHONE SIMULATOR
+// --------------------------------------------------------------------------
+window.restartSimulator = function() {
+  simCart = [];
+  renderSimulator();
+};
+
+function renderSimulator() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  if (!chatBody) return;
+
+  const welcomeText = (currentConfig?.welcome_message || "Welcome to *InstaPics*! 📸✨\n\nWe craft premium Non-Tearable & Waterproof Photobooks with lifetime durability.\n\nSwipe through our products below to choose your package:")
+    .replace('{name}', 'Customer');
+
+  const products = currentConfig?.products || [];
+
+  const cardsHtml = products.slice(0, 4).map(p => `
+    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 6px;">
+      <div style="font-weight: 600; font-size: 13px; color: #09090b;">${escapeHtml(p.title)}</div>
+      <div style="font-size: 11px; color: #64748b; margin: 2px 0 6px 0;">${escapeHtml(p.description || '')}</div>
+      <div class="phone-btn" onclick="simClickProduct('${p.id}')" style="background: #0f172a; color: #fff; font-weight: 500;">
+        Select: ${escapeHtml(p.title.split(' ')[1] || p.title)} (${escapeHtml(p.price || '')})
+      </div>
+    </div>
+  `).join('');
+
+  chatBody.innerHTML = `
+    <div class="phone-msg-bubble outgoing">
+      Hi! I want to order a photobook.
+    </div>
+
+    <div class="phone-msg-bubble incoming">
+      <div style="white-space: pre-line;">${escapeHtml(welcomeText)}</div>
+      <div style="margin-top: 6px; font-weight: 600; font-size: 11px; color: #475569;">◄ Swipe Cards / Choose Product ►</div>
+      ${cardsHtml}
+    </div>
+  `;
+
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+window.simClickProduct = function(prodId) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const product = (currentConfig?.products || []).find(p => p.id === prodId) || { title: prodId };
+  const flow = (currentConfig?.product_flows || {})[prodId] || {
+    step1_prompt: "Please choose your page count:",
+    step1_options: [
+      { text: "📘 40 Pages ₹1,750", price: 1750 },
+      { text: "📘 60 Pages ₹2,150", price: 2150 }
+    ]
+  };
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      Selected: ${escapeHtml(product.title)}
+    </div>
+  `;
+
+  const options = flow.step1_options || [];
+  const buttonsHtml = options.map(opt => `
+    <div class="phone-btn" onclick="simChooseOption('${prodId}', '${escapeHtml(opt.text)}', ${opt.price || extractPrice(opt.text)})">
+      ${escapeHtml(opt.text)}
+    </div>
+  `).join('');
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble incoming">
+      <strong>Selected: ${escapeHtml(product.title)}</strong><br>
+      <span style="font-size: 12px; color: #475569;">${escapeHtml(flow.step1_prompt || 'Please choose your package:')}</span>
+      <div class="phone-buttons-group">
+        ${buttonsHtml || `<div class="phone-btn" onclick="simChooseOption('${prodId}', 'Standard', 1500)">Standard Option ₹1,500</div>`}
+      </div>
+    </div>
+  `;
+
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simChooseOption = function(prodId, optionText, price) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const product = (currentConfig?.products || []).find(p => p.id === prodId) || { title: prodId };
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      Selected: ${escapeHtml(optionText)}
+    </div>
+  `;
+
+  const cleanPrice = price || extractPrice(optionText) || 1500;
+  simCart.push({
+    productTitle: product.title,
+    option: optionText,
+    price: cleanPrice
+  });
+
+  const cartTotal = simCart.reduce((sum, item) => sum + (item.price || 0), 0);
+  const cartLines = simCart.map((item, idx) => `
+    <div style="margin-bottom: 6px;">
+      ${idx + 1}. <strong>${escapeHtml(item.productTitle)}</strong><br>
+      <span style="font-size: 11px; color: #64748b;">&nbsp;&nbsp;• ${escapeHtml(item.option)}</span>
+    </div>
+  `).join('');
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble incoming">
+      <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">🛒 Your InstaPics Cart:</div>
+      ${cartLines}
+      <div style="border-top: 1px dashed #cbd5e1; margin: 8px 0; padding-top: 6px; font-weight: 600; color: #16a34a;">
+        💰 Cart Total: ₹${cartTotal.toLocaleString('en-IN')} (${simCart.length} item${simCart.length > 1 ? 's' : ''})
+      </div>
+      <div style="font-size: 11px; margin-bottom: 6px;">Would you like to add another item or proceed to order?</div>
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simAddAnotherItem()">➕ Add Another Item</div>
+        <div class="phone-btn" onclick="simStartCheckout()" style="background: #0f172a; color: #fff; font-weight: 500;">📸 Upload Photos & Order</div>
+      </div>
+    </div>
+  `;
+
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simAddAnotherItem = function() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const products = currentConfig?.products || [];
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      ➕ Add Another Item
+    </div>
+    <div class="phone-msg-bubble incoming">
+      ✨ <strong>Add Another Item to Your Order</strong> 🛍️<br><br>
+      Select your next product from our collection below:
+      <div class="phone-buttons-group">
+        ${products.slice(0, 4).map(p => `
+          <div class="phone-btn" onclick="simClickProduct('${p.id}')">
+            ${escapeHtml(p.title)} (${escapeHtml(p.price || '')})
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simStartCheckout = function() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      📸 Upload Photos & Order
+    </div>
+    <div class="phone-msg-bubble incoming">
+      📸 <strong>Step 1/3: Send Photos</strong> ✨<br><br>
+      Please upload your photos directly here on WhatsApp, or send a <strong>Google Drive / iCloud link</strong>:
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simSendPhotos('https://drive.google.com/drive/folders/sample-photos')">📁 Share Google Drive Link</div>
+        <div class="phone-btn" onclick="simSendPhotos('Uploaded 60 High-Res Photos.zip')">📷 Upload Photos Directly</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simSendPhotos = function(link) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      ${link}
+    </div>
+    <div class="phone-msg-bubble incoming">
+      Photos received! ✨<br><br>
+      <strong>Step 2/3: Customer Name</strong><br>
+      What is your <strong>Full Name</strong>?
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simSendCustomerName('Priya Sharma')">Simulate: "Priya Sharma"</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simSendCustomerName = function(name) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      ${name}
+    </div>
+    <div class="phone-msg-bubble incoming">
+      Thank you, ${name}! 🏠<br><br>
+      <strong>Step 3/3: Delivery Address</strong><br>
+      Please share your complete <strong>Delivery Address with Pincode</strong> for courier shipping:
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simSendDeliveryAddress('Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040')">
+          Simulate: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040"
+        </div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simSendDeliveryAddress = function(addr) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const total = simCart.reduce((sum, item) => sum + (item.price || 0), 0);
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      ${addr}
+    </div>
+    <div class="phone-msg-bubble incoming">
+      Order Total: <strong>₹${total.toLocaleString('en-IN')}</strong><br><br>
+      Please choose your preferred <strong>Payment Method</strong>:
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simCompleteOrder('Instant UPI / Online QR')">📱 Instant UPI / QR Code</div>
+        <div class="phone-btn" onclick="simCompleteOrder('Pay on Pickup / Delivery')">💵 Pay on Pickup / Delivery</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simCompleteOrder = function(paymentType) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const orderId = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
+  const total = simCart.reduce((sum, item) => sum + (item.price || 0), 0);
+  const itemsText = simCart.map((i, idx) => `${idx + 1}. ${i.productTitle} (${i.option})`).join('<br>');
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      Payment Choice: ${paymentType}
+    </div>
+    <div class="phone-msg-bubble incoming">
+      🎉 <strong>Order Booked Successfully!</strong><br><br>
+      <strong>Order ID:</strong> #${orderId}<br>
+      <strong>Customer:</strong> Priya Sharma<br><br>
+      <strong>Items Ordered:</strong><br>
+      ${itemsText}<br><br>
+      <strong>Total Order Value:</strong> <span style="color:#16a34a; font-weight:700;">₹${total.toLocaleString('en-IN')}</span><br>
+      <strong>Delivery to:</strong> Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040<br>
+      <strong>Payment Mode:</strong> ${paymentType}<br><br>
+      ${paymentType.includes('UPI') ? '<em>[Dynamic UPI QR Code generated for ₹' + total.toLocaleString('en-IN') + ']</em><br><br>' : ''}
+      Our design team has received your order and will share your digital album preview shortly! 📖✨
+      <div class="phone-buttons-group">
+        <div class="phone-btn">📦 Track Order Status</div>
+        <div class="phone-btn">📞 Call Studio Support</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+// --------------------------------------------------------------------------
+// 4. ORDERS MANAGEMENT
+// --------------------------------------------------------------------------
+async function fetchOrders() {
+  const tbody = document.getElementById('ordersTableBody');
+  const filter = document.getElementById('orderStatusFilter')?.value || 'ALL';
+
+  try {
+    const url = filter === 'ALL' ? '/api/orders' : `/api/orders?status=${encodeURIComponent(filter)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    currentOrders = data.orders || [];
+    renderOrdersTable(currentOrders);
+  } catch (err) {
+    console.error('[Orders] Load error:', err);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Error loading orders: ${err.message}</td></tr>`;
+  }
+}
+
+function renderOrdersTable(orders) {
+  const tbody = document.getElementById('ordersTableBody');
+  if (!tbody) return;
+
+  if (!orders || orders.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No customer orders recorded yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = orders.map(order => {
+    const photoCount = order.photos ? order.photos.length : 0;
+    const formattedDate = new Date(order.created_at).toLocaleString([], {
+      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    const photoCell = photoCount > 0
+      ? `<span class="badge-amount" style="background:#e0f2fe; color:#0369a1;">📷 ${photoCount} Photo(s)</span>`
+      : `<span style="color: var(--text-muted); font-size: 11px;">None / Link</span>`;
+
+    const cleanPhone = (order.phone || '').replace(/[^0-9]/g, '');
+
+    return `
+      <tr>
+        <td>
+          <div class="order-badge">#${escapeHtml(order.id)}</div>
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">${formattedDate}</span>
+        </td>
+        <td>
+          <div style="font-weight: 600;">${escapeHtml(order.customer_name || 'Anonymous')}</div>
+          <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" style="font-size: 12px; color: #0284c7; text-decoration: none;">
+            +${escapeHtml(order.phone)} ↗
+          </a>
+        </td>
+        <td>
+          <div style="font-weight: 600; margin-bottom: 2px;">${escapeHtml(order.product_name)}</div>
+          <div style="font-size: 12px; color: #475569; white-space: pre-line;">${escapeHtml(order.details || 'Standard')}</div>
+        </td>
+        <td>${photoCell}</td>
+        <td style="max-width: 200px; font-size: 12px; color: var(--text-secondary);">
+          ${escapeHtml(order.address || 'Pickup at Studio')}
+        </td>
+        <td>
+          <div class="badge-amount">${order.amount ? `₹${Number(order.amount).toLocaleString('en-IN')}` : '₹0'}</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${escapeHtml(order.payment_type || 'UPI')}</div>
+        </td>
+        <td>
+          <select class="select-input" style="font-size: 11px; padding: 4px 6px;" onchange="updateOrderStatus('${order.id}', this.value)">
+            <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+            <option value="Designing" ${order.status === 'Designing' ? 'selected' : ''}>Designing Preview</option>
+            <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>Printing & Binding</option>
+            <option value="Ready for Pickup" ${order.status === 'Ready for Pickup' ? 'selected' : ''}>Ready for Pickup</option>
+            <option value="Dispatched" ${order.status === 'Dispatched' ? 'selected' : ''}>Dispatched</option>
+            <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+          </select>
+        </td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="notifyOrderUpdate('${order.id}', '${order.status}')">
+            WhatsApp Notify
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.updateOrderStatus = async function(id, newStatus) {
+  try {
+    const res = await fetch(`/api/orders/${encodeURIComponent(id)}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus, notifyCustomer: false })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Order #${id} status updated to ${newStatus}`);
+    }
+  } catch (err) {
+    showToast(`Failed to update status: ${err.message}`);
+  }
+};
+
+window.notifyOrderUpdate = async function(id, status) {
+  try {
+    const res = await fetch(`/api/orders/${encodeURIComponent(id)}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, notifyCustomer: true })
+    });
+    const data = await res.json();
+    if (data.notificationSent) {
+      showToast(`WhatsApp status notification sent for #${id}!`);
+    } else {
+      showToast(`Status updated, but customer notification could not be delivered`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  }
+};
+
+// --------------------------------------------------------------------------
+// 5. STUDIO SETTINGS
+// --------------------------------------------------------------------------
+function populateSettingsFields(cfg) {
+  setVal('cfgStudioName', cfg.studio_name);
+  setVal('cfgStudioPhone', cfg.studio_phone);
+  setVal('cfgStudioAddress', cfg.studio_address);
+  setVal('cfgUpiId', cfg.upi_id);
+  setVal('cfgWelcomeMessage', cfg.welcome_message);
+  setVal('cfgPromptName', cfg.prompt_name);
+  setVal('cfgPromptAddress', cfg.prompt_address);
+  setVal('cfgOrderConfirmedMessage', cfg.order_confirmed_message);
+  setVal('cfgTrackingMessage', cfg.tracking_message);
+}
+
+window.saveSettings = async function() {
+  const config = {
+    ...currentConfig,
+    studio_name: getVal('cfgStudioName'),
+    studio_phone: getVal('cfgStudioPhone'),
+    studio_address: getVal('cfgStudioAddress'),
+    upi_id: getVal('cfgUpiId'),
+    welcome_message: getVal('cfgWelcomeMessage'),
+    prompt_name: getVal('cfgPromptName'),
+    prompt_address: getVal('cfgPromptAddress'),
+    order_confirmed_message: getVal('cfgOrderConfirmedMessage'),
+    tracking_message: getVal('cfgTrackingMessage')
+  };
+
+  try {
+    const res = await fetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config })
+    });
+    const data = await res.json();
+    if (data.success) {
+      currentConfig = data.config;
+      renderSimulator();
+      showToast('Studio settings saved successfully!');
+    }
+  } catch (err) {
+    showToast(`Failed to save settings: ${err.message}`);
+  }
+};
+
+// --------------------------------------------------------------------------
+// 6. WHATSAPP DEVICE MANAGEMENT
+// --------------------------------------------------------------------------
+window.restartWhatsAppSocket = async function() {
+  try {
+    await fetch('/api/restart', { method: 'POST' });
+    showToast('WhatsApp socket restart initiated...');
+    setTimeout(fetchDeviceStatus, 2000);
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  }
+};
+
+window.requestPairingCode = async function() {
+  const phone = getVal('pairingPhoneInput');
+  if (!phone) {
+    alert('Please enter your WhatsApp phone number with country code (e.g. 916369134270)');
+    return;
+  }
+  try {
+    showToast('Requesting 8-digit pairing code...');
+    const res = await fetch('/api/pairing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+    if (data.pairingCode) {
+      document.getElementById('pairingCodeValue').textContent = data.pairingCode;
+      document.getElementById('pairingCodeDisplay').classList.remove('hidden');
+      showToast('Pairing code generated! Check your phone.');
+    } else {
+      alert(data.error || 'Failed to generate code');
+    }
+  } catch (err) {
+    alert(`Pairing error: ${err.message}`);
+  }
+};
+
+window.sendTestMenuToPhone = async function() {
+  const btn = document.getElementById('sendTestMenuBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+  }
+  try {
+    const res = await fetch('/api/send-test-menu', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message || 'Test menu dispatched to your phone!');
+    } else {
+      showToast(`Error: ${data.error || 'Failed to dispatch'}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '📲 Test on My Phone';
+    }
+  }
+};
+
+window.sendWelcomeToCustomPhone = async function() {
+  const phone = getVal('targetCustomerPhoneInput');
+  if (!phone) {
+    alert('Please enter a WhatsApp number (e.g. 9629661668)');
+    return;
+  }
+  try {
+    showToast(`Sending welcome carousel to +${phone}...`);
+    const res = await fetch('/api/send-welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message || 'Carousel message sent successfully!');
+      setVal('targetCustomerPhoneInput', '');
+    } else {
+      showToast(`Error: ${data.error || 'Failed to send'}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  }
+};
+
+let lastDeviceState = { status: null, qrCodeDataUrl: null, phone: null };
+
+async function fetchDeviceStatus() {
+  try {
+    const res = await fetch('/api/status');
+    const data = await res.json();
+
+    if (
+      lastDeviceState.status === data.status &&
+      lastDeviceState.qrCodeDataUrl === data.qrCodeDataUrl &&
+      lastDeviceState.phone === data.phone
+    ) {
+      return;
+    }
+    lastDeviceState = {
+      status: data.status,
+      qrCodeDataUrl: data.qrCodeDataUrl,
+      phone: data.phone
+    };
+
+    const pill = document.getElementById('deviceStatusPill');
+    const statusText = pill?.querySelector('.status-text');
+    const qrContainer = document.getElementById('qrCodeContainer');
+    const connectedBanner = document.getElementById('connectedBanner');
+    const phoneText = document.getElementById('connectedPhoneText');
+
+    if (data.status === 'connected') {
+      if (pill) pill.className = 'device-pill connected';
+      if (statusText) statusText.textContent = `Online (+${data.phone})`;
+      if (qrContainer) qrContainer.classList.add('hidden');
+      if (connectedBanner) {
+        connectedBanner.classList.remove('hidden');
+        if (phoneText) phoneText.textContent = `+${data.phone}`;
+      }
+    } else {
+      if (pill) pill.className = 'device-pill';
+      if (connectedBanner) connectedBanner.classList.add('hidden');
+      if (qrContainer) qrContainer.classList.remove('hidden');
+
+      if (data.status === 'qr_ready' && data.qrCodeDataUrl) {
+        if (statusText) statusText.textContent = 'Scan QR';
+        qrContainer.innerHTML = `<img src="${data.qrCodeDataUrl}" class="qr-image" alt="WhatsApp QR Code" />`;
+      } else if (data.status === 'connecting') {
+        if (statusText) statusText.textContent = 'Connecting...';
+        qrContainer.innerHTML = `<div class="field-hint">Connecting to WhatsApp...</div>`;
+      } else {
+        if (statusText) statusText.textContent = 'Offline';
+        qrContainer.innerHTML = `<div class="field-hint">Waiting for QR Code...</div>`;
+      }
+    }
+
+    if (data.pairingCode) {
+      const codeVal = document.getElementById('pairingCodeValue');
+      if (codeVal) codeVal.textContent = data.pairingCode;
+      document.getElementById('pairingCodeDisplay')?.classList.remove('hidden');
+    }
+  } catch (err) {
+    // Silent status poll catch
+  }
+}
+
+// --------------------------------------------------------------------------
+// 7. UTILITY HELPERS
+// --------------------------------------------------------------------------
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val !== undefined && val !== null ? val : '';
+}
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function setElText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text || '';
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.remove('hidden');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 3500);
+}
+
+function extractPrice(str) {
+  if (!str) return 0;
+  const match = String(str).match(/₹\s*([0-9,]+)/);
+  if (match) return parseInt(match[1].replace(/,/g, ''), 10) || 0;
+  const digits = String(str).replace(/[^0-9]/g, '');
+  return parseInt(digits, 10) || 0;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+</script>
+  <script src="/app.js?v=3.0"></script>
 </body>
 
 </html>

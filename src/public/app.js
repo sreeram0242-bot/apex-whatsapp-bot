@@ -1,74 +1,595 @@
 // ==========================================================================
-// INSTAPICS PHOTOBOOKS & FRAMES ADMIN PANEL — JAVASCRIPT
+// INSTAPICS PHOTOBOOKS & FRAMES — ADMIN CONSOLE JAVASCRIPT ENGINE (v3.0)
 // ==========================================================================
 
 let currentConfig = null;
 let currentOrders = [];
 let statusPollInterval = null;
 let activeProductFlowId = 'prod_photobook_a4';
+let simCart = [];
 
-document.addEventListener('DOMContentLoaded', () => {
-  try { initTabs(); } catch (e) { console.error('initTabs failed:', e); }
-  try { initOrders(); } catch (e) { console.error('initOrders failed:', e); }
-  try { initFlowEditor(); } catch (e) { console.error('initFlowEditor failed:', e); }
-  try { initSettings(); } catch (e) { console.error('initSettings failed:', e); }
-  try { initDeviceManager(); } catch (e) { console.error('initDeviceManager failed:', e); }
-  try { initSimulator(); } catch (e) { console.error('initSimulator failed:', e); }
+// Self-invoking bootloader (immune to DOMContentLoaded race conditions)
+function bootConsole() {
+  console.log('[Console] Booting InstaPics Admin Console...');
+  try { initTabs(); } catch (e) { console.error('initTabs:', e); }
+  try { fetchOrders(); } catch (e) { console.error('fetchOrders:', e); }
+  try { fetchConfig(); } catch (e) { console.error('fetchConfig:', e); }
+  try { fetchDeviceStatus(); } catch (e) { console.error('fetchDeviceStatus:', e); }
 
-  // Start polling device status every 3 seconds
-  fetchDeviceStatus();
-  statusPollInterval = setInterval(fetchDeviceStatus, 3000);
-});
+  if (!statusPollInterval) {
+    statusPollInterval = setInterval(fetchDeviceStatus, 3000);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootConsole);
+} else {
+  bootConsole();
+}
 
 // --------------------------------------------------------------------------
-// 1. TABS NAVIGATION
+// 1. TABS MANAGEMENT
 // --------------------------------------------------------------------------
+window.switchTab = function(tabId) {
+  const tabs = document.querySelectorAll('.tab-content');
+  const navBtns = document.querySelectorAll('.nav-tab');
+
+  tabs.forEach(t => t.classList.remove('active'));
+  navBtns.forEach(b => b.classList.remove('active'));
+
+  const activeContent = document.getElementById(`tab-${tabId}`);
+  const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+
+  if (activeContent) activeContent.classList.add('active');
+  if (activeBtn) activeBtn.classList.add('active');
+
+  if (tabId === 'orders') fetchOrders();
+  if (tabId === 'product-flows') fetchConfig();
+  if (tabId === 'settings') fetchConfig();
+  if (tabId === 'device') fetchDeviceStatus();
+};
+
 function initTabs() {
-  const tabButtons = document.querySelectorAll('.nav-tab');
-  const tabContents = document.querySelectorAll('.tab-content');
-
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetTab = btn.getAttribute('data-tab');
-
-      tabButtons.forEach(b => b.classList.remove('active'));
-      tabContents.forEach(c => c.classList.remove('active'));
-
-      btn.classList.add('active');
-      const targetEl = document.getElementById(`tab-${targetTab}`);
-      if (targetEl) targetEl.classList.add('active');
-
-      if (targetTab === 'orders') fetchOrders();
-      if (targetTab === 'product-flows') fetchConfig();
-      if (targetTab === 'settings') fetchConfig();
-      if (targetTab === 'device') fetchDeviceStatus();
+  const navBtns = document.querySelectorAll('.nav-tab');
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const target = btn.getAttribute('data-tab') || btn.id.replace('tabBtn-', '');
+      if (target) window.switchTab(target);
     });
   });
 }
 
 // --------------------------------------------------------------------------
-// 2. ORDERS MANAGEMENT
+// 2. CONFIGURATION & PRODUCT FLOW EDITOR
 // --------------------------------------------------------------------------
-function initOrders() {
-  const refreshBtn = document.getElementById('refreshOrdersBtn');
-  const filterSelect = document.getElementById('orderStatusFilter');
-
-  if (refreshBtn) refreshBtn.addEventListener('click', () => fetchOrders());
-  if (filterSelect) filterSelect.addEventListener('change', () => fetchOrders());
-
-  // Close Photo Modal
-  const closeBtn = document.getElementById('closePhotoModalBtn');
-  const modal = document.getElementById('photoModal');
-  if (closeBtn && modal) {
-    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.classList.add('hidden');
-    });
+async function fetchConfig() {
+  try {
+    const res = await fetch('/api/config');
+    const data = await res.json();
+    currentConfig = data.config || {};
+    populateSettingsFields(currentConfig);
+    renderProductFlowTabs(currentConfig.products || [], currentConfig.product_flows || {});
+    renderSimulator();
+  } catch (err) {
+    console.error('[Config] Failed to load config:', err);
   }
-
-  fetchOrders();
 }
 
+function renderProductFlowTabs(products, productFlows) {
+  const container = document.getElementById('productFlowTabs');
+  if (!container) return;
+
+  if (!products.some(p => p.id === activeProductFlowId) && products.length > 0) {
+    activeProductFlowId = products[0].id;
+  }
+
+  container.innerHTML = products.map(p => `
+    <button type="button" class="product-pill ${p.id === activeProductFlowId ? 'active' : ''}" onclick="selectProductFlow('${p.id}')">
+      ${escapeHtml(p.title)}
+    </button>
+  `).join('');
+
+  renderActiveProductFlow(activeProductFlowId, productFlows);
+}
+
+window.selectProductFlow = function(prodId) {
+  activeProductFlowId = prodId;
+
+  const pills = document.querySelectorAll('.product-pill');
+  pills.forEach(p => {
+    p.classList.toggle('active', p.textContent.includes(prodId) || p.getAttribute('onclick')?.includes(prodId));
+  });
+
+  const productFlows = currentConfig?.product_flows || {};
+  renderActiveProductFlow(prodId, productFlows);
+};
+
+function renderActiveProductFlow(prodId, productFlows) {
+  const flow = productFlows[prodId] || {
+    id: prodId,
+    title: prodId,
+    description: "",
+    price: "",
+    step1_title: "Product Options",
+    step1_prompt: "Please select an option:",
+    step1_options: [],
+    photo_prompt: "Please upload your photos:"
+  };
+
+  const product = (currentConfig?.products || []).find(p => p.id === prodId) || {};
+
+  setElText('editorProductTitle', flow.title || product.title || prodId);
+  setElText('editorProductId', prodId);
+
+  setVal('flowTitleInput', product.title || flow.title || '');
+  setVal('flowPriceInput', product.price || flow.price || '');
+  setVal('flowDescInput', product.description || flow.description || '');
+
+  setVal('flowStep1PromptInput', flow.step1_prompt || '');
+  setVal('flowPhotoPromptInput', flow.photo_prompt || '');
+
+  // Render options table rows
+  const tbody = document.getElementById('optionsTableBody');
+  if (tbody) {
+    const options = flow.step1_options || [];
+    if (options.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No options defined yet. Click '+ Add Option' above.</td></tr>`;
+    } else {
+      tbody.innerHTML = options.map((opt, idx) => `
+        <tr class="option-row" data-index="${idx}">
+          <td>
+            <input type="text" class="text-input opt-text" value="${escapeHtml(opt.text)}" placeholder="e.g. 📘 40 Pgs (60 Photos) ₹1,750">
+          </td>
+          <td>
+            <input type="number" class="text-input opt-price" value="${escapeHtml(opt.price || extractPrice(opt.text) || '')}" placeholder="₹ Price">
+          </td>
+          <td>
+            <input type="text" class="text-input opt-id" value="${escapeHtml(opt.id || `${prodId}_opt_${idx + 1}`)}" placeholder="opt_id">
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn btn-secondary btn-sm" style="color: #ef4444; padding: 4px 8px;" onclick="removeOptionRow(this)">&times;</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+}
+
+window.addOptionRow = function() {
+  const tbody = document.getElementById('optionsTableBody');
+  if (!tbody) return;
+
+  const emptyState = tbody.querySelector('.empty-state');
+  if (emptyState) emptyState.parentElement.remove();
+
+  const count = tbody.querySelectorAll('.option-row').length + 1;
+  const newRow = document.createElement('tr');
+  newRow.className = 'option-row';
+  newRow.innerHTML = `
+    <td>
+      <input type="text" class="text-input opt-text" value="Option ${count} ₹1,000" placeholder="Button text & price">
+    </td>
+    <td>
+      <input type="number" class="text-input opt-price" value="1000" placeholder="1000">
+    </td>
+    <td>
+      <input type="text" class="text-input opt-id" value="${activeProductFlowId}_opt_${count}" placeholder="id">
+    </td>
+    <td style="text-align: center;">
+      <button type="button" class="btn btn-secondary btn-sm" style="color: #ef4444; padding: 4px 8px;" onclick="removeOptionRow(this)">&times;</button>
+    </td>
+  `;
+  tbody.appendChild(newRow);
+};
+
+window.removeOptionRow = function(btn) {
+  const row = btn.closest('.option-row');
+  if (row) row.remove();
+};
+
+window.saveActiveProductFlow = async function() {
+  if (!activeProductFlowId) return;
+
+  const title = getVal('flowTitleInput');
+  const price = getVal('flowPriceInput');
+  const description = getVal('flowDescInput');
+  const step1_prompt = getVal('flowStep1PromptInput');
+  const photo_prompt = getVal('flowPhotoPromptInput');
+
+  // Gather options
+  const optionRows = document.querySelectorAll('#optionsTableBody .option-row');
+  const step1_options = [];
+  optionRows.forEach((row, i) => {
+    const text = row.querySelector('.opt-text')?.value.trim();
+    const optPriceRaw = row.querySelector('.opt-price')?.value.trim();
+    const optPrice = parseInt(optPriceRaw, 10) || extractPrice(text) || 0;
+    const optId = row.querySelector('.opt-id')?.value.trim() || `${activeProductFlowId}_opt_${i + 1}`;
+    if (text) {
+      step1_options.push({ id: optId, text, price: optPrice });
+    }
+  });
+
+  const updatedFlow = {
+    id: activeProductFlowId,
+    title: title || activeProductFlowId,
+    description: description,
+    price: price,
+    step1_title: title || "Product Options",
+    step1_prompt: step1_prompt,
+    step1_options: step1_options,
+    photo_prompt: photo_prompt
+  };
+
+  const updatedFlows = { ...(currentConfig?.product_flows || {}) };
+  updatedFlows[activeProductFlowId] = updatedFlow;
+
+  // Update in products list
+  const updatedProducts = (currentConfig?.products || []).map(p => {
+    if (p.id === activeProductFlowId) {
+      return { ...p, title, price, description };
+    }
+    return p;
+  });
+
+  const newConfig = {
+    ...currentConfig,
+    products: updatedProducts,
+    product_flows: updatedFlows
+  };
+
+  try {
+    const res = await fetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: newConfig })
+    });
+    const data = await res.json();
+    if (data.success) {
+      currentConfig = data.config;
+      renderProductFlowTabs(currentConfig.products || [], currentConfig.product_flows || {});
+      renderSimulator();
+      showToast(`Flow for "${title || activeProductFlowId}" saved successfully!`);
+    } else {
+      showToast(`Error: ${data.error || 'Failed to save'}`);
+    }
+  } catch (err) {
+    showToast(`Save error: ${err.message}`);
+  }
+};
+
+window.addNewProductPrompt = function() {
+  const name = prompt("Enter the new Product Title (e.g. 🎁 Magic Photo Mug):");
+  if (!name || !name.trim()) return;
+
+  const id = 'prod_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 20) + '_' + Math.floor(Math.random() * 1000);
+  const price = prompt("Enter Starting Price (e.g. From ₹399):", "From ₹399") || "₹399";
+  const desc = prompt("Enter short description:", "Custom printed with lifetime photo durability.") || "";
+
+  const newProd = { id, title: name.trim(), price: price.trim(), description: desc.trim() };
+  const newFlow = {
+    id: id,
+    title: name.trim(),
+    price: price.trim(),
+    description: desc.trim(),
+    step1_title: name.trim(),
+    step1_prompt: `Please select your preferred option for ${name.trim()}:`,
+    step1_options: [
+      { id: `${id}_opt1`, text: "Standard Size ₹399", price: 399 },
+      { id: `${id}_opt2`, text: "Premium Size ₹599", price: 599 }
+    ],
+    photo_prompt: "📸 Please upload your photo for printing:"
+  };
+
+  const updatedProducts = [...(currentConfig?.products || []), newProd];
+  const updatedFlows = { ...(currentConfig?.product_flows || {}), [id]: newFlow };
+
+  const newConfig = { ...currentConfig, products: updatedProducts, product_flows: updatedFlows };
+
+  fetch('/api/config', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config: newConfig })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      currentConfig = data.config;
+      activeProductFlowId = id;
+      renderProductFlowTabs(currentConfig.products, currentConfig.product_flows);
+      showToast(`Added product "${name}"!`);
+    }
+  })
+  .catch(e => showToast(`Error: ${e.message}`));
+};
+
+window.deleteCurrentProduct = function() {
+  if (!activeProductFlowId) return;
+  if (!confirm(`Are you sure you want to delete product "${activeProductFlowId}"?`)) return;
+
+  const updatedProducts = (currentConfig?.products || []).filter(p => p.id !== activeProductFlowId);
+  const updatedFlows = { ...(currentConfig?.product_flows || {}) };
+  delete updatedFlows[activeProductFlowId];
+
+  const newConfig = { ...currentConfig, products: updatedProducts, product_flows: updatedFlows };
+
+  fetch('/api/config', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config: newConfig })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      currentConfig = data.config;
+      activeProductFlowId = currentConfig.products[0]?.id || '';
+      renderProductFlowTabs(currentConfig.products, currentConfig.product_flows);
+      showToast('Product deleted!');
+    }
+  })
+  .catch(e => showToast(`Delete failed: ${e.message}`));
+};
+
+window.testCurrentProductInSim = function() {
+  restartSimulator();
+  setTimeout(() => {
+    simClickProduct(activeProductFlowId);
+  }, 200);
+};
+
+// --------------------------------------------------------------------------
+// 3. LIVE WHATSAPP PHONE SIMULATOR
+// --------------------------------------------------------------------------
+window.restartSimulator = function() {
+  simCart = [];
+  renderSimulator();
+};
+
+function renderSimulator() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  if (!chatBody) return;
+
+  const welcomeText = (currentConfig?.welcome_message || "Welcome to *InstaPics*! 📸✨\n\nWe craft premium Non-Tearable & Waterproof Photobooks with lifetime durability.\n\nSwipe through our products below to choose your package:")
+    .replace('{name}', 'Customer');
+
+  const products = currentConfig?.products || [];
+
+  const cardsHtml = products.slice(0, 4).map(p => `
+    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 6px;">
+      <div style="font-weight: 600; font-size: 13px; color: #09090b;">${escapeHtml(p.title)}</div>
+      <div style="font-size: 11px; color: #64748b; margin: 2px 0 6px 0;">${escapeHtml(p.description || '')}</div>
+      <div class="phone-btn" onclick="simClickProduct('${p.id}')" style="background: #0f172a; color: #fff; font-weight: 500;">
+        Select: ${escapeHtml(p.title.split(' ')[1] || p.title)} (${escapeHtml(p.price || '')})
+      </div>
+    </div>
+  `).join('');
+
+  chatBody.innerHTML = `
+    <div class="phone-msg-bubble outgoing">
+      Hi! I want to order a photobook.
+    </div>
+
+    <div class="phone-msg-bubble incoming">
+      <div style="white-space: pre-line;">${escapeHtml(welcomeText)}</div>
+      <div style="margin-top: 6px; font-weight: 600; font-size: 11px; color: #475569;">◄ Swipe Cards / Choose Product ►</div>
+      ${cardsHtml}
+    </div>
+  `;
+
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+window.simClickProduct = function(prodId) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const product = (currentConfig?.products || []).find(p => p.id === prodId) || { title: prodId };
+  const flow = (currentConfig?.product_flows || {})[prodId] || {
+    step1_prompt: "Please choose your page count:",
+    step1_options: [
+      { text: "📘 40 Pages ₹1,750", price: 1750 },
+      { text: "📘 60 Pages ₹2,150", price: 2150 }
+    ]
+  };
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      Selected: ${escapeHtml(product.title)}
+    </div>
+  `;
+
+  const options = flow.step1_options || [];
+  const buttonsHtml = options.map(opt => `
+    <div class="phone-btn" onclick="simChooseOption('${prodId}', '${escapeHtml(opt.text)}', ${opt.price || extractPrice(opt.text)})">
+      ${escapeHtml(opt.text)}
+    </div>
+  `).join('');
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble incoming">
+      <strong>Selected: ${escapeHtml(product.title)}</strong><br>
+      <span style="font-size: 12px; color: #475569;">${escapeHtml(flow.step1_prompt || 'Please choose your package:')}</span>
+      <div class="phone-buttons-group">
+        ${buttonsHtml || `<div class="phone-btn" onclick="simChooseOption('${prodId}', 'Standard', 1500)">Standard Option ₹1,500</div>`}
+      </div>
+    </div>
+  `;
+
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simChooseOption = function(prodId, optionText, price) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const product = (currentConfig?.products || []).find(p => p.id === prodId) || { title: prodId };
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      Selected: ${escapeHtml(optionText)}
+    </div>
+  `;
+
+  const cleanPrice = price || extractPrice(optionText) || 1500;
+  simCart.push({
+    productTitle: product.title,
+    option: optionText,
+    price: cleanPrice
+  });
+
+  const cartTotal = simCart.reduce((sum, item) => sum + (item.price || 0), 0);
+  const cartLines = simCart.map((item, idx) => `
+    <div style="margin-bottom: 6px;">
+      ${idx + 1}. <strong>${escapeHtml(item.productTitle)}</strong><br>
+      <span style="font-size: 11px; color: #64748b;">&nbsp;&nbsp;• ${escapeHtml(item.option)}</span>
+    </div>
+  `).join('');
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble incoming">
+      <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">🛒 Your InstaPics Cart:</div>
+      ${cartLines}
+      <div style="border-top: 1px dashed #cbd5e1; margin: 8px 0; padding-top: 6px; font-weight: 600; color: #16a34a;">
+        💰 Cart Total: ₹${cartTotal.toLocaleString('en-IN')} (${simCart.length} item${simCart.length > 1 ? 's' : ''})
+      </div>
+      <div style="font-size: 11px; margin-bottom: 6px;">Would you like to add another item or proceed to order?</div>
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simAddAnotherItem()">➕ Add Another Item</div>
+        <div class="phone-btn" onclick="simStartCheckout()" style="background: #0f172a; color: #fff; font-weight: 500;">📸 Upload Photos & Order</div>
+      </div>
+    </div>
+  `;
+
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simAddAnotherItem = function() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const products = currentConfig?.products || [];
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      ➕ Add Another Item
+    </div>
+    <div class="phone-msg-bubble incoming">
+      ✨ <strong>Add Another Item to Your Order</strong> 🛍️<br><br>
+      Select your next product from our collection below:
+      <div class="phone-buttons-group">
+        ${products.slice(0, 4).map(p => `
+          <div class="phone-btn" onclick="simClickProduct('${p.id}')">
+            ${escapeHtml(p.title)} (${escapeHtml(p.price || '')})
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simStartCheckout = function() {
+  const chatBody = document.getElementById('simulatorChatBody');
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      📸 Upload Photos & Order
+    </div>
+    <div class="phone-msg-bubble incoming">
+      📸 <strong>Step 1/3: Send Photos</strong> ✨<br><br>
+      Please upload your photos directly here on WhatsApp, or send a <strong>Google Drive / iCloud link</strong>:
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simSendPhotos('https://drive.google.com/drive/folders/sample-photos')">📁 Share Google Drive Link</div>
+        <div class="phone-btn" onclick="simSendPhotos('Uploaded 60 High-Res Photos.zip')">📷 Upload Photos Directly</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simSendPhotos = function(link) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      ${link}
+    </div>
+    <div class="phone-msg-bubble incoming">
+      Photos received! ✨<br><br>
+      <strong>Step 2/3: Customer Name</strong><br>
+      What is your <strong>Full Name</strong>?
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simSendCustomerName('Priya Sharma')">Simulate: "Priya Sharma"</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simSendCustomerName = function(name) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      ${name}
+    </div>
+    <div class="phone-msg-bubble incoming">
+      Thank you, ${name}! 🏠<br><br>
+      <strong>Step 3/3: Delivery Address</strong><br>
+      Please share your complete <strong>Delivery Address with Pincode</strong> for courier shipping:
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simSendDeliveryAddress('Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040')">
+          Simulate: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040"
+        </div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simSendDeliveryAddress = function(addr) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const total = simCart.reduce((sum, item) => sum + (item.price || 0), 0);
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      ${addr}
+    </div>
+    <div class="phone-msg-bubble incoming">
+      Order Total: <strong>₹${total.toLocaleString('en-IN')}</strong><br><br>
+      Please choose your preferred <strong>Payment Method</strong>:
+      <div class="phone-buttons-group">
+        <div class="phone-btn" onclick="simCompleteOrder('Instant UPI / Online QR')">📱 Instant UPI / QR Code</div>
+        <div class="phone-btn" onclick="simCompleteOrder('Pay on Pickup / Delivery')">💵 Pay on Pickup / Delivery</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+window.simCompleteOrder = function(paymentType) {
+  const chatBody = document.getElementById('simulatorChatBody');
+  const orderId = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
+  const total = simCart.reduce((sum, item) => sum + (item.price || 0), 0);
+  const itemsText = simCart.map((i, idx) => `${idx + 1}. ${i.productTitle} (${i.option})`).join('<br>');
+
+  chatBody.innerHTML += `
+    <div class="phone-msg-bubble outgoing">
+      Payment Choice: ${paymentType}
+    </div>
+    <div class="phone-msg-bubble incoming">
+      🎉 <strong>Order Booked Successfully!</strong><br><br>
+      <strong>Order ID:</strong> #${orderId}<br>
+      <strong>Customer:</strong> Priya Sharma<br><br>
+      <strong>Items Ordered:</strong><br>
+      ${itemsText}<br><br>
+      <strong>Total Order Value:</strong> <span style="color:#16a34a; font-weight:700;">₹${total.toLocaleString('en-IN')}</span><br>
+      <strong>Delivery to:</strong> Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040<br>
+      <strong>Payment Mode:</strong> ${paymentType}<br><br>
+      ${paymentType.includes('UPI') ? '<em>[Dynamic UPI QR Code generated for ₹' + total.toLocaleString('en-IN') + ']</em><br><br>' : ''}
+      Our design team has received your order and will share your digital album preview shortly! 📖✨
+      <div class="phone-buttons-group">
+        <div class="phone-btn">📦 Track Order Status</div>
+        <div class="phone-btn">📞 Call Studio Support</div>
+      </div>
+    </div>
+  `;
+  chatBody.scrollTop = chatBody.scrollHeight;
+};
+
+// --------------------------------------------------------------------------
+// 4. ORDERS MANAGEMENT
+// --------------------------------------------------------------------------
 async function fetchOrders() {
   const tbody = document.getElementById('ordersTableBody');
   const filter = document.getElementById('orderStatusFilter')?.value || 'ALL';
@@ -80,13 +601,15 @@ async function fetchOrders() {
     currentOrders = data.orders || [];
     renderOrdersTable(currentOrders);
   } catch (err) {
-    console.error('Failed to fetch orders:', err);
-    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Error loading orders: ${err.message}</td></tr>`;
+    console.error('[Orders] Load error:', err);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Error loading orders: ${err.message}</td></tr>`;
   }
 }
 
 function renderOrdersTable(orders) {
   const tbody = document.getElementById('ordersTableBody');
+  if (!tbody) return;
+
   if (!orders || orders.length === 0) {
     tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No customer orders recorded yet.</td></tr>`;
     return;
@@ -98,36 +621,41 @@ function renderOrdersTable(orders) {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
-    const photoButton = photoCount > 0
-      ? `<button class="photo-thumb-btn" onclick="openPhotos('${order.id}')">📷 ${photoCount} Photo(s)</button>`
-      : `<span style="color: var(--text-muted); font-size: 12px;">None</span>`;
+    const photoCell = photoCount > 0
+      ? `<span class="badge-amount" style="background:#e0f2fe; color:#0369a1;">📷 ${photoCount} Photo(s)</span>`
+      : `<span style="color: var(--text-muted); font-size: 11px;">None / Link</span>`;
+
+    const cleanPhone = (order.phone || '').replace(/[^0-9]/g, '');
 
     return `
       <tr>
         <td>
-          <div class="order-id">#${order.id}</div>
-          <span class="field-hint" style="font-family: var(--font-mono); font-size: 11px;">${formattedDate}</span>
+          <div class="order-badge">#${escapeHtml(order.id)}</div>
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">${formattedDate}</span>
         </td>
         <td>
-          <div class="customer-name">${escapeHtml(order.customer_name || 'Anonymous')}</div>
-          <span class="order-phone">+${escapeHtml(order.phone)}</span>
+          <div style="font-weight: 600;">${escapeHtml(order.customer_name || 'Anonymous')}</div>
+          <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" style="font-size: 12px; color: #0284c7; text-decoration: none;">
+            +${escapeHtml(order.phone)} ↗
+          </a>
         </td>
         <td>
-          <strong>${escapeHtml(order.product_name)}</strong>
-          <div><span class="specs-badge" style="white-space: pre-line; text-align: left; display: inline-block;">${escapeHtml(order.details || 'Standard')}</span></div>
+          <div style="font-weight: 600; margin-bottom: 2px;">${escapeHtml(order.product_name)}</div>
+          <div style="font-size: 12px; color: #475569; white-space: pre-line;">${escapeHtml(order.details || 'Standard')}</div>
         </td>
-        <td>${photoButton}</td>
-        <td style="max-width: 220px; font-size: 12px; color: var(--text-secondary);">
+        <td>${photoCell}</td>
+        <td style="max-width: 200px; font-size: 12px; color: var(--text-secondary);">
           ${escapeHtml(order.address || 'Pickup at Studio')}
         </td>
         <td>
-          <div style="font-size: 13px; font-weight: 600; color: #16a34a;">${order.amount ? `₹${Number(order.amount).toLocaleString('en-IN')}` : ''}</div>
-          <span style="font-size: 11px; color: var(--text-muted);">${escapeHtml(order.payment_type)}</span>
+          <div class="badge-amount">${order.amount ? `₹${Number(order.amount).toLocaleString('en-IN')}` : '₹0'}</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${escapeHtml(order.payment_type || 'UPI')}</div>
         </td>
         <td>
-          <select class="select-input" style="font-size: 12px; padding: 4px 6px;" onchange="updateOrderStatus('${order.id}', this.value)">
+          <select class="select-input" style="font-size: 11px; padding: 4px 6px;" onchange="updateOrderStatus('${order.id}', this.value)">
             <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-            <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>Printing</option>
+            <option value="Designing" ${order.status === 'Designing' ? 'selected' : ''}>Designing Preview</option>
+            <option value="Printing" ${order.status === 'Printing' ? 'selected' : ''}>Printing & Binding</option>
             <option value="Ready for Pickup" ${order.status === 'Ready for Pickup' ? 'selected' : ''}>Ready for Pickup</option>
             <option value="Dispatched" ${order.status === 'Dispatched' ? 'selected' : ''}>Dispatched</option>
             <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
@@ -143,52 +671,34 @@ function renderOrdersTable(orders) {
   }).join('');
 }
 
-window.openPhotos = function(orderId) {
-  const order = currentOrders.find(o => o.id === orderId);
-  if (!order || !order.photos || order.photos.length === 0) return;
-
-  const modal = document.getElementById('photoModal');
-  const gallery = document.getElementById('photoModalBody');
-
-  gallery.innerHTML = order.photos.map(p => `
-    <a href="${p}" target="_blank" rel="noopener noreferrer">
-      <img src="${p}" class="modal-gallery-img" alt="Order Photo" />
-    </a>
-  `).join('');
-
-  modal.classList.remove('hidden');
-};
-
-window.updateOrderStatus = async function(orderId, newStatus) {
+window.updateOrderStatus = async function(id, newStatus) {
   try {
-    const res = await fetch(`/api/orders/${orderId}/status`, {
+    const res = await fetch(`/api/orders/${encodeURIComponent(id)}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus, notifyCustomer: false })
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`Order #${orderId} marked as ${newStatus}`);
-      fetchOrders();
+      showToast(`Order #${id} status updated to ${newStatus}`);
     }
   } catch (err) {
     showToast(`Failed to update status: ${err.message}`);
   }
 };
 
-window.notifyOrderUpdate = async function(orderId, currentStatus) {
-  if (!confirm(`Send WhatsApp status notification to customer for Order #${orderId} (${currentStatus})?`)) {
-    return;
-  }
+window.notifyOrderUpdate = async function(id, status) {
   try {
-    const res = await fetch(`/api/orders/${orderId}/status`, {
+    const res = await fetch(`/api/orders/${encodeURIComponent(id)}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: currentStatus, notifyCustomer: true })
+      body: JSON.stringify({ status, notifyCustomer: true })
     });
     const data = await res.json();
-    if (data.success) {
-      showToast(`WhatsApp message dispatched to customer!`);
+    if (data.notificationSent) {
+      showToast(`WhatsApp status notification sent for #${id}!`);
+    } else {
+      showToast(`Status updated, but customer notification could not be delivered`);
     }
   } catch (err) {
     showToast(`Error: ${err.message}`);
@@ -196,32 +706,9 @@ window.notifyOrderUpdate = async function(orderId, currentStatus) {
 };
 
 // --------------------------------------------------------------------------
-// 3. PRODUCT FLOWS EDITOR
+// 5. STUDIO SETTINGS
 // --------------------------------------------------------------------------
-function initFlowEditor() {
-  const saveBtn = document.getElementById('saveProductFlowsBtn');
-  const addProdBtn = document.getElementById('addProductBtn');
-
-  if (saveBtn) saveBtn.addEventListener('click', saveProductFlows);
-  if (addProdBtn) addProdBtn.addEventListener('click', () => addProductCard());
-
-  fetchConfig();
-}
-
-async function fetchConfig() {
-  try {
-    const res = await fetch('/api/config');
-    const data = await res.json();
-    currentConfig = data.config || {};
-    populateConfigFields(currentConfig);
-    renderSimulator();
-  } catch (err) {
-    console.error('Failed to load bot config:', err);
-  }
-}
-
-function populateConfigFields(cfg) {
-  // Settings Tab Fields
+function populateSettingsFields(cfg) {
   setVal('cfgStudioName', cfg.studio_name);
   setVal('cfgStudioPhone', cfg.studio_phone);
   setVal('cfgStudioAddress', cfg.studio_address);
@@ -231,222 +718,9 @@ function populateConfigFields(cfg) {
   setVal('cfgPromptAddress', cfg.prompt_address);
   setVal('cfgOrderConfirmedMessage', cfg.order_confirmed_message);
   setVal('cfgTrackingMessage', cfg.tracking_message);
-
-  // Flow Tab Fields
-  renderProductFlowTabs(cfg.products || [], cfg.product_flows || {});
-  renderProductsList(cfg.products || []);
 }
 
-function renderProductFlowTabs(products, productFlows) {
-  const tabsContainer = document.getElementById('productFlowTabs');
-  if (!tabsContainer) return;
-
-  if (!products.some(p => p.id === activeProductFlowId) && products.length > 0) {
-    activeProductFlowId = products[0].id;
-  }
-
-  tabsContainer.innerHTML = products.map(p => `
-    <button type="button" class="product-pill ${p.id === activeProductFlowId ? 'active' : ''}" onclick="selectProductFlow('${p.id}')">
-      ${escapeHtml(p.title)}
-    </button>
-  `).join('');
-
-  renderActiveProductFlow(activeProductFlowId, productFlows);
-}
-
-window.selectProductFlow = function(prodId) {
-  activeProductFlowId = prodId;
-  const pills = document.querySelectorAll('.product-pill');
-  pills.forEach(p => p.classList.remove('active'));
-  event?.target?.classList.add('active');
-
-  const productFlows = currentConfig?.product_flows || {};
-  renderActiveProductFlow(prodId, productFlows);
-};
-
-function renderActiveProductFlow(prodId, productFlows) {
-  const container = document.getElementById('activeProductFlowEditor');
-  if (!container) return;
-
-  const flow = productFlows[prodId] || {
-    id: prodId,
-    title: prodId,
-    step1_title: "Options",
-    step1_prompt: "Select an option:",
-    step1_options: [],
-    step2_title: "Customization",
-    step2_prompt: "",
-    step2_options: [],
-    photo_prompt: "Please send your photo:"
-  };
-
-  const step1OptsText = (flow.step1_options || []).map(o => o.text).join('\n');
-  const step2OptsText = (flow.step2_options || []).map(o => o.text).join('\n');
-
-  container.innerHTML = `
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-      <span class="product-flow-section-title">Dedicated Flow for: <strong>${escapeHtml(flow.title || prodId)}</strong></span>
-      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">${prodId}</span>
-    </div>
-
-    <!-- Step 1 Config -->
-    <div class="form-group" style="margin-top: 10px;">
-      <label>Step 1 Heading & Prompt Question</label>
-      <input type="text" id="flowStep1Prompt" class="text-input" value="${escapeHtml(flow.step1_prompt || '')}" placeholder="e.g. Please choose your Frame Size:">
-    </div>
-
-    <div class="form-group">
-      <label>Step 1 Clickable Buttons (1 option per line)</label>
-      <textarea id="flowStep1Options" class="textarea-input" rows="3" placeholder="Option 1&#10;Option 2&#10;Option 3">${escapeHtml(step1OptsText)}</textarea>
-      <span class="field-hint">Each line generates a modern clickable WhatsApp button for the customer.</span>
-    </div>
-
-    <!-- Step 2 Config -->
-    <div class="form-group">
-      <label>Step 2 Heading / Prompt (Leave empty if no Step 2 needed)</label>
-      <input type="text" id="flowStep2Prompt" class="text-input" value="${escapeHtml(flow.step2_prompt || '')}" placeholder="e.g. Select Finish & Border or Custom Quote:">
-    </div>
-
-    <div class="form-group">
-      <label>Step 2 Clickable Buttons (Optional, 1 per line)</label>
-      <textarea id="flowStep2Options" class="textarea-input" rows="3" placeholder="Finish 1&#10;Finish 2">${escapeHtml(step2OptsText)}</textarea>
-      <span class="field-hint">Leave blank if Step 2 is a custom text question (e.g. quote, engraving name).</span>
-    </div>
-
-    <!-- Photo Upload Prompt -->
-    <div class="form-group">
-      <label>Product-Specific Photo Upload Instructions</label>
-      <textarea id="flowPhotoPrompt" class="textarea-input" rows="2">${escapeHtml(flow.photo_prompt || '')}</textarea>
-    </div>
-  `;
-}
-
-function gatherActiveProductFlowData() {
-  if (!activeProductFlowId) return null;
-  const flowStep1Prompt = document.getElementById('flowStep1Prompt')?.value.trim() || '';
-  const flowStep1OptsRaw = document.getElementById('flowStep1Options')?.value.trim() || '';
-  const flowStep2Prompt = document.getElementById('flowStep2Prompt')?.value.trim() || '';
-  const flowStep2OptsRaw = document.getElementById('flowStep2Options')?.value.trim() || '';
-  const flowPhotoPrompt = document.getElementById('flowPhotoPrompt')?.value.trim() || '';
-
-  const step1_options = flowStep1OptsRaw.split('\n')
-    .map(s => s.trim())
-    .filter(Boolean)
-    .map((text, idx) => ({ id: `${activeProductFlowId}_opt1_${idx + 1}`, text }));
-
-  const step2_options = flowStep2OptsRaw.split('\n')
-    .map(s => s.trim())
-    .filter(Boolean)
-    .map((text, idx) => ({ id: `${activeProductFlowId}_opt2_${idx + 1}`, text }));
-
-  const currentProduct = (currentConfig?.products || []).find(p => p.id === activeProductFlowId);
-
-  return {
-    id: activeProductFlowId,
-    title: currentProduct?.title || activeProductFlowId,
-    description: currentProduct?.description || '',
-    price: currentProduct?.price || '',
-    step1_title: "Product Options",
-    step1_prompt: flowStep1Prompt,
-    step1_options,
-    step2_title: "Customization",
-    step2_prompt: flowStep2Prompt,
-    step2_options,
-    photo_prompt: flowPhotoPrompt
-  };
-}
-
-function renderProductsList(products) {
-  const container = document.getElementById('productsList');
-  if (!container) return;
-  container.innerHTML = products.map((prod, index) => `
-    <div class="product-item-card" data-index="${index}">
-      <div class="product-item-header">
-        <input type="text" class="text-input prod-title" value="${escapeHtml(prod.title)}" placeholder="Product Title (e.g. 🖼️ Frames)">
-        <input type="text" class="text-input prod-price" style="width: 100px;" value="${escapeHtml(prod.price || '')}" placeholder="₹ Price">
-        <button class="delete-product-btn" onclick="removeProductCard(${index})">&times;</button>
-      </div>
-      <input type="text" class="text-input prod-desc" value="${escapeHtml(prod.description || '')}" placeholder="Short description / specs hint">
-      <input type="hidden" class="prod-id" value="${escapeHtml(prod.id || `prod_${Date.now()}`)}">
-    </div>
-  `).join('');
-}
-
-function addProductCard() {
-  const products = gatherCurrentProducts();
-  const newId = `prod_${Date.now().toString(36)}`;
-  products.push({
-    id: newId,
-    title: "✨ New Photo Product",
-    description: "High quality custom photo product",
-    price: "₹499+"
-  });
-  renderProductsList(products);
-  renderProductFlowTabs(products, currentConfig?.product_flows || {});
-}
-
-window.removeProductCard = function(index) {
-  const products = gatherCurrentProducts();
-  products.splice(index, 1);
-  renderProductsList(products);
-  renderProductFlowTabs(products, currentConfig?.product_flows || {});
-};
-
-function gatherCurrentProducts() {
-  const cards = document.querySelectorAll('.product-item-card');
-  const products = [];
-  cards.forEach(card => {
-    const title = card.querySelector('.prod-title')?.value.trim() || 'Product';
-    const price = card.querySelector('.prod-price')?.value.trim() || '';
-    const description = card.querySelector('.prod-desc')?.value.trim() || '';
-    const id = card.querySelector('.prod-id')?.value.trim() || `prod_${Date.now()}`;
-    products.push({ id, title, description, price });
-  });
-  return products;
-}
-
-async function saveProductFlows() {
-  const activeFlow = gatherActiveProductFlowData();
-  const updatedProductFlows = { ...(currentConfig?.product_flows || {}) };
-  if (activeFlow) {
-    updatedProductFlows[activeFlow.id] = activeFlow;
-  }
-
-  const updatedProducts = gatherCurrentProducts();
-
-  const config = {
-    ...currentConfig,
-    products: updatedProducts,
-    product_flows: updatedProductFlows
-  };
-
-  try {
-    const res = await fetch('/api/config', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ config })
-    });
-    const data = await res.json();
-    if (data.success) {
-      currentConfig = data.config;
-      renderProductFlowTabs(currentConfig.products || [], currentConfig.product_flows || {});
-      renderSimulator();
-      showToast('Product flows updated & saved!');
-    }
-  } catch (err) {
-    showToast(`Failed to save: ${err.message}`);
-  }
-}
-
-// --------------------------------------------------------------------------
-// 4. STUDIO SETTINGS
-// --------------------------------------------------------------------------
-function initSettings() {
-  const saveBtn = document.getElementById('saveSettingsBtn');
-  if (saveBtn) saveBtn.addEventListener('click', saveSettings);
-}
-
-async function saveSettings() {
+window.saveSettings = async function() {
   const config = {
     ...currentConfig,
     studio_name: getVal('cfgStudioName'),
@@ -469,477 +743,101 @@ async function saveSettings() {
     const data = await res.json();
     if (data.success) {
       currentConfig = data.config;
-      showToast('Studio settings saved successfully!');
       renderSimulator();
+      showToast('Studio settings saved successfully!');
     }
   } catch (err) {
     showToast(`Failed to save settings: ${err.message}`);
   }
-}
-
-// --------------------------------------------------------------------------
-// 5. LIVE WHATSAPP PHONE SIMULATOR (SEE PRODUCTS LIVELY)
-// --------------------------------------------------------------------------
-function initSimulator() {
-  const resetBtn = document.getElementById('resetSimulatorBtn');
-  if (resetBtn) resetBtn.addEventListener('click', () => renderSimulator());
-}
-
-function renderSimulator() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const simTitle = document.getElementById('simPhoneTitle');
-  if (!chatBody) return;
-
-  const studioName = currentConfig?.studio_name || "InstaPics Photobooks & Frames";
-  if (simTitle) simTitle.textContent = studioName;
-
-  const welcomeText = (currentConfig?.welcome_message || "Welcome to *InstaPics*! 📸✨\n\nWe craft premium Non-Tearable & Waterproof Photobooks with lifetime durability.\n\nChoose your package below:")
-    .replace('{name}', 'Customer');
-
-  const products = currentConfig?.products || [];
-
-  const catalogBtnHtml = `
-    <div class="phone-btn" onclick="simClickCatalog()" style="background: var(--navy-primary); color: #FFFFFF; font-weight: 500;">
-      🛍️ View WhatsApp Catalogue
-    </div>
-  `;
-
-  const buttonsHtml = products.slice(0, 5).map(p => `
-    <div class="phone-btn" onclick="simClickProduct('${p.id}')">
-      ${escapeHtml(p.title)} ${p.price ? `(${escapeHtml(p.price)})` : ''}
-    </div>
-  `).join('');
-
-  chatBody.innerHTML = `
-    <!-- User initial message -->
-    <div class="phone-msg-bubble outgoing">
-      Hi! I'd like to place an order.
-    </div>
-
-    <!-- Bot Welcome Bubble with Buttons -->
-    <div class="phone-msg-bubble incoming">
-      <div style="white-space: pre-line;">${escapeHtml(welcomeText)}</div>
-      <div class="phone-buttons-group">
-        ${catalogBtnHtml}
-        ${buttonsHtml}
-      </div>
-    </div>
-  `;
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
-
-window.simClickCatalog = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const products = currentConfig?.products || [];
-  const itemsHtml = products.map(p => `
-    <div style="border-bottom: 1px solid var(--border-color); padding: 8px 0; display: flex; justify-content: space-between; align-items: center;">
-      <div>
-        <strong>${escapeHtml(p.title)}</strong><br>
-        <span style="font-size: 11px; color: var(--text-secondary);">${escapeHtml(p.description || '')}</span>
-      </div>
-      <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">${escapeHtml(p.price || '')}</div>
-    </div>
-  `).join('');
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      🛍️ View WhatsApp Catalogue
-    </div>
-    <div class="phone-msg-bubble incoming">
-      <div style="font-weight: 600; margin-bottom: 6px; font-size: 13px;">📦 WhatsApp Business Catalogue</div>
-      ${itemsHtml}
-      <div style="margin-top: 8px; font-size: 11px; color: var(--text-secondary);">Tap any product below to start booking:</div>
-      <div class="phone-buttons-group" style="margin-top: 6px;">
-        ${products.slice(0, 4).map(p => `<div class="phone-btn" onclick="simClickProduct('${p.id}')">${escapeHtml(p.title)}</div>`).join('')}
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simClickProduct = function(prodId) {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const product = (currentConfig?.products || []).find(p => p.id === prodId) || { title: prodId };
-  const flow = (currentConfig?.product_flows || {})[prodId] || {
-    step1_prompt: "Please choose your size:",
-    step1_options: [
-      { text: "Option A" },
-      { text: "Option B" }
-    ],
-    photo_prompt: "Please upload your photo:"
-  };
-
-  // Add outgoing click
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      Selected: ${escapeHtml(product.title)}
-    </div>
-  `;
-
-  // Bot response with Step 1 Buttons
-  const step1Buttons = (flow.step1_options || []).map(opt => `
-    <div class="phone-btn" onclick="simClickStep1('${prodId}', '${escapeHtml(opt.text)}')">
-      ${escapeHtml(opt.text)}
-    </div>
-  `).join('');
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble incoming">
-      <strong>${escapeHtml(product.title)}</strong><br>
-      <span style="font-size: 12px; color: var(--text-secondary);">${escapeHtml(flow.step1_prompt || 'Please choose an option:')}</span>
-      <div class="phone-buttons-group">
-        ${step1Buttons || `<div class="phone-btn" onclick="simClickStep1('${prodId}', 'Standard Size')">Standard Size</div>`}
-      </div>
-    </div>
-  `;
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-let simCart = [];
-
-function extractSimPrice(str) {
-  if (!str) return 0;
-  const match = str.match(/₹\s*([0-9,]+)/);
-  if (match) return parseInt(match[1].replace(/,/g, ''), 10) || 0;
-  const digits = str.replace(/[^0-9]/g, '');
-  return parseInt(digits, 10) || 0;
-}
-
-window.simClickStep1 = function(prodId, step1Choice) {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const flow = (currentConfig?.product_flows || {})[prodId] || {};
-  const product = (currentConfig?.products || []).find(p => p.id === prodId) || { title: prodId };
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      Selected: ${escapeHtml(step1Choice)}
-    </div>
-  `;
-
-  if (flow.step2_options && flow.step2_options.length > 0) {
-    const step2Buttons = flow.step2_options.map(opt => `
-      <div class="phone-btn" onclick="simClickStep2('${prodId}', '${escapeHtml(step1Choice)}', '${escapeHtml(opt.text)}')">
-        ${escapeHtml(opt.text)}
-      </div>
-    `).join('');
-
-    chatBody.innerHTML += `
-      <div class="phone-msg-bubble incoming">
-        <span style="font-size: 12px; color: var(--text-secondary);">${escapeHtml(flow.step2_prompt || 'Choose Finish / Style:')}</span>
-        <div class="phone-buttons-group">
-          ${step2Buttons}
-        </div>
-      </div>
-    `;
-    chatBody.scrollTop = chatBody.scrollHeight;
-  } else {
-    const price = extractSimPrice(step1Choice) || extractSimPrice(product.price);
-    simCart.push({
-      productTitle: product.title,
-      option: step1Choice,
-      price: price
-    });
-    simShowCartReview();
-  }
-};
-
-window.simClickStep2 = function(prodId, step1Choice, step2Choice) {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const product = (currentConfig?.products || []).find(p => p.id === prodId) || { title: prodId };
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      Customization: ${escapeHtml(step2Choice)}
-    </div>
-  `;
-  const price = extractSimPrice(step1Choice) || extractSimPrice(step2Choice) || extractSimPrice(product.price);
-  simCart.push({
-    productTitle: product.title,
-    option: `${step1Choice} • ${step2Choice}`,
-    price: price
-  });
-  simShowCartReview();
-};
-
-window.simShowCartReview = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const total = simCart.reduce((sum, i) => sum + (i.price || 0), 0);
-  const itemsListHtml = simCart.map((item, idx) => `
-    <div style="margin-bottom: 6px;">
-      ${idx + 1}. <strong>${escapeHtml(item.productTitle)}</strong><br>
-      <span style="font-size: 11px; color: var(--text-secondary);">&nbsp;&nbsp;• ${escapeHtml(item.option)}</span>
-    </div>
-  `).join('');
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble incoming">
-      <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">🛒 Your InstaPics Cart:</div>
-      ${itemsListHtml}
-      <div style="border-top: 1px dashed var(--border-light); margin: 8px 0; padding-top: 6px; font-weight: 600; color: #16a34a;">
-        💰 Cart Total: ₹${total.toLocaleString('en-IN')} (${simCart.length} item${simCart.length > 1 ? 's' : ''})
-      </div>
-      <div style="font-size: 12px; margin-bottom: 8px;">Would you like to add another item or proceed to order?</div>
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simShowMoreProducts()">➕ Add Another Item</div>
-        <div class="phone-btn" onclick="simShowPhotoStep()" style="background: var(--navy-dark); color: #fff; font-weight: 500;">📸 Upload Photos & Order</div>
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simShowMoreProducts = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const products = currentConfig?.products || [];
-  const buttonsHtml = products.slice(0, 4).map(p => `
-    <div class="phone-btn" onclick="simClickProduct('${p.id}')">
-      ${escapeHtml(p.title)} ${p.price ? `(${escapeHtml(p.price)})` : ''}
-    </div>
-  `).join('');
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      ➕ Add Another Item
-    </div>
-    <div class="phone-msg-bubble incoming">
-      ✨ <strong>Add Another Item to Your Order</strong> 🛍️<br><br>
-      Select your next product from our collection below:
-      <div class="phone-buttons-group">
-        ${buttonsHtml}
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simShowPhotoStep = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const photoPrompt = "📸 *Step 1/3: Send Photos*\n\nPlease upload your photos directly here on WhatsApp, or send a *Google Drive / Google Photos / iCloud link* for high-resolution printing:";
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      📸 Upload Photos & Order
-    </div>
-    <div class="phone-msg-bubble incoming">
-      <div style="white-space: pre-line;">${escapeHtml(photoPrompt)}</div>
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simUploadPhoto('https://drive.google.com/drive/folders/sample-album')">
-          📁 Share Google Drive Link
-        </div>
-        <div class="phone-btn" onclick="simUploadPhoto('Attached 60 Photos')">
-          📷 Upload Photos Directly
-        </div>
-      </div>
-    </div>
-  `;
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simUploadPhoto = function(sampleLink) {
-  const chatBody = document.getElementById('simulatorChatBody');
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      <span>${sampleLink || '📁 Google Drive link shared'}</span>
-    </div>
-
-    <div class="phone-msg-bubble incoming">
-      Photos received! ✨<br><br>
-      <strong>Step 2/3: Customer Name</strong><br>
-      What is your <strong>Full Name</strong>?
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simSendName()">Simulate Name: "Priya Sharma"</div>
-      </div>
-    </div>
-  `;
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simSendName = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      Priya Sharma
-    </div>
-
-    <div class="phone-msg-bubble incoming">
-      Thank you, Priya Sharma! 🏠<br><br>
-      <strong>Step 3/3: Delivery Address</strong><br>
-      Please share your <strong>Delivery Address with Pincode</strong> for courier shipping:
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simSendAddress()">Simulate: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040"</div>
-      </div>
-    </div>
-  `;
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simSendAddress = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const total = simCart.reduce((sum, i) => sum + (i.price || 0), 0);
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040
-    </div>
-
-    <div class="phone-msg-bubble incoming">
-      Order Total: <strong>₹${total.toLocaleString('en-IN')}</strong><br><br>
-      Please choose your preferred <strong>Payment Method</strong>:
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simFinishOrder('Instant UPI / Online QR')">📱 Instant UPI / QR</div>
-        <div class="phone-btn" onclick="simFinishOrder('Pay on Pickup / Delivery')">💵 Pay on Pickup / Delivery</div>
-      </div>
-    </div>
-  `;
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simFinishOrder = function(paymentType) {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const orderId = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
-  const total = simCart.reduce((sum, i) => sum + (i.price || 0), 0);
-  const itemsSummary = simCart.map((i, idx) => `${idx + 1}. ${i.productTitle} (${i.option})`).join('<br>');
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      Payment Choice: ${paymentType}
-    </div>
-
-    <div class="phone-msg-bubble incoming">
-      🎉 <strong>Order Booked Successfully!</strong><br><br>
-      <strong>Order ID:</strong> #${orderId}<br>
-      <strong>Customer:</strong> Priya Sharma<br><br>
-      <strong>Items Ordered:</strong><br>
-      ${itemsSummary}<br><br>
-      <strong>Total Amount:</strong> <span style="color:#16a34a; font-weight:600;">₹${total.toLocaleString('en-IN')}</span><br>
-      <strong>Shipping to:</strong> Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040<br>
-      <strong>Payment Mode:</strong> ${paymentType}<br><br>
-      ${paymentType.includes('UPI') ? '<em>[UPI QR Code generated automatically for instant payment]</em><br><br>' : ''}
-      Our design team has received your order and will share your photobook layout preview shortly! 📖✨
-      <div class="phone-buttons-group">
-        <div class="phone-btn">📦 Track Order Status</div>
-        <div class="phone-btn">📞 Call Studio Support</div>
-      </div>
-    </div>
-  `;
-
-  chatBody.scrollTop = chatBody.scrollHeight;
 };
 
 // --------------------------------------------------------------------------
-// 6. WHATSAPP DEVICE MANAGER
+// 6. WHATSAPP DEVICE MANAGEMENT
 // --------------------------------------------------------------------------
-function initDeviceManager() {
-  const restartBtn = document.getElementById('restartBotBtn');
-  const pairingBtn = document.getElementById('requestPairingBtn');
-  const testMenuBtn = document.getElementById('sendTestMenuBtn');
-  const sendCustomerWelcomeBtn = document.getElementById('sendCustomerWelcomeBtn');
-
-  if (sendCustomerWelcomeBtn) {
-    sendCustomerWelcomeBtn.addEventListener('click', async () => {
-      const phoneInput = document.getElementById('targetCustomerPhoneInput');
-      const phone = phoneInput?.value.trim();
-      if (!phone) {
-        showToast('Please enter a WhatsApp phone number');
-        return;
-      }
-      sendCustomerWelcomeBtn.disabled = true;
-      sendCustomerWelcomeBtn.textContent = 'Sending...';
-      try {
-        const res = await fetch('/api/send-welcome', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone })
-        });
-        const data = await res.json();
-        if (data.success) {
-          showToast(data.message);
-          phoneInput.value = '';
-        } else {
-          showToast(`Error: ${data.error || 'Failed to send'}`);
-        }
-      } catch (err) {
-        showToast(`Error: ${err.message}`);
-      } finally {
-        sendCustomerWelcomeBtn.disabled = false;
-        sendCustomerWelcomeBtn.textContent = 'Send Welcome Message & Buttons';
-      }
-    });
+window.restartWhatsAppSocket = async function() {
+  try {
+    await fetch('/api/restart', { method: 'POST' });
+    showToast('WhatsApp socket restart initiated...');
+    setTimeout(fetchDeviceStatus, 2000);
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
   }
+};
 
-  if (testMenuBtn) {
-    testMenuBtn.addEventListener('click', async () => {
-      testMenuBtn.disabled = true;
-      testMenuBtn.textContent = 'Sending...';
-      try {
-        const res = await fetch('/api/send-test-menu', { method: 'POST' });
-        const data = await res.json();
-        if (data.success) {
-          showToast(data.message || 'Interactive menu sent to your phone!');
-        } else {
-          showToast(`Error: ${data.error || 'Failed to send'}`);
-        }
-      } catch (err) {
-        showToast(`Error: ${err.message}`);
-      } finally {
-        testMenuBtn.disabled = false;
-        testMenuBtn.textContent = '📲 Test on My Phone';
-      }
-    });
+window.requestPairingCode = async function() {
+  const phone = getVal('pairingPhoneInput');
+  if (!phone) {
+    alert('Please enter your WhatsApp phone number with country code (e.g. 916369134270)');
+    return;
   }
+  try {
+    showToast('Requesting 8-digit pairing code...');
+    const res = await fetch('/api/pairing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+    if (data.pairingCode) {
+      document.getElementById('pairingCodeValue').textContent = data.pairingCode;
+      document.getElementById('pairingCodeDisplay').classList.remove('hidden');
+      showToast('Pairing code generated! Check your phone.');
+    } else {
+      alert(data.error || 'Failed to generate code');
+    }
+  } catch (err) {
+    alert(`Pairing error: ${err.message}`);
+  }
+};
 
-  if (restartBtn) {
-    restartBtn.addEventListener('click', async () => {
-      try {
-        await fetch('/api/restart', { method: 'POST' });
-        showToast('WhatsApp restart initiated...');
-        setTimeout(fetchDeviceStatus, 2000);
-      } catch (err) {
-        showToast(`Error restarting: ${err.message}`);
-      }
-    });
+window.sendTestMenuToPhone = async function() {
+  const btn = document.getElementById('sendTestMenuBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
   }
+  try {
+    const res = await fetch('/api/send-test-menu', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message || 'Test menu dispatched to your phone!');
+    } else {
+      showToast(`Error: ${data.error || 'Failed to dispatch'}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '📲 Test on My Phone';
+    }
+  }
+};
 
-  if (pairingBtn) {
-    pairingBtn.addEventListener('click', async () => {
-      const phoneInput = document.getElementById('pairingPhoneInput');
-      const phone = phoneInput?.value.trim();
-      if (!phone) {
-        alert('Please enter your WhatsApp phone number with country code (e.g. 919876543210)');
-        return;
-      }
-      try {
-        pairingBtn.disabled = true;
-        pairingBtn.textContent = 'Requesting Code...';
-        const res = await fetch('/api/pairing', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone })
-        });
-        const data = await res.json();
-        if (data.pairingCode) {
-          document.getElementById('pairingCodeValue').textContent = data.pairingCode;
-          document.getElementById('pairingCodeDisplay').classList.remove('hidden');
-          showToast('Pairing code generated!');
-        } else {
-          alert(data.error || 'Failed to generate code');
-        }
-      } catch (err) {
-        alert(`Error: ${err.message}`);
-      } finally {
-        pairingBtn.disabled = false;
-        pairingBtn.textContent = 'Generate 8-Digit Pairing Code';
-      }
-    });
+window.sendWelcomeToCustomPhone = async function() {
+  const phone = getVal('targetCustomerPhoneInput');
+  if (!phone) {
+    alert('Please enter a WhatsApp number (e.g. 9629661668)');
+    return;
   }
-}
+  try {
+    showToast(`Sending welcome carousel to +${phone}...`);
+    const res = await fetch('/api/send-welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message || 'Carousel message sent successfully!');
+      setVal('targetCustomerPhoneInput', '');
+    } else {
+      showToast(`Error: ${data.error || 'Failed to send'}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  }
+};
 
 let lastDeviceState = { status: null, qrCodeDataUrl: null, phone: null };
 
@@ -948,7 +846,6 @@ async function fetchDeviceStatus() {
     const res = await fetch('/api/status');
     const data = await res.json();
 
-    // Avoid DOM thrashing and QR image flickering if state hasn't changed
     if (
       lastDeviceState.status === data.status &&
       lastDeviceState.qrCodeDataUrl === data.qrCodeDataUrl &&
@@ -969,7 +866,7 @@ async function fetchDeviceStatus() {
     const phoneText = document.getElementById('connectedPhoneText');
 
     if (data.status === 'connected') {
-      pill.className = 'device-pill connected';
+      if (pill) pill.className = 'device-pill connected';
       if (statusText) statusText.textContent = `Online (+${data.phone})`;
       if (qrContainer) qrContainer.classList.add('hidden');
       if (connectedBanner) {
@@ -977,7 +874,7 @@ async function fetchDeviceStatus() {
         if (phoneText) phoneText.textContent = `+${data.phone}`;
       }
     } else {
-      pill.className = 'device-pill';
+      if (pill) pill.className = 'device-pill';
       if (connectedBanner) connectedBanner.classList.add('hidden');
       if (qrContainer) qrContainer.classList.remove('hidden');
 
@@ -986,10 +883,10 @@ async function fetchDeviceStatus() {
         qrContainer.innerHTML = `<img src="${data.qrCodeDataUrl}" class="qr-image" alt="WhatsApp QR Code" />`;
       } else if (data.status === 'connecting') {
         if (statusText) statusText.textContent = 'Connecting...';
-        qrContainer.innerHTML = `<div class="qr-placeholder">Connecting to WhatsApp...</div>`;
+        qrContainer.innerHTML = `<div class="field-hint">Connecting to WhatsApp...</div>`;
       } else {
         if (statusText) statusText.textContent = 'Offline';
-        qrContainer.innerHTML = `<div class="qr-placeholder">Waiting for QR Code...</div>`;
+        qrContainer.innerHTML = `<div class="field-hint">Waiting for QR Code...</div>`;
       }
     }
 
@@ -999,12 +896,12 @@ async function fetchDeviceStatus() {
       document.getElementById('pairingCodeDisplay')?.classList.remove('hidden');
     }
   } catch (err) {
-    console.warn('Status poll error:', err);
+    // Silent status poll catch
   }
 }
 
 // --------------------------------------------------------------------------
-// HELPERS
+// 7. UTILITY HELPERS
 // --------------------------------------------------------------------------
 function setVal(id, val) {
   const el = document.getElementById(id);
@@ -1016,6 +913,11 @@ function getVal(id) {
   return el ? el.value.trim() : '';
 }
 
+function setElText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text || '';
+}
+
 function showToast(msg) {
   const toast = document.getElementById('toast');
   if (!toast) return;
@@ -1025,6 +927,14 @@ function showToast(msg) {
   toast._timer = setTimeout(() => {
     toast.classList.add('hidden');
   }, 3500);
+}
+
+function extractPrice(str) {
+  if (!str) return 0;
+  const match = String(str).match(/₹\s*([0-9,]+)/);
+  if (match) return parseInt(match[1].replace(/,/g, ''), 10) || 0;
+  const digits = String(str).replace(/[^0-9]/g, '');
+  return parseInt(digits, 10) || 0;
 }
 
 function escapeHtml(str) {
