@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import {
   getAllConfig,
@@ -713,21 +714,23 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
     { id: 'prod_price_list', title: '🏷️ Full Price List & Offers', price: 'Special Offers', description: 'Non-tearable photobook complete offer price sheet with discounts.', image: '/assets/products/price_list.jpg' }
   ];
 
-  const carouselCards = products.slice(0, 5).map(p => {
-    let imgPath = p.image || '/assets/products/photobook_a4.jpg';
-    if (imgPath.startsWith('/')) imgPath = imgPath.slice(1);
-    const resolvedPath = path.resolve(imgPath);
-
-    return {
-      title: `${p.title} (${p.price || ''})`,
-      imagePath: fs.existsSync(resolvedPath) ? resolvedPath : path.resolve('assets/products/photobook_a4.jpg'),
-      body: p.description || 'Premium quality customized photo product.',
-      buttonText: `Select ${p.title.split(' ')[1] || 'Product'}`,
-      buttonId: p.id
-    };
-  });
-
   try {
+    const carouselCards = products.slice(0, 5).map(p => {
+      let imgPath = p.image || '/assets/products/photobook_a4.jpg';
+      if (imgPath.startsWith('/')) imgPath = imgPath.slice(1);
+      const resolvedPath = path.resolve(imgPath);
+      const shortWord = (p.title || '').replace(/[^a-zA-Z0-9\s]/g, '').trim().split(/\s+/)[0] || 'Item';
+      const buttonLabel = `Select ${shortWord}`.slice(0, 20);
+
+      return {
+        title: (p.title || 'Product').slice(0, 30),
+        imagePath: fs.existsSync(resolvedPath) ? resolvedPath : path.resolve('assets/products/photobook_a4.jpg'),
+        body: p.description || 'Premium quality customized photo product.',
+        buttonText: buttonLabel,
+        buttonId: p.id
+      };
+    });
+
     await sendCarouselMessage(sock, jid, {
       bodyText: fullBody,
       footerText: carouselFooter,
@@ -737,7 +740,7 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
     console.warn('[WelcomeMenu] Carousel fallback to buttons:', err.message);
     const buttons = products.slice(0, 4).map(p => ({
       type: 'quick_reply',
-      text: `${p.title.slice(0, 20)} (${p.price || ''})`,
+      text: `${p.title.slice(0, 20)}`,
       id: p.id
     }));
 

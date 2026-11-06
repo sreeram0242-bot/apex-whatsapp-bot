@@ -1794,3 +1794,4 @@ if (startIdx !== -1 && endIdx !== -1) {
 } else {
   console.error('❌ Could not locate script tags in index.html');
 }
+
