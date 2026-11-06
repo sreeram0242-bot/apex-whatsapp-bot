@@ -8,16 +8,16 @@ let statusPollInterval = null;
 let activeProductFlowId = 'prod_meta_ads';
 
 document.addEventListener('DOMContentLoaded', () => {
-  initTabs();
-  initOrders();
-  initFlowEditor();
-  initSettings();
-  initDeviceManager();
-  initSimulator();
+  try { initTabs(); } catch (e) { console.error('initTabs failed:', e); }
+  try { initOrders(); } catch (e) { console.error('initOrders failed:', e); }
+  try { initFlowEditor(); } catch (e) { console.error('initFlowEditor failed:', e); }
+  try { initSettings(); } catch (e) { console.error('initSettings failed:', e); }
+  try { initDeviceManager(); } catch (e) { console.error('initDeviceManager failed:', e); }
+  try { initSimulator(); } catch (e) { console.error('initSimulator failed:', e); }
 
-  // Start polling device status every 4 seconds
+  // Start polling device status every 3 seconds
   fetchDeviceStatus();
-  statusPollInterval = setInterval(fetchDeviceStatus, 4000);
+  statusPollInterval = setInterval(fetchDeviceStatus, 3000);
 });
 
 // --------------------------------------------------------------------------

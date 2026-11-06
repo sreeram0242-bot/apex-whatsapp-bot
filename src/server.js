@@ -18,17 +18,31 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend, assets and uploaded customer photos
-app.use(express.static(path.resolve('src/public')));
-app.use('/assets', express.static(path.resolve('assets')));
-app.use('/uploads', express.static(path.resolve('uploads')));
+const publicDir = path.join(import.meta.dirname, 'public');
+const assetsDir = path.resolve('assets');
+const uploadsDir = path.resolve('uploads');
+
+// Explicit static serving with proper Content-Type & cache headers
+app.use(express.static(publicDir, {
+  maxAge: '1h',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.css')) res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    if (filePath.endsWith('.js')) res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    if (filePath.endsWith('.html')) res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  }
+}));
+app.use('/assets', express.static(assetsDir));
+app.use('/uploads', express.static(uploadsDir));
 
 // Mount API routes
 app.use('/api', apiRoutes);
 
-// Fallback to Admin Panel for SPA routing
+// Fallback to Admin Panel ONLY for HTML page navigations (never for missing .css, .js, or assets)
 app.use((req, res) => {
-  res.sendFile(path.resolve('src/public/index.html'));
+  if (req.method === 'GET' && !req.path.includes('.') && !req.path.startsWith('/api')) {
+    return res.sendFile(path.join(publicDir, 'index.html'));
+  }
+  res.status(404).send('Not Found');
 });
 
 // Start Express server and Baileys WhatsApp client

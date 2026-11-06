@@ -27,3 +27,4 @@ ENV NODE_ENV=production
 
 # Start WhatsApp bot server
 CMD ["node", "src/server.js"]
+
