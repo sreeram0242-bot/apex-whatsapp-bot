@@ -1356,8 +1356,15 @@ body {
         <div class="card">
           <h2 class="card-title">Live QR Scanner</h2>
           <p class="card-subtitle">Open WhatsApp on your phone → Linked Devices → Link a device.</p>
-          <div id="qrCodeContainer" class="qr-container">
-            <div class="field-hint">Waiting for QR Code...</div>
+          <div id="qrCodeContainer" class="qr-container" style="flex-direction: column; gap: 8px;">
+            <div id="qrImageWrap" style="text-align: center; width: 100%;">
+              <img id="liveQrImage" src="/api/qr.png" alt="WhatsApp QR Code" class="qr-image" style="background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light); box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: inline-block;" onerror="this.style.display='none'; document.getElementById('qrFallbackHint').style.display='block';" onload="this.style.display='inline-block'; document.getElementById('qrFallbackHint').style.display='none';" />
+              <div id="qrFallbackHint" class="field-hint" style="display: none; padding: 16px;">
+                ⏳ Waiting for WhatsApp QR Code...<br>
+                <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px;" onclick="refreshLiveQr()">🔄 Refresh QR Code</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="refreshLiveQr()" style="font-size: 12px; margin-top: 6px;">🔄 Refresh QR Code</button>
           </div>
           <div id="connectedBanner" class="pairing-box hidden" style="background: #ECFDF5; border: 1px solid #A7F3D0;">
             <span style="color: #065F46; font-weight: 700; font-size: 14px;">DEVICE CONNECTED & ONLINE</span>
@@ -3112,31 +3119,32 @@ window.sendWelcomeToCustomPhone = async function() {
   }
 };
 
+window.refreshLiveQr = function() {
+  const img = document.getElementById('liveQrImage');
+  if (img) {
+    img.src = '/api/qr.png?t=' + Date.now();
+    img.style.display = 'inline-block';
+  }
+  const hint = document.getElementById('qrFallbackHint');
+  if (hint) hint.style.display = 'none';
+  fetchDeviceStatus(true);
+};
+
 let lastDeviceState = { status: null, qrCodeDataUrl: null, phone: null };
 
-async function fetchDeviceStatus() {
+async function fetchDeviceStatus(forceUpdate = false) {
   try {
     const res = await fetch('/api/status', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-
-    if (
-      lastDeviceState.status === data.status &&
-      lastDeviceState.qrCodeDataUrl === data.qrCodeDataUrl &&
-      lastDeviceState.phone === data.phone
-    ) {
-      return;
-    }
-    lastDeviceState = {
-      status: data.status,
-      qrCodeDataUrl: data.qrCodeDataUrl,
-      phone: data.phone
-    };
 
     const pill = document.getElementById('deviceStatusPill');
     const statusText = pill?.querySelector('.status-text');
     const qrContainer = document.getElementById('qrCodeContainer');
     const connectedBanner = document.getElementById('connectedBanner');
     const phoneText = document.getElementById('connectedPhoneText');
+    const img = document.getElementById('liveQrImage');
+    const hint = document.getElementById('qrFallbackHint');
 
     if (data.status === 'connected') {
       if (pill) pill.className = 'device-pill connected';
@@ -3151,15 +3159,31 @@ async function fetchDeviceStatus() {
       if (connectedBanner) connectedBanner.classList.add('hidden');
       if (qrContainer) qrContainer.classList.remove('hidden');
 
-      if (data.status === 'qr_ready' && data.qrCodeDataUrl) {
+      if (data.status === 'qr_ready') {
         if (statusText) statusText.textContent = 'Scan QR';
-        qrContainer.innerHTML = `<img src="${data.qrCodeDataUrl}" class="qr-image" alt="WhatsApp QR Code" />`;
+        if (img) {
+          if (data.qrCodeDataUrl) {
+            img.src = data.qrCodeDataUrl;
+          } else {
+            img.src = '/api/qr.png?t=' + Date.now();
+          }
+          img.style.display = 'inline-block';
+        }
+        if (hint) hint.style.display = 'none';
       } else if (data.status === 'connecting') {
         if (statusText) statusText.textContent = 'Connecting...';
-        qrContainer.innerHTML = `<div class="field-hint">Connecting to WhatsApp...</div>`;
+        if (hint) {
+          hint.textContent = 'Connecting to WhatsApp servers...';
+          hint.style.display = 'block';
+        }
+        if (img) img.style.display = 'none';
       } else {
-        if (statusText) statusText.textContent = 'Offline';
-        qrContainer.innerHTML = `<div class="field-hint">Waiting for QR Code...</div>`;
+        if (statusText) statusText.textContent = 'Waiting for QR';
+        if (hint) {
+          hint.textContent = 'Waiting for QR code... Click "Restart Bot Socket" if needed.';
+          hint.style.display = 'block';
+        }
+        if (img) img.style.display = 'none';
       }
     }
 
@@ -3169,11 +3193,7 @@ async function fetchDeviceStatus() {
       document.getElementById('pairingCodeDisplay')?.classList.remove('hidden');
     }
   } catch (err) {
-    const pill = document.getElementById('deviceStatusPill');
-    const statusText = pill?.querySelector('.status-text');
-    if (statusText && statusText.textContent === 'Checking...') {
-      statusText.textContent = 'Online';
-    }
+    console.warn('[DeviceStatus] Note:', err.message);
   }
 }
 

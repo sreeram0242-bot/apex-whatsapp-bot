@@ -18,6 +18,7 @@ import {
 } from '../db.js';
 import {
   getWhatsAppStatus,
+  getQrBuffer,
   requestPairing,
   restartWhatsApp,
   logoutWhatsApp,
@@ -46,6 +47,20 @@ router.get('/check-phone', async (req, res) => {
 // 1. WhatsApp Connection & Device Management
 router.get('/status', (req, res) => {
   res.json(getWhatsAppStatus());
+});
+
+router.get(['/qr.png', '/qr'], async (req, res) => {
+  try {
+    const buf = await getQrBuffer();
+    if (!buf) {
+      return res.status(404).send('QR code not ready or device already connected');
+    }
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.send(buf);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 router.post('/send-test-menu', async (req, res) => {

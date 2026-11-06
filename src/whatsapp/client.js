@@ -215,6 +215,17 @@ export function getWhatsAppStatus() {
   };
 }
 
+export async function getQrBuffer() {
+  if (currentQrDataUrl) {
+    const base64Data = currentQrDataUrl.replace(/^data:image\/png;base64,/, '');
+    return Buffer.from(base64Data, 'base64');
+  }
+  if (currentRawQr) {
+    return await QRCode.toBuffer(currentRawQr, { margin: 2, scale: 6 });
+  }
+  return null;
+}
+
 export async function requestPairing(phoneNumber) {
   if (!sock) throw new Error('WhatsApp socket not initialized');
   if (currentStatus === 'connected') throw new Error('WhatsApp is already connected');
