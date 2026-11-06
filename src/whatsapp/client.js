@@ -12,7 +12,7 @@ import pino from 'pino';
 import path from 'node:path';
 import { serializeMessage } from './serializer.js';
 import { handleIncomingMessage, sendWelcomeMenu } from './handler.js';
-import { sendCarouselMessage, sendInteractiveButtons } from './buttons.js';
+import { sendCarouselMessage, sendInteractiveButtons, sendPriceListImageDemo } from './buttons.js';
 import { saveMessage, getStoredMessage } from './store.js';
 import { getAllConfig } from '../db.js';
 
@@ -441,6 +441,21 @@ export async function sendCarouselDemoToPhone(phoneNumber) {
       }
     ]
   });
+}
+
+export async function sendPriceListDemoToPhone(phoneNumber) {
+  if (!sock || currentStatus !== 'connected') {
+    throw new Error('WhatsApp is not connected');
+  }
+  let cleanPhone = (phoneNumber || '').replace(/[^0-9]/g, '');
+  if (cleanPhone.length === 10) {
+    cleanPhone = '91' + cleanPhone;
+  }
+  if (!cleanPhone || cleanPhone.length < 10) {
+    throw new Error('Invalid phone number provided');
+  }
+  const jid = `${cleanPhone}@s.whatsapp.net`;
+  return await sendPriceListImageDemo(sock, jid);
 }
 
 

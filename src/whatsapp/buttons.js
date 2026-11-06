@@ -1,6 +1,7 @@
 import QRCode from 'qrcode';
 import buttonHelper from '@ryuu-reinzz/button-helper';
 import fs from 'node:fs';
+import path from 'node:path';
 import { prepareWAMessageMedia, generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 import { saveMessage } from './store.js';
 
@@ -289,5 +290,99 @@ export async function sendCarouselMessage(sock, jid, {
   } catch (err) {
     console.error('[Carousel] Error sending carousel:', err);
     throw err;
+  }
+}
+
+/**
+ * Sends Format 3: Instant Price List Image Card with interactive action buttons underneath
+ */
+export async function sendPriceListImageDemo(sock, jid) {
+  const imgPath = path.resolve('assets/products/price_list.jpg');
+  const buf = fs.readFileSync(imgPath);
+
+  const caption = "📸 *InstaPics Official Photobook Price List*\n\n" +
+    "✨ *Non-Tearable | 100% Waterproof | Lifetime Durability*\n\n" +
+    "📘 *A4 Premium Photobook:*\n" +
+    "• 40 Pgs (60 Photos): *₹1,750* (was ₹3,600)\n" +
+    "• 60 Pgs (100 Photos): *₹2,150* (was ₹4,500)\n" +
+    "• 80 Pgs (140 Photos): *₹2,500* (was ₹5,200)\n\n" +
+    "📚 *A3 Jumbo Photobook:*\n" +
+    "• 40 Pgs (130 Photos): *₹2,500* (was ₹5,000)\n" +
+    "• 60 Pgs (220 Photos): *₹3,300* (was ₹6,500)\n" +
+    "• 80 Pgs (300 Photos): *₹4,200* (was ₹8,500)\n\n" +
+    "Tap an option below to start your order:";
+
+  try {
+    const media = await prepareWAMessageMedia(
+      { image: buf },
+      { upload: sock.waUploadToServer }
+    );
+
+    const userJid = sock.authState?.creds?.me?.id || sock.user?.id;
+    const fullMsg = generateWAMessageFromContent(
+      jid,
+      {
+        viewOnceMessage: {
+          message: {
+            messageContextInfo: { deviceListMetadata: {}, deviceListMetadataVersion: 2 },
+            interactiveMessage: proto.Message.InteractiveMessage.create({
+              header: proto.Message.InteractiveMessage.Header.create({
+                title: "🏷️ InstaPics Price List",
+                hasMediaAttachment: true,
+                imageMessage: media.imageMessage
+              }),
+              body: proto.Message.InteractiveMessage.Body.create({ text: caption }),
+              footer: proto.Message.InteractiveMessage.Footer.create({ text: "Tap an option below to order" }),
+              nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                buttons: [
+                  {
+                    name: 'quick_reply',
+                    buttonParamsJson: JSON.stringify({ display_text: '📘 Order A4 Book', id: 'prod_photobook_a4' })
+                  },
+                  {
+                    name: 'quick_reply',
+                    buttonParamsJson: JSON.stringify({ display_text: '📚 Order A3 Jumbo', id: 'prod_photobook_a3' })
+                  },
+                  {
+                    name: 'quick_reply',
+                    buttonParamsJson: JSON.stringify({ display_text: '🖼️ Custom Frames', id: 'prod_frames' })
+                  }
+                ]
+              })
+            })
+          }
+        }
+      },
+      { userJid, logger: sock.logger }
+    );
+
+    const additionalNodes = [
+      {
+        tag: 'biz',
+        attrs: {},
+        content: [
+          {
+            tag: 'interactive',
+            attrs: { type: 'native_flow', v: '1' },
+            content: [{ tag: 'native_flow', attrs: { v: '9', name: 'mixed' } }]
+          }
+        ]
+      },
+      { tag: 'bot', attrs: { biz_bot: '1' } }
+    ];
+
+    console.log(`[PriceListDemo] Relaying interactive price card to ${jid}...`);
+    await sock.relayMessage(jid, fullMsg.message, { messageId: fullMsg.key.id, additionalNodes });
+    if (fullMsg?.key?.id && fullMsg?.message) {
+      saveMessage(fullMsg.key.id, fullMsg.message);
+    }
+    console.log(`[PriceListDemo] Sent successfully! ID: ${fullMsg.key.id}`);
+    return fullMsg;
+  } catch (err) {
+    console.warn('[PriceListDemo] Falling back to standard image message:', err.message);
+    return await sock.sendMessage(jid, {
+      image: buf,
+      caption: caption
+    });
   }
 }

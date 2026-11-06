@@ -19,6 +19,7 @@ import {
   sendWelcomeToPhone,
   sendListDemoToPhone,
   sendCarouselDemoToPhone,
+  sendPriceListDemoToPhone,
   checkPhoneOnWhatsApp
 } from '../whatsapp/client.js';
 
@@ -88,9 +89,50 @@ router.post('/send-carousel-demo', async (req, res) => {
     const { phone } = req.body || {};
     const targetPhone = phone || '9629661668';
     const result = await sendCarouselDemoToPhone(targetPhone);
-    res.json({ success: true, message: `Carousel demo sent to +${targetPhone}!`, result });
+    res.json({ success: true, message: `Carousel demo (Format 1) sent to +${targetPhone}!`, result });
   } catch (err) {
     console.error('[API] Error in /send-carousel-demo:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/send-pricelist-demo', async (req, res) => {
+  try {
+    const { phone } = req.body || {};
+    const targetPhone = phone || '9629661668';
+    const result = await sendPriceListDemoToPhone(targetPhone);
+    res.json({ success: true, message: `Price list image demo (Format 3) sent to +${targetPhone}!`, result });
+  } catch (err) {
+    console.error('[API] Error in /send-pricelist-demo:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/send-all-demos', async (req, res) => {
+  try {
+    const { phone } = req.body || {};
+    const targetPhone = phone || '9629661668';
+
+    // 1. Send Format 1: Swipeable Photo Carousel
+    console.log(`[Demo] Sending Format 1 (Carousel) to ${targetPhone}...`);
+    await sendCarouselDemoToPhone(targetPhone);
+    await new Promise(r => setTimeout(r, 2000));
+
+    // 2. Send Format 2: Native List Menu
+    console.log(`[Demo] Sending Format 2 (List Menu) to ${targetPhone}...`);
+    await sendListDemoToPhone(targetPhone);
+    await new Promise(r => setTimeout(r, 2000));
+
+    // 3. Send Format 3: Instant Price List Image Card
+    console.log(`[Demo] Sending Format 3 (Price List Image) to ${targetPhone}...`);
+    await sendPriceListDemoToPhone(targetPhone);
+
+    res.json({
+      success: true,
+      message: `All 3 demo formats sent successfully to +${targetPhone}!`
+    });
+  } catch (err) {
+    console.error('[API] Error in /send-all-demos:', err);
     res.status(500).json({ error: err.message });
   }
 });
