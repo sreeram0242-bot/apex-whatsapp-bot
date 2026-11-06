@@ -1,0 +1,8 @@
+node_modules/
+sessions/
+uploads/
+_references/
+*.db
+*.db-journal
+.env
+*.log

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Agency — WhatsApp Orders & Live Product Flows</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-title">Software & Digital Agency</span>
+        <span class="brand-divider">/</span>
+        <span class="brand-sub">WhatsApp Bot Console</span>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="orders">Orders & Inquiries</button>
+        <button class="nav-tab" data-tab="product-flows">Product Flows & Live Preview</button>
+        <button class="nav-tab" data-tab="settings">Agency Settings</button>
+        <button class="nav-tab" data-tab="device">WhatsApp Device</button>
+      </nav>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="sendTestMenuBtn" class="btn btn-secondary"
+          style="font-size: 12px; padding: 6px 12px; height: 32px; border-radius: 6px; font-weight: 500;">📲 Test on My
+          Phone</button>
+        <div class="device-pill" id="deviceStatusPill">
+          <span class="status-dot"></span>
+          <span class="status-text">Checking...</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- 1. ORDERS VIEW -->
+    <section id="tab-orders" class="tab-content active">
+      <div class="section-header">
+        <div>
+          <h1 class="page-title">Customer Orders</h1>
+          <p class="page-desc">Real-time incoming orders captured directly via WhatsApp interactive bot.</p>
+        </div>
+        <div class="header-actions">
+          <select id="orderStatusFilter" class="select-input">
+            <option value="ALL">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Printing">Printing</option>
+            <option value="Ready for Pickup">Ready for Pickup</option>
+            <option value="Dispatched">Dispatched</option>
+            <option value="Completed">Completed</option>
+          </select>
+          <button id="refreshOrdersBtn" class="btn btn-secondary">Refresh</button>
+        </div>
+      </div>
+
+      <!-- Orders Table Container -->
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Product & Specs</th>
+              <th>Uploaded Photos</th>
+              <th>Delivery Address</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody">
+            <tr>
+              <td colspan="8" class="empty-state">Loading orders...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 2. PRODUCT FLOWS & LIVE SIMULATOR -->
+    <section id="tab-product-flows" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h1 class="page-title">Individual Product Chatflows & Live Simulator</h1>
+          <p class="page-desc">Customize distinct options, questions, and buttons for each product, and test them lively
+            in the WhatsApp simulator.</p>
+        </div>
+        <div class="header-actions">
+          <button id="resetSimulatorBtn" class="btn btn-secondary btn-sm">↺ Restart Simulator</button>
+          <button id="saveProductFlowsBtn" class="btn btn-primary">Save Product Flows</button>
+        </div>
+      </div>
+
+      <div class="simulator-layout-grid">
+        <!-- Left: Product Flow Editor -->
+        <div class="card">
+          <div class="card-header-flex">
+            <div>
+              <h2 class="card-title">Select Product to Edit Flow</h2>
+              <p class="card-subtitle">Choose any product below to configure its unique WhatsApp questions & buttons.
+              </p>
+            </div>
+            <button id="addProductBtn" class="btn btn-secondary btn-sm">+ Add Product</button>
+          </div>
+
+          <!-- Product Selector Sub-Nav -->
+          <div id="productFlowTabs" class="product-pills-nav">
+            <!-- Populated via JS -->
+          </div>
+
+          <!-- Active Product Flow Details -->
+          <div id="activeProductFlowEditor" class="product-flow-details">
+            <!-- Populated via JS -->
+          </div>
+
+          <!-- Main Menu Products List -->
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-light);">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title" style="font-size: 13px;">Welcome Menu Products</h3>
+                <p class="card-subtitle" style="margin-bottom: 8px;">These products appear as clickable buttons in the
+                  opening WhatsApp greeting.</p>
+              </div>
+            </div>
+            <div id="productsList" class="products-list">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Live WhatsApp Chat Simulator (See Products Lively) -->
+        <div class="card phone-simulator-card">
+          <div class="card-header-flex" style="margin-bottom: 12px;">
+            <div>
+              <h2 class="card-title">Live WhatsApp Simulator</h2>
+              <p class="card-subtitle">Interactive preview of how your customer experiences this bot lively.</p>
+            </div>
+          </div>
+
+          <!-- Phone Mockup Container -->
+          <div class="phone-frame">
+            <div class="phone-topbar">
+              <div class="phone-avatar">🚀</div>
+              <div class="phone-contact">
+                <span id="simPhoneTitle" class="phone-contact-name">Software & Digital Agency</span>
+                <span class="phone-contact-status">online • WhatsApp Business</span>
+              </div>
+            </div>
+
+            <div id="simulatorChatBody" class="phone-chat-body">
+              <!-- Populated lively by JS -->
+            </div>
+
+            <div class="phone-footer">
+              <span class="phone-footer-hint">Tap any button above to test the chat flow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. STUDIO SETTINGS -->
+    <section id="tab-settings" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h1 class="page-title">Studio & Messaging Settings</h1>
+          <p class="page-desc">Manage studio contact info, UPI payment details, opening greeting, and order confirmation
+            templates.</p>
+        </div>
+        <div class="header-actions">
+          <button id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <div class="card">
+          <h2 class="card-title">Studio Profile & Contact Info</h2>
+
+          <div class="form-group">
+            <label for="cfgStudioName">Studio Name</label>
+            <input type="text" id="cfgStudioName" class="text-input" placeholder="e.g. Lumina Photo Studio">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cfgStudioPhone">Studio Phone (for Click-to-Call button)</label>
+              <input type="text" id="cfgStudioPhone" class="text-input" placeholder="+919876543210">
+            </div>
+            <div class="form-group">
+              <label for="cfgUpiId">UPI ID (for Instant Payment QR)</label>
+              <input type="text" id="cfgUpiId" class="text-input" placeholder="studiolumina@okhdfcbank">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cfgStudioAddress">Studio Address (for One-tap Copy button)</label>
+            <input type="text" id="cfgStudioAddress" class="text-input" placeholder="42 Creative Plaza, Art District">
+          </div>
+
+          <div class="form-group">
+            <label for="cfgWelcomeMessage">Welcome Greeting Message</label>
+            <textarea id="cfgWelcomeMessage" class="textarea-input" rows="4"></textarea>
+            <span class="field-hint">Supports WhatsApp formatting (*bold*, _italic_). Use {name} for customer
+              name.</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Checkout Questions & Confirmation Templates</h2>
+
+          <div class="form-group">
+            <label for="cfgPromptName">Customer Name Question</label>
+            <input type="text" id="cfgPromptName" class="text-input" placeholder="What is your Full Name?">
+          </div>
+
+          <div class="form-group">
+            <label for="cfgPromptAddress">Delivery Address Question</label>
+            <textarea id="cfgPromptAddress" class="textarea-input" rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="cfgOrderConfirmedMessage">Order Confirmation Message</label>
+            <textarea id="cfgOrderConfirmedMessage" class="textarea-input" rows="4"></textarea>
+            <span class="field-hint">Variables: {order_id}, {name}, {product}, {details}, {photo_count}, {address},
+              {payment_type}</span>
+          </div>
+
+          <div class="form-group">
+            <label for="cfgTrackingMessage">Order Status Tracking Message</label>
+            <textarea id="cfgTrackingMessage" class="textarea-input" rows="3"></textarea>
+            <span class="field-hint">Variables: {order_id}, {product}, {status}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. WHATSAPP DEVICE VIEW -->
+    <section id="tab-device" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h1 class="page-title">WhatsApp Device Connection</h1>
+          <p class="page-desc">Connect or pair your studio WhatsApp account via QR Code or 8-digit Pairing Code.</p>
+        </div>
+        <div class="header-actions">
+          <button id="restartBotBtn" class="btn btn-secondary">Restart Bot Socket</button>
+        </div>
+      </div>
+
+      <div class="device-grid">
+        <!-- Connection Status & QR Code -->
+        <div class="card">
+          <h2 class="card-title">Live QR Scanner</h2>
+          <p class="card-subtitle">Open WhatsApp on your phone → Linked Devices → Link a device.</p>
+
+          <div id="qrCodeContainer" class="qr-container">
+            <div class="qr-placeholder">Waiting for QR Code...</div>
+          </div>
+
+          <div id="connectedBanner" class="connected-banner hidden">
+            <div class="banner-badge">CONNECTED</div>
+            <h3 id="connectedPhoneText" class="connected-phone">+91 00000 00000</h3>
+            <p class="connected-desc">WhatsApp bot is active and replying to customer messages.</p>
+          </div>
+        </div>
+
+        <!-- Alternative: 8-digit Pairing Code -->
+        <div class="card">
+          <h2 class="card-title">Link with Phone Number (Pairing Code)</h2>
+          <p class="card-subtitle">Prefer not to scan? Enter your phone number to receive an 8-digit code.</p>
+
+          <div class="form-group">
+            <label for="pairingPhoneInput">WhatsApp Phone Number with Country Code</label>
+            <input type="text" id="pairingPhoneInput" class="text-input" placeholder="e.g. 919876543210">
+            <span class="field-hint">Include country code without '+' or spaces (e.g. 91 for India).</span>
+          </div>
+
+          <button id="requestPairingBtn" class="btn btn-primary">Generate 8-Digit Pairing Code</button>
+
+          <div id="pairingCodeDisplay" class="pairing-box hidden">
+            <span class="pairing-label">Your WhatsApp Pairing Code:</span>
+            <div id="pairingCodeValue" class="pairing-code">---- ----</div>
+            <span class="field-hint">Open WhatsApp → Linked Devices → Link with phone number → Enter this code.</span>
+          </div>
+        </div>
+
+        <!-- Send Welcome Message to Customer -->
+        <div class="card" style="grid-column: span 2;">
+          <h2 class="card-title">Send Interactive Welcome Message to Any Customer</h2>
+          <p class="card-subtitle">Initiate contact by sending your interactive catalogue & service buttons to any
+            WhatsApp number.</p>
+
+          <div style="display: flex; gap: 10px; margin-top: 14px; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="targetCustomerPhoneInput" class="text-input"
+              placeholder="e.g. 9629661668 or 919629661668" style="max-width: 320px;">
+            <button id="sendCustomerWelcomeBtn" class="btn btn-primary">Send Welcome Message & Buttons</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Photo Preview Modal -->
+  <div id="photoModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Customer Uploaded Photos</h3>
+        <button id="closePhotoModalBtn" class="btn-icon">&times;</button>
+      </div>
+      <div id="photoModalBody" class="modal-body-gallery">
+        <!-- Rendered images -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
