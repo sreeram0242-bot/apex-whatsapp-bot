@@ -202,7 +202,17 @@ export async function handleIncomingMessage(sock, msg) {
     return;
   }
 
-  // 2. Check for Payment Info Request
+  // 2. Check for Products / Catalogue Request
+  const isProductsCmd =
+    buttonId === 'menu_products' ||
+    ['products', 'browse products', 'all products', 'catalogue', 'catalog', 'shop', 'our products', 'albums', 'photobooks', 'frames'].some(k => lowerText === k);
+
+  if (isProductsCmd && !productInfo && !orderInfo) {
+    await sendProductsListMenu(sock, jid, config);
+    return;
+  }
+
+  // 3. Check for Payment Info Request
   const isPaymentCmd =
     buttonId === 'btn_payment_info' ||
     ['payment', 'payments', 'upi', 'pay', 'bank', 'account', 'qr', 'gpay', 'phonepe'].some(k => lowerText === k || lowerText.includes(k + ' info') || lowerText.includes(k + ' details'));
@@ -212,7 +222,7 @@ export async function handleIncomingMessage(sock, msg) {
     return;
   }
 
-  // 3. Check for Order Tracking & History Request
+  // 4. Check for Order Tracking & History Request
   const isTrackCmd =
     buttonId === 'btn_track' ||
     buttonId === 'btn_history' ||
@@ -706,7 +716,7 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
 
   const fullBody = `${greeting}\n\n${body}\n\n${instruction}\n\n🛍️ *Official WhatsApp Catalogue:*\n${catalogueLink}`;
 
-  // Build carousel cards dynamically from configured products
+  // Build carousel cards: Product cards + Dedicated Track Orders card + Dedicated Payment card
   const products = (config.products && config.products.length > 0) ? config.products : [
     { id: 'prod_photobook_a4', title: '📖 A4 Premium Photobook', price: 'From ₹1,750', description: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.', image: '/assets/products/photobook_a4.jpg' },
     { id: 'prod_photobook_a3', title: '📚 A3 Jumbo Photobook', price: 'From ₹2,500', description: 'Large luxury album for weddings, birthdays & family memories. Up to 300 photos.', image: '/assets/products/photobook_a3.jpg' },
@@ -715,7 +725,7 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
   ];
 
   try {
-    const carouselCards = products.slice(0, 5).map(p => {
+    const carouselCards = products.slice(0, 4).map(p => {
       let imgPath = p.image || '/assets/products/photobook_a4.jpg';
       if (imgPath.startsWith('/')) imgPath = imgPath.slice(1);
       const resolvedPath = path.resolve(imgPath);
@@ -731,18 +741,50 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
       };
     });
 
+    // Dedicated Track Orders Card in Carousel
+    carouselCards.push({
+      title: '📦 Track Orders & History',
+      imagePath: path.resolve('assets/products/photobook_a4.jpg'),
+      body: 'Check real-time production, printing, design approval & delivery tracking for your orders.',
+      buttonText: '📦 Track Orders',
+      buttonId: 'btn_track'
+    });
+
+    // Dedicated Payment & UPI Card in Carousel
+    carouselCards.push({
+      title: '💳 UPI & Payments Info',
+      imagePath: path.resolve('assets/products/price_list.jpg'),
+      body: 'Official UPI ID: 6369134270@okbizaxis. Pay via GPay, PhonePe, Paytm, or Cash on Pickup.',
+      buttonText: '💳 Payment Info',
+      buttonId: 'btn_payment_info'
+    });
+
+    // 1. Send Swipeable Carousel
     await sendCarouselMessage(sock, jid, {
       bodyText: fullBody,
       footerText: carouselFooter,
       cards: carouselCards
     });
+
+    // 2. Also send Quick Navigation Menu with direct action buttons
+    await new Promise(r => setTimeout(r, 600));
+    await sendInteractiveButtons(sock, jid, {
+      title: `📸 ${studioName} — Main Menu`,
+      body: `Welcome to *${studioName}*!\n\nPlease select what you would like to do:\n\n• 📖 *Browse Products:* Photobooks & Frames\n• 📦 *Track Orders:* View order history & printing status\n• 💳 *Payment Info:* Official UPI QR & payment details`,
+      footer: 'Tap any option below',
+      buttons: [
+        { type: 'quick_reply', text: '📖 Browse Products', id: 'menu_products' },
+        { type: 'quick_reply', text: '📦 Track Orders', id: 'btn_track' },
+        { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' }
+      ]
+    });
   } catch (err) {
     console.warn('[WelcomeMenu] Carousel fallback to buttons:', err.message);
-    const buttons = products.slice(0, 4).map(p => ({
-      type: 'quick_reply',
-      text: `${p.title.slice(0, 20)}`,
-      id: p.id
-    }));
+    const buttons = [
+      { type: 'quick_reply', text: '📖 Browse Products', id: 'menu_products' },
+      { type: 'quick_reply', text: '📦 Track Orders', id: 'btn_track' },
+      { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' }
+    ];
 
     await sendInteractiveButtons(sock, jid, {
       title: `📸 ${studioName}`,
@@ -751,6 +793,42 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
       buttons
     });
   }
+}
+
+export async function sendProductsListMenu(sock, jid, config) {
+  const studioName = config.studio_name || 'InstaPics Photobooks & Frames';
+  const products = (config.products && config.products.length > 0) ? config.products : [
+    { id: 'prod_photobook_a4', title: '📖 A4 Premium Photobook', price: 'From ₹1,750', description: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.' },
+    { id: 'prod_photobook_a3', title: '📚 A3 Jumbo Photobook', price: 'From ₹2,500', description: 'Large luxury album for weddings, birthdays & memories. Up to 300 photos.' },
+    { id: 'prod_frames', title: '🖼️ Custom Photo Frames', price: 'From ₹499', description: 'Crystal acrylic & wooden photo frames for wall & tabletop display.' },
+    { id: 'prod_price_list', title: '🏷️ Full Price List & Offers', price: 'Special Offers', description: 'View discount offers & price sheet.' }
+  ];
+
+  const rows = products.map(p => ({
+    id: p.id,
+    title: p.title.slice(0, 24),
+    description: `${p.price || ''} • ${p.description || ''}`.slice(0, 60)
+  }));
+
+  await sendInteractiveButtons(sock, jid, {
+    title: `📖 ${studioName} — Products`,
+    body: `Select a product below to choose your page count, view offer prices, and upload photos for printing:\n\n✨ *Non-Tearable | 100% Waterproof | Lifetime Durability*`,
+    footer: 'InstaPics Custom Print Studio',
+    buttons: [
+      {
+        type: 'single_select',
+        title: '📖 Select a Product',
+        sections: [
+          {
+            title: 'Photobooks & Frames',
+            rows: rows
+          }
+        ]
+      },
+      { type: 'quick_reply', text: '📦 Track Orders', id: 'btn_track' },
+      { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' }
+    ]
+  });
 }
 
 async function handleOrderHistory(sock, jid, phone, config) {
