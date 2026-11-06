@@ -15,8 +15,25 @@ export async function serializeMessage(sock, m) {
   const isNewsletter = jid.endsWith('@newsletter');
   const pushName = m.pushName || 'Customer';
 
-  // Extract phone number from JID
-  const phone = jid.split('@')[0];
+  // Extract phone number from JID (resolve @lid to real phone number if mapped)
+  let phone = jid.split('@')[0];
+  if (jid.endsWith('@lid')) {
+    const lid = phone;
+    if (key.participant && !key.participant.endsWith('@lid')) {
+      phone = key.participant.split('@')[0];
+    } else if (key.remoteJidAlt && !key.remoteJidAlt.endsWith('@lid')) {
+      phone = key.remoteJidAlt.split('@')[0];
+    } else {
+      try {
+        const sessionDir = path.resolve(process.env.SESSION_DIR || 'sessions');
+        const mappingPath = path.join(sessionDir, `lid-mapping-${lid}_reverse.json`);
+        if (fs.existsSync(mappingPath)) {
+          const mappedPhone = JSON.parse(fs.readFileSync(mappingPath, 'utf8'));
+          if (mappedPhone) phone = String(mappedPhone).replace(/[^0-9]/g, '');
+        }
+      } catch {}
+    }
+  }
 
   const raw = m.message;
   // Unwrap viewOnceMessage or ephemeralMessage if present

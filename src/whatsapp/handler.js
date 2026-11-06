@@ -169,7 +169,7 @@ export async function handleIncomingMessage(sock, msg) {
 
   const jid = msg.jid;
   const phone = msg.phone;
-  const incomingText = msg.text.trim();
+  const incomingText = (msg.text || '').trim();
   const lowerText = incomingText.toLowerCase();
   const buttonId = msg.buttonId;
   const productInfo = msg.productInfo;
@@ -208,7 +208,7 @@ export async function handleIncomingMessage(sock, msg) {
     ['products', 'browse products', 'all products', 'catalogue', 'catalog', 'shop', 'our products', 'albums', 'photobooks', 'frames'].some(k => lowerText === k);
 
   if (isProductsCmd && !productInfo && !orderInfo) {
-    await sendProductsListMenu(sock, jid, config);
+    await sendProductCarousel(sock, jid, config);
     return;
   }
 
@@ -656,11 +656,22 @@ async function startProductPageSelection(sock, jid, phone, product, config, draf
   // If product has dedicated Step 1 buttons (page counts & prices)
   if (flow.step1_options && flow.step1_options.length > 0) {
     setSession(phone, 'PRODUCT_STEP1', updatedDraft);
-    const step1Buttons = flow.step1_options.map(opt => ({
-      type: 'quick_reply',
-      text: opt.text,
-      id: opt.id
-    }));
+    const step1Buttons = flow.step1_options.map(opt => {
+      let label = opt.text || '';
+      if (label.length > 20) {
+        if (opt.price) {
+          const words = label.replace(/[^\w\s]/g, '').trim().split(/\s+/).slice(0, 2).join(' ');
+          label = `${words} ₹${opt.price}`.slice(0, 20);
+        } else {
+          label = label.slice(0, 20);
+        }
+      }
+      return {
+        type: 'quick_reply',
+        text: label,
+        id: opt.id
+      };
+    });
     step1Buttons.push({ type: 'quick_reply', text: '🔄 Main Menu', id: 'menu' });
 
     await sendInteractiveButtons(sock, jid, {
@@ -710,13 +721,29 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
   // Build welcome copy from customizable parts or defaults
   const greeting = (config.welcome_greeting || "Welcome to *InstaPics*! 📸✨").replace('{name}', pushName || 'there');
   const body = config.welcome_body || "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.";
-  const instruction = config.welcome_instruction || "Swipe through our products below to choose your package:";
   const catalogueLink = config.catalogue_link || `https://wa.me/c/${ownPhone}`;
-  const carouselFooter = config.carousel_footer || '◄ Swipe Left / Right to Choose ►';
 
-  const fullBody = `${greeting}\n\n${body}\n\n${instruction}\n\n🛍️ *Official WhatsApp Catalogue:*\n${catalogueLink}`;
+  const fullBody = `${greeting}\n\n${body}\n\n🛍️ *Official WhatsApp Catalogue:*\n${catalogueLink}\n\nPlease choose an option below to proceed:`;
 
-  // Build carousel cards: Product cards + Dedicated Track Orders card + Dedicated Payment card
+  const buttons = [
+    { type: 'quick_reply', text: '📖 Browse Products', id: 'menu_products' },
+    { type: 'quick_reply', text: '📦 Order History', id: 'btn_history' },
+    { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' }
+  ];
+
+  await sendInteractiveButtons(sock, jid, {
+    title: `📸 ${studioName}`,
+    body: fullBody,
+    footer: 'Tap an option below',
+    buttons
+  });
+}
+
+export async function sendProductCarousel(sock, jid, config) {
+  const ownPhone = sock.user?.id ? sock.user.id.split(':')[0].replace(/[^0-9]/g, '') : '916369134270';
+  const studioName = config.studio_name || 'InstaPics Photobooks & Frames';
+
+  // Build product carousel cards
   const products = (config.products && config.products.length > 0) ? config.products : [
     { id: 'prod_photobook_a4', title: '📖 A4 Premium Photobook', price: 'From ₹1,750', description: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.', image: '/assets/products/photobook_a4.jpg' },
     { id: 'prod_photobook_a3', title: '📚 A3 Jumbo Photobook', price: 'From ₹2,500', description: 'Large luxury album for weddings, birthdays & family memories. Up to 300 photos.', image: '/assets/products/photobook_a3.jpg' },
@@ -735,63 +762,23 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
       return {
         title: (p.title || 'Product').slice(0, 30),
         imagePath: fs.existsSync(resolvedPath) ? resolvedPath : path.resolve('assets/products/photobook_a4.jpg'),
-        body: p.description || 'Premium quality customized photo product.',
+        body: `${p.price ? `*${p.price}*\n` : ''}${p.description || 'Premium quality customized photo product.'}`,
         buttonText: buttonLabel,
         buttonId: p.id
       };
     });
 
-    // Dedicated Track Orders Card in Carousel
-    carouselCards.push({
-      title: '📦 Track Orders & History',
-      imagePath: path.resolve('assets/products/photobook_a4.jpg'),
-      body: 'Check real-time production, printing, design approval & delivery tracking for your orders.',
-      buttonText: '📦 Track Orders',
-      buttonId: 'btn_track'
-    });
+    const carouselBody = `📸 *${studioName} — Products* ✨\n\nSwipe left/right to view all products. Tap *Select* on any product below to choose your page count & prices:`;
+    const carouselFooter = config.carousel_footer || '◄ Swipe Left / Right to Choose ►';
 
-    // Dedicated Payment & UPI Card in Carousel
-    carouselCards.push({
-      title: '💳 UPI & Payments Info',
-      imagePath: path.resolve('assets/products/price_list.jpg'),
-      body: 'Official UPI ID: 6369134270@okbizaxis. Pay via GPay, PhonePe, Paytm, or Cash on Pickup.',
-      buttonText: '💳 Payment Info',
-      buttonId: 'btn_payment_info'
-    });
-
-    // 1. Send Swipeable Carousel
     await sendCarouselMessage(sock, jid, {
-      bodyText: fullBody,
+      bodyText: carouselBody,
       footerText: carouselFooter,
       cards: carouselCards
     });
-
-    // 2. Also send Quick Navigation Menu with direct action buttons
-    await new Promise(r => setTimeout(r, 600));
-    await sendInteractiveButtons(sock, jid, {
-      title: `📸 ${studioName} — Main Menu`,
-      body: `Welcome to *${studioName}*!\n\nPlease select what you would like to do:\n\n• 📖 *Browse Products:* Photobooks & Frames\n• 📦 *Track Orders:* View order history & printing status\n• 💳 *Payment Info:* Official UPI QR & payment details`,
-      footer: 'Tap any option below',
-      buttons: [
-        { type: 'quick_reply', text: '📖 Browse Products', id: 'menu_products' },
-        { type: 'quick_reply', text: '📦 Track Orders', id: 'btn_track' },
-        { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' }
-      ]
-    });
   } catch (err) {
-    console.warn('[WelcomeMenu] Carousel fallback to buttons:', err.message);
-    const buttons = [
-      { type: 'quick_reply', text: '📖 Browse Products', id: 'menu_products' },
-      { type: 'quick_reply', text: '📦 Track Orders', id: 'btn_track' },
-      { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' }
-    ];
-
-    await sendInteractiveButtons(sock, jid, {
-      title: `📸 ${studioName}`,
-      body: fullBody,
-      footer: 'Tap an option below to proceed',
-      buttons
-    });
+    console.warn('[Carousel] Fallback to product list buttons:', err.message);
+    await sendProductsListMenu(sock, jid, config);
   }
 }
 
@@ -838,7 +825,7 @@ async function handleOrderHistory(sock, jid, phone, config) {
       title: "📦 Order History & Tracking",
       body: `We couldn't find any orders placed from your number (*+${phone}*).\n\nWould you like to browse our premium non-tearable photobooks & frames?`,
       buttons: [
-        { type: 'quick_reply', text: '📖 Our Products', id: 'menu' },
+        { type: 'quick_reply', text: '📖 Browse Products', id: 'menu_products' },
         { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' },
         { type: 'call', text: '📞 Call Studio', phone: config.studio_phone || '+916369134270' }
       ]
@@ -846,24 +833,25 @@ async function handleOrderHistory(sock, jid, phone, config) {
     return;
   }
 
-  const orderLines = orders.slice(0, 3).map((o, idx) => {
+  const orderLines = orders.slice(0, 4).map((o, idx) => {
     const formattedDate = new Date(o.created_at || Date.now()).toLocaleDateString([], {
       month: 'short', day: 'numeric', year: 'numeric'
     });
     const statusEmoji = o.status.includes('Pending') ? '🟡' : (o.status.includes('Approved') || o.status.includes('Designing') ? '🎨' : (o.status.includes('Printing') ? '🖨️' : '✅'));
-    return `${idx + 1}. *Order #${o.id}*\n   • Items: ${o.product_name}\n   • Amount: *₹${Number(o.amount || 0).toLocaleString('en-IN')}*\n   • Status: ${statusEmoji} *${o.status.toUpperCase()}*\n   • Date: ${formattedDate}`;
+    const payStatus = o.payment_status || (o.status === 'Pending' ? 'Pending' : 'Received');
+    return `${idx + 1}. *Order #${o.id}*\n   • Items: ${o.product_name || 'Photobook'}\n   • Amount: *₹${Number(o.amount || 0).toLocaleString('en-IN')}*\n   • Fulfillment: ${statusEmoji} *${o.status.toUpperCase()}*\n   • Payment: *${payStatus}*\n   • Date: ${formattedDate}`;
   }).join('\n\n');
 
-  const historyBody = `📜 *Your InstaPics Order History:*\n\n${orderLines}\n\n━━━━━━━━━━━━━━━━━━━━\nTotal Orders Placed: *${orders.length}*\n━━━━━━━━━━━━━━━━━━━━\n\nTap below for more options or message us anytime!`;
+  const historyBody = `📜 *Your InstaPics Order History:*\n\n${orderLines}\n\n━━━━━━━━━━━━━━━━━━━━\nTotal Orders Placed: *${orders.length}*\n━━━━━━━━━━━━━━━━━━━━\n\nTap below to order more or check payment details:`;
 
   await sendInteractiveButtons(sock, jid, {
     title: "📦 Orders & Status",
     body: historyBody,
     footer: config.studio_name || "InstaPics Custom Print Studio",
     buttons: [
-      { type: 'quick_reply', text: '🛍️ New Order', id: 'menu' },
+      { type: 'quick_reply', text: '📖 Browse Products', id: 'menu_products' },
       { type: 'quick_reply', text: '💳 Payment Info', id: 'btn_payment_info' },
-      { type: 'quick_reply', text: '🔄 Refresh Status', id: 'btn_track' }
+      { type: 'quick_reply', text: '🔄 Refresh Status', id: 'btn_history' }
     ]
   });
 }
@@ -893,8 +881,8 @@ async function sendPaymentInfoMessage(sock, jid, config) {
     body: bodyText,
     footer: "InstaPics Secure Payment Portal",
     buttons: [
-      { type: 'quick_reply', text: '📖 View Products', id: 'menu' },
-      { type: 'quick_reply', text: '📦 Track My Orders', id: 'btn_track' },
+      { type: 'quick_reply', text: '📖 Browse Products', id: 'menu_products' },
+      { type: 'quick_reply', text: '📦 Order History', id: 'btn_history' },
       { type: 'call', text: '📞 Call Studio', phone: phone.replace(/[^0-9+]/g, '') }
     ]
   });
