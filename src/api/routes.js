@@ -20,6 +20,7 @@ import {
   getWhatsAppStatus,
   requestPairing,
   restartWhatsApp,
+  logoutWhatsApp,
   sendCustomerNotification,
   fetchBusinessCatalog,
   sendWelcomeToOwner,
@@ -159,6 +160,15 @@ router.post('/restart', async (req, res) => {
   try {
     await restartWhatsApp();
     res.json({ success: true, message: 'WhatsApp restart initiated' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/logout', async (req, res) => {
+  try {
+    await logoutWhatsApp();
+    res.json({ success: true, message: 'WhatsApp unlinked successfully. Ready for new QR / pairing code.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

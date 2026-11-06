@@ -122,7 +122,19 @@ export async function initWhatsApp() {
         }
       } else {
         currentStatus = 'logged_out';
-        console.log('[WhatsApp] Session logged out. Please rescan QR code.');
+        console.log('[WhatsApp] Session logged out. Purging old session files and generating fresh QR code for new number...');
+        try {
+          const sessionDir = path.resolve(process.env.SESSION_DIR || 'sessions');
+          if (fs.existsSync(sessionDir)) {
+            const files = fs.readdirSync(sessionDir);
+            for (const file of files) {
+              try { fs.rmSync(path.join(sessionDir, file), { recursive: true, force: true }); } catch {}
+            }
+          }
+        } catch {}
+        setTimeout(() => {
+          initWhatsApp();
+        }, 1500);
       }
     }
   });
@@ -251,6 +263,46 @@ export async function fetchBusinessCatalog() {
     console.warn('[WhatsApp] Could not fetch catalog from WhatsApp server:', err.message);
     return { products: [] };
   }
+}
+
+export async function logoutWhatsApp() {
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+  if (sock) {
+    try {
+      await sock.logout();
+    } catch {}
+    try {
+      sock.ev.removeAllListeners();
+      sock.end(undefined);
+    } catch {}
+    sock = null;
+  }
+  isInitializing = false;
+  currentStatus = 'offline';
+  currentQrDataUrl = null;
+  currentRawQr = null;
+  pairingCode = null;
+
+  // Clear session directory so old credentials don't prevent new number login
+  try {
+    const sessionDir = path.resolve(process.env.SESSION_DIR || 'sessions');
+    if (fs.existsSync(sessionDir)) {
+      const files = fs.readdirSync(sessionDir);
+      for (const file of files) {
+        try {
+          fs.rmSync(path.join(sessionDir, file), { recursive: true, force: true });
+        } catch {}
+      }
+    }
+  } catch (err) {
+    console.warn('[WhatsApp] Error purging session files on logout:', err.message);
+  }
+
+  console.log('[WhatsApp] Unlinked successfully. Reinitializing socket for new WhatsApp number...');
+  return await initWhatsApp();
 }
 
 export async function restartWhatsApp() {
