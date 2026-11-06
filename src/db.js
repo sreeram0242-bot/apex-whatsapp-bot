@@ -165,6 +165,50 @@ if (count === 0 || isOldDemo) {
   }
 }
 
+// Seed initial sample InstaPics orders if database is brand new
+try {
+  const orderCount = db.prepare("SELECT COUNT(*) AS count FROM orders").get().count;
+  if (orderCount === 0) {
+    const now = new Date().toISOString();
+    const insertOrderStmt = db.prepare(`
+      INSERT INTO orders (id, phone, customer_name, product_id, product_name, details, photos, address, payment_type, status, amount, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    insertOrderStmt.run(
+      "ORD-98421",
+      "919629661668",
+      "Priya Sharma",
+      "prod_photobook_a4",
+      "📖 A4 Premium Photobook",
+      "1. 📖 A4 Premium Photobook (40 Pgs / 60 Photos) — ₹1,750\n📁 Cloud Photos: drive.google.com/album-sample-photos",
+      JSON.stringify(["assets/products/photobook_a4.jpg"]),
+      "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
+      "Instant UPI / Online QR",
+      "Designing",
+      1750,
+      now,
+      now
+    );
+    insertOrderStmt.run(
+      "ORD-87142",
+      "916369134270",
+      "Karthik Sundaram",
+      "prod_photobook_a3, prod_frames",
+      "A3 Jumbo Photobook + Wall Frame",
+      "1. 📚 A3 Jumbo Photobook (60 Pgs / 220 Photos) — ₹3,300\n2. 🖼️ Wall Frame (12x18) — ₹999",
+      JSON.stringify(["assets/products/photobook_a3.jpg", "assets/products/photo_frame.jpg"]),
+      "12 Gandhi Road, Karur - 639002",
+      "Instant UPI / Online QR",
+      "Printing",
+      4299,
+      now,
+      now
+    );
+  }
+} catch (e) {
+  console.warn('[DB] Order seed check note:', e.message);
+}
+
 export function getAllConfig() {
   const stmt = db.prepare("SELECT key, value FROM bot_config");
   const rows = stmt.all();

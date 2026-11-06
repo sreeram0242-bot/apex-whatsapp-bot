@@ -22,13 +22,19 @@ const publicDir = path.join(import.meta.dirname, 'public');
 const assetsDir = path.resolve('assets');
 const uploadsDir = path.resolve('uploads');
 
-// Explicit static serving with proper Content-Type & cache headers
+// Explicit static serving with proper Content-Type & cache headers (disabled caching for instant reload)
 app.use(express.static(publicDir, {
-  maxAge: '1h',
+  maxAge: 0,
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.css')) res.setHeader('Content-Type', 'text/css; charset=utf-8');
-    if (filePath.endsWith('.js')) res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-    if (filePath.endsWith('.html')) res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
   }
 }));
 app.use('/assets', express.static(assetsDir));
@@ -40,6 +46,7 @@ app.use('/api', apiRoutes);
 // Fallback to Admin Panel ONLY for HTML page navigations (never for missing .css, .js, or assets)
 app.use((req, res) => {
   if (req.method === 'GET' && !req.path.includes('.') && !req.path.startsWith('/api')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     return res.sendFile(path.join(publicDir, 'index.html'));
   }
   res.status(404).send('Not Found');
