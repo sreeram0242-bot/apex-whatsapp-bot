@@ -36,134 +36,106 @@ db.exec(`
 `);
 
 export const DEFAULT_CONFIG = {
-  studio_name: "Apex Software & Digital Marketing",
+  studio_name: "InstaPics Photobooks & Frames",
   studio_phone: "+91 6369134270",
-  studio_address: "Tech Hub, 4th Floor, Innovation Tower",
+  studio_address: "InstaPics Custom Print Studio",
   upi_id: "6369134270@okbizaxis",
-  upi_name: "Software & Digital Agency",
-  welcome_message: "Welcome to *Software & Digital Marketing Solutions* 🚀💻\n\nWe build high-converting websites, run ROI-driven Meta ad campaigns, and rank your business on Google.\n\nPlease choose a service below to get started:",
+  upi_name: "InstaPics Studio",
+  welcome_message: "Welcome to *InstaPics*! 📸✨\n\nWe craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.\n\nSwipe through our products below to choose your package:",
   products: [
     {
-      id: "prod_meta_ads",
-      title: "Meta Ads",
-      description: "High-ROI Facebook & Instagram ad campaigns",
-      price: "₹999.00"
+      id: "prod_photobook_a4",
+      title: "📖 A4 Premium Photobook",
+      description: "Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.",
+      price: "From ₹1,750"
     },
     {
-      id: "prod_digital_marketing",
-      title: "Digital Marketing",
-      description: "Complete 360° digital growth & brand management",
-      price: "₹14,999.00"
+      id: "prod_photobook_a3",
+      title: "📚 A3 Jumbo Photobook",
+      description: "Large luxury album for weddings, birthdays & family memories. Up to 300 photos.",
+      price: "From ₹2,500"
     },
     {
-      id: "prod_seo",
-      title: "SEO management",
-      description: "Google Maps & Search Page 1 keyword ranking",
-      price: "₹999.00"
+      id: "prod_frames",
+      title: "🖼️ Custom Photo Frames",
+      description: "Crystal acrylic & wooden photo frames for wall & tabletop display.",
+      price: "From ₹499"
     },
     {
-      id: "prod_web_dev",
-      title: "Web Development",
-      description: "Fast, modern & responsive business website (Save ₹3,000)",
-      price: "₹4,999.00"
+      id: "prod_price_list",
+      title: "🏷️ Full Price List & Offers",
+      description: "Non-tearable photobook complete offer price sheet with discounts.",
+      price: "Special Offers"
     }
   ],
   product_flows: {
-    prod_meta_ads: {
-      id: "prod_meta_ads",
-      title: "Meta Ads (₹999.00)",
-      description: "High-ROI Facebook & Instagram ad campaigns",
-      price: "₹999.00",
-      step1_title: "🎯 Campaign Goal",
-      step1_prompt: "What is your primary goal for *Meta Ads*?",
+    prod_photobook_a4: {
+      id: "prod_photobook_a4",
+      title: "📖 A4 Premium Photobook",
+      description: "Non-tearable, waterproof pages with lifetime durability",
+      price: "From ₹1,750",
+      step1_title: "📖 Choose A4 Package",
+      step1_prompt: "Select your desired *A4 Photobook Page Count*:\n\n✨ *Non-Tearable | Waterproof | Lifetime Durability*",
       step1_options: [
-        { id: "meta_leads", text: "🎯 Lead Gen" },
-        { id: "meta_ecommerce", text: "🛍️ E-Commerce" },
-        { id: "meta_branding", text: "📈 Brand Reach" }
+        { id: "a4_40p", text: "📘 40 Pgs (60 Photos) ₹1,750" },
+        { id: "a4_60p", text: "📘 60 Pgs (100 Photos) ₹2,150" },
+        { id: "a4_80p", text: "📘 80 Pgs (140 Photos) ₹2,500" }
       ],
-      step2_title: "💰 Monthly Ad Spend Budget",
-      step2_prompt: "Select your estimated *Monthly Ad Budget*:",
-      step2_options: [
-        { id: "budget_10k", text: "💰 ₹5k - ₹15k" },
-        { id: "budget_30k", text: "💰 ₹15k - ₹50k" },
-        { id: "budget_50k_plus", text: "🚀 ₹50k+ (Scale)" }
-      ],
-      photo_prompt: "🔗 Please share your *Website URL, Instagram page link, or Business niche* so our media buyer can review your audience:"
+      photo_prompt: "📸 Great choice! Please upload your photos here on WhatsApp, or send a *Google Drive / Google Photos / iCloud link* for high-resolution printing:"
     },
-    prod_digital_marketing: {
-      id: "prod_digital_marketing",
-      title: "Digital Marketing (₹14,999.00)",
-      description: "Complete 360° digital growth & brand management",
-      price: "₹14,999.00",
-      step1_title: "🚀 Growth Priority",
-      step1_prompt: "What is your main target for the *360° Digital Marketing* package?",
+    prod_photobook_a3: {
+      id: "prod_photobook_a3",
+      title: "📚 A3 Jumbo Photobook",
+      description: "Large luxury album for weddings & family memories",
+      price: "From ₹2,500",
+      step1_title: "📚 Choose A3 Jumbo Package",
+      step1_prompt: "Select your desired *A3 Jumbo Photobook Page Count*:\n\n✨ *Jumbo Size | Non-Tearable | Waterproof | Lifetime Durability*",
       step1_options: [
-        { id: "dm_360", text: "🚀 360° Growth" },
-        { id: "dm_performance", text: "📊 Direct ROI" },
-        { id: "dm_social", text: "📱 Social Media" }
+        { id: "a3_40p", text: "📙 40 Pgs (130 Photos) ₹2,500" },
+        { id: "a3_60p", text: "📙 60 Pgs (220 Photos) ₹3,300" },
+        { id: "a3_80p", text: "📙 80 Pgs (300 Photos) ₹4,200" }
       ],
-      step2_title: "🏢 Business Stage",
-      step2_prompt: "Select your *Business Industry / Category*:",
-      step2_options: [
-        { id: "biz_startup", text: "🌱 Startup" },
-        { id: "biz_local", text: "🏪 Local Biz" },
-        { id: "biz_d2c", text: "📦 E-Commerce" }
-      ],
-      photo_prompt: "📝 Tell us a bit about your *Business & Current Monthly Revenue or Growth Goals* for the next 90 days:"
+      photo_prompt: "📸 Excellent! Please upload your photos here on WhatsApp, or send a *Google Drive / Google Photos / iCloud link* for high-resolution printing:"
     },
-    prod_seo: {
-      id: "prod_seo",
-      title: "SEO management (₹999.00)",
-      description: "Google Maps & Search Page 1 keyword ranking",
-      price: "₹999.00",
-      step1_title: "🔍 SEO Strategy",
-      step1_prompt: "Select your *SEO Focus Area*:",
+    prod_frames: {
+      id: "prod_frames",
+      title: "🖼️ Custom Photo Frames",
+      description: "Crystal acrylic & wooden photo frames",
+      price: "From ₹499",
+      step1_title: "🖼️ Choose Frame Style",
+      step1_prompt: "Select your *Frame Style & Placement*:",
       step1_options: [
-        { id: "seo_local", text: "📍 Google Maps" },
-        { id: "seo_nationwide", text: "🚀 Google Search" },
-        { id: "seo_audit", text: "🛠️ Site Audit" }
+        { id: "frame_table", text: "🖼️ Tabletop Frame (8x10)" },
+        { id: "frame_wall", text: "🖼️ Wall Frame (12x18)" },
+        { id: "frame_collage", text: "🖼️ Family Collage Frame" }
       ],
-      step2_title: "💻 Website Platform",
-      step2_prompt: "What platform is your website built on?",
-      step2_options: [
-        { id: "cms_wordpress", text: "💻 WordPress" },
-        { id: "cms_shopify", text: "🛒 Shopify" },
-        { id: "cms_custom", text: "⚡ Custom Code" }
-      ],
-      photo_prompt: "🌐 Please send your *Website Link (e.g. yourbrand.com)* and the main cities or keywords you want to rank for:"
+      photo_prompt: "📸 Please send the high-resolution photo(s) you would like printed in the frame:"
     },
-    prod_web_dev: {
-      id: "prod_web_dev",
-      title: "Web Development (₹4,999.00)",
-      description: "Fast, modern & responsive business website (Save ₹3,000)",
-      price: "₹4,999.00",
-      step1_title: "🌐 Website Category",
-      step1_prompt: "What kind of *Website* do you want to build?",
+    prod_price_list: {
+      id: "prod_price_list",
+      title: "🏷️ Full Price List & Offers",
+      description: "View all photobook sizes, page counts, and offer prices",
+      price: "Special Offers",
+      step1_title: "🏷️ Photobook Offers",
+      step1_prompt: "Here are our current offer prices:\n\n📘 *A4 Premium Photobooks:*\n• 40 Pgs (60 Photos): *₹1,750* (was ₹3,600)\n• 60 Pgs (100 Photos): *₹2,150* (was ₹4,500)\n• 80 Pgs (140 Photos): *₹2,500* (was ₹5,200)\n\n📚 *A3 Jumbo Photobooks:*\n• 40 Pgs (130 Photos): *₹2,500* (was ₹5,000)\n• 60 Pgs (220 Photos): *₹3,300* (was ₹6,500)\n• 80 Pgs (300 Photos): *₹4,200* (was ₹8,500)\n\nTap below to start your order:",
       step1_options: [
-        { id: "web_business", text: "💼 Business Site" },
-        { id: "web_store", text: "🛒 Online Store" },
-        { id: "web_landing", text: "⚡ Landing Page" }
+        { id: "order_a4", text: "📘 Order A4 Book" },
+        { id: "order_a3", text: "📚 Order A3 Jumbo" },
+        { id: "order_frame", text: "🖼️ Order Frame" }
       ],
-      step2_title: "⏱️ Target Delivery Timeline",
-      step2_prompt: "Select your target launch timeline:",
-      step2_options: [
-        { id: "time_urgent", text: "⚡ Express (3-5d)" },
-        { id: "time_standard", text: "📅 Standard (1-2w)" },
-        { id: "time_redesign", text: "🔄 Redesign" }
-      ],
-      photo_prompt: "🎨 Please share any *reference websites you like, or special features needed* (Payment gateway, WhatsApp chat, Booking, etc.):"
+      photo_prompt: "📸 Please send your photos here on WhatsApp, or paste a Google Drive link:"
     }
   },
-  prompt_details: "Please specify your project requirements or reference links:",
-  prompt_photo: "Please share your website link, logo, or project brief:",
-  prompt_name: "Requirement saved! 🤝\n\nWhat is your *Full Name*?",
-  prompt_address: "Thank you, {name}! 🏢\n\nPlease share your *Company / Business Name and City* (or billing address):",
-  prompt_payment: "Please choose your preferred *Payment / Onboarding Method*:",
-  order_confirmed_message: "🎉 *Service Order Booked Successfully!*\n\n*Project ID:* #{order_id}\n*Client:* {name}\n*Service:* {product}\n*Specifications:* {details}\n*Company/Location:* {address}\n*Payment Mode:* {payment_type}\n\nOur project strategist has received your requirements and will reach out with the onboarding roadmap.",
-  tracking_message: "📊 *Project Status Update*\n\n*Project ID:* #{order_id}\n*Service:* {product}\n*Current Status:* *{status}*\n*Assigned Lead:* Senior Growth Specialist\n\nFeel free to contact us anytime for milestone updates! 🚀"
+  prompt_details: "Please specify your book title, cover photo choice or notes:",
+  prompt_photo: "📸 Please upload your photos here on WhatsApp, or paste a Google Drive / Google Photos / iCloud link:",
+  prompt_name: "Photos noted! ✨\n\nWhat is your *Full Name*?",
+  prompt_address: "Thank you, {name}! 🏠\n\nPlease share your *Delivery Address with Pincode* for courier shipping:",
+  prompt_payment: "Please choose your preferred *Payment Method*:",
+  order_confirmed_message: "🎉 *Order Booked Successfully!*\n\n*Order ID:* #{order_id}\n*Customer:* {name}\n*Product:* {product}\n*Package / Pages:* {details}\n*Photos Received:* {photo_count} item(s)\n*Delivery Address:* {address}\n*Payment Mode:* {payment_type}\n\nOur design team has received your order and will share your digital album preview shortly! 📖✨",
+  tracking_message: "📦 *Order Status Tracking*\n\n*Order ID:* #{order_id}\n*Product:* {product}\n*Current Status:* *{status}*\n\nFeel free to message us here for design preview updates! 📸"
 };
 
-// Seed defaults if empty or missing product_flows
+// Seed defaults or migrate from old demo config
 const countStmt = db.prepare("SELECT COUNT(*) AS count FROM bot_config");
 const { count } = countStmt.get();
 const insertStmt = db.prepare(`
@@ -171,7 +143,10 @@ const insertStmt = db.prepare(`
   ON CONFLICT(key) DO UPDATE SET value = excluded.value
 `);
 
-if (count === 0) {
+const checkOld = db.prepare("SELECT value FROM bot_config WHERE key = 'studio_name'").get();
+const isOldDemo = checkOld && (checkOld.value.includes('Apex') || checkOld.value.includes('Marketing'));
+
+if (count === 0 || isOldDemo) {
   for (const [k, v] of Object.entries(DEFAULT_CONFIG)) {
     insertStmt.run(k, JSON.stringify(v));
   }

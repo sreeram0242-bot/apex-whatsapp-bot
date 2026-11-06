@@ -1,11 +1,11 @@
 // ==========================================================================
-// LUMINA PHOTO STUDIO ADMIN PANEL — JAVASCRIPT
+// INSTAPICS PHOTOBOOKS & FRAMES ADMIN PANEL — JAVASCRIPT
 // ==========================================================================
 
 let currentConfig = null;
 let currentOrders = [];
 let statusPollInterval = null;
-let activeProductFlowId = 'prod_meta_ads';
+let activeProductFlowId = 'prod_photobook_a4';
 
 document.addEventListener('DOMContentLoaded', () => {
   try { initTabs(); } catch (e) { console.error('initTabs failed:', e); }
@@ -489,10 +489,10 @@ function renderSimulator() {
   const simTitle = document.getElementById('simPhoneTitle');
   if (!chatBody) return;
 
-  const studioName = currentConfig?.studio_name || "Lumina Photo Studio";
+  const studioName = currentConfig?.studio_name || "InstaPics Photobooks & Frames";
   if (simTitle) simTitle.textContent = studioName;
 
-  const welcomeText = (currentConfig?.welcome_message || "Welcome to our Photo Studio! 📸\n\nChoose a product below:")
+  const welcomeText = (currentConfig?.welcome_message || "Welcome to *InstaPics*! 📸✨\n\nWe craft premium Non-Tearable & Waterproof Photobooks with lifetime durability.\n\nChoose your package below:")
     .replace('{name}', 'Customer');
 
   const products = currentConfig?.products || [];
@@ -651,17 +651,17 @@ window.simClickStep2 = function(prodId, step1Choice, step2Choice) {
 function simShowPhotoStep(prodId, step1Choice, step2Choice) {
   const chatBody = document.getElementById('simulatorChatBody');
   const flow = (currentConfig?.product_flows || {})[prodId] || {};
-  const photoPrompt = flow.photo_prompt || "🔗 Please share your Website URL, Instagram handle, or Business brief:";
+  const photoPrompt = flow.photo_prompt || "📸 Please upload your photos here directly on WhatsApp, or send a Google Drive / Google Photos / iCloud link:";
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble incoming">
       <div style="white-space: pre-line;">${escapeHtml(photoPrompt)}</div>
       <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simUploadPhoto('${prodId}', 'https://examplebrand.com')">
-          🌐 Share Website: https://examplebrand.com
+        <div class="phone-btn" onclick="simUploadPhoto('${prodId}', 'https://drive.google.com/drive/folders/my-album-photos')">
+          📁 Share Google Drive Link: drive.google.com/...
         </div>
-        <div class="phone-btn" onclick="simUploadPhoto('${prodId}', '@mybrand_official (Instagram)')">
-          📱 Share Instagram: @mybrand_official
+        <div class="phone-btn" onclick="simUploadPhoto('${prodId}', 'Attached 40 High-Res Photos.zip')">
+          📷 Upload 40 Photos directly
         </div>
       </div>
     </div>
@@ -675,14 +675,14 @@ window.simUploadPhoto = function(prodId, sampleLink) {
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
-      <span>🔗 ${sampleLink || 'https://mycompany.com'}</span>
+      <span>${sampleLink || '📁 Google Drive link shared'}</span>
     </div>
 
     <div class="phone-msg-bubble incoming">
-      Project details noted! 🤝<br><br>
+      Photos received! ✨<br><br>
       What is your <strong>Full Name</strong>?
       <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simSendName()">Simulate Name: "Rajesh Sharma"</div>
+        <div class="phone-btn" onclick="simSendName()">Simulate Name: "Priya Sharma"</div>
       </div>
     </div>
   `;
@@ -695,14 +695,14 @@ window.simSendName = function() {
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
-      Rajesh Sharma
+      Priya Sharma
     </div>
 
     <div class="phone-msg-bubble incoming">
-      Thank you, Rajesh Sharma! 🏢<br><br>
-      Please share your <strong>Company / Business Name & City</strong>:
+      Thank you, Priya Sharma! 🏠<br><br>
+      Please share your <strong>Delivery Address with Pincode</strong> for courier shipping:
       <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simSendAddress()">Simulate: "TechVenture Solutions, Bangalore"</div>
+        <div class="phone-btn" onclick="simSendAddress()">Simulate: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040"</div>
       </div>
     </div>
   `;
@@ -715,14 +715,14 @@ window.simSendAddress = function() {
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
-      TechVenture Solutions, Bangalore
+      Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040
     </div>
 
     <div class="phone-msg-bubble incoming">
-      Please choose your preferred <strong>Onboarding / Payment Method</strong>:
+      Please choose your preferred <strong>Payment Method</strong>:
       <div class="phone-buttons-group">
         <div class="phone-btn" onclick="simFinishOrder('Instant UPI / QR')">📱 Instant UPI / QR</div>
-        <div class="phone-btn" onclick="simFinishOrder('Bank Transfer / Invoice')">💳 Bank Transfer / Invoice</div>
+        <div class="phone-btn" onclick="simFinishOrder('Net Banking / Card')">💳 Net Banking / Card</div>
       </div>
     </div>
   `;
@@ -732,7 +732,7 @@ window.simSendAddress = function() {
 
 window.simFinishOrder = function(paymentType) {
   const chatBody = document.getElementById('simulatorChatBody');
-  const orderId = 'PRJ-' + Math.floor(10000 + Math.random() * 90000);
+  const orderId = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
@@ -740,17 +740,17 @@ window.simFinishOrder = function(paymentType) {
     </div>
 
     <div class="phone-msg-bubble incoming">
-      🎉 <strong>Service Booked Successfully!</strong><br><br>
-      <strong>Project ID:</strong> #${orderId}<br>
-      <strong>Client:</strong> Rajesh Sharma<br>
-      <strong>Company:</strong> TechVenture Solutions, Bangalore<br>
+      🎉 <strong>Order Booked Successfully!</strong><br><br>
+      <strong>Order ID:</strong> #${orderId}<br>
+      <strong>Customer:</strong> Priya Sharma<br>
+      <strong>Product:</strong> A4 Premium Photobook (40 Pages)<br>
+      <strong>Shipping to:</strong> Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040<br>
       <strong>Payment Mode:</strong> ${paymentType}<br><br>
-      ${paymentType.includes('UPI') ? '<em>[UPI QR Code generated automatically for instant setup payment]</em><br><br>' : ''}
-      Our project strategist has received your brief and is preparing your onboarding roadmap!
+      ${paymentType.includes('UPI') ? '<em>[UPI QR Code generated automatically for instant payment]</em><br><br>' : ''}
+      Our design team has received your order and will share your photobook layout preview shortly! 📖✨
       <div class="phone-buttons-group">
-        <div class="phone-btn">📊 Track Project Status</div>
-        <div class="phone-btn">📞 Call Project Lead</div>
-        <div class="phone-btn">🌐 View Agency Portfolio</div>
+        <div class="phone-btn">📦 Track Order Status</div>
+        <div class="phone-btn">📞 Call Studio Support</div>
       </div>
     </div>
   `;

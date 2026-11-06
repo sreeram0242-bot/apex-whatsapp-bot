@@ -99,17 +99,20 @@ export function findProductMatch(products, { buttonId, incomingText, productInfo
   // 7. Keyword heuristic fallback
   const combined = [normInput, normButton, normProductTitle, normProductDesc, normOrderTitle, orderInfo?.message].filter(Boolean).join(' ');
 
-  if (combined.includes('meta') || combined.includes('facebook') || combined.includes('insta') || combined.includes('leadgen')) {
-    return products.find(p => p.id.includes('meta')) || products[0];
+  if (combined.includes('a4') || combined.includes('40 page') || combined.includes('60 photo') || combined.includes('1750')) {
+    return products.find(p => p.id.includes('photobook_a4')) || products[0];
   }
-  if (combined.includes('digital') || combined.includes('marketing') || combined.includes('360') || combined.includes('omni')) {
-    return products.find(p => p.id.includes('digital')) || products[1];
+  if (combined.includes('a3') || combined.includes('jumbo') || combined.includes('large') || combined.includes('wedding')) {
+    return products.find(p => p.id.includes('photobook_a3')) || products[1];
   }
-  if (combined.includes('seo') || combined.includes('ranking') || combined.includes('googlemap') || combined.includes('gmb') || combined.includes('keyword')) {
-    return products.find(p => p.id.includes('seo')) || products[2];
+  if (combined.includes('frame') || combined.includes('acrylic') || combined.includes('wooden') || combined.includes('wall') || combined.includes('table')) {
+    return products.find(p => p.id.includes('frames')) || products[2];
   }
-  if (combined.includes('web') || combined.includes('site') || combined.includes('develop') || combined.includes('landing') || combined.includes('ecommerce')) {
-    return products.find(p => p.id.includes('web')) || products[3];
+  if (combined.includes('price') || combined.includes('rate') || combined.includes('cost') || combined.includes('offer') || combined.includes('sheet')) {
+    return products.find(p => p.id.includes('price_list')) || products[3];
+  }
+  if (combined.includes('book') || combined.includes('album') || combined.includes('photo')) {
+    return products[0];
   }
 
   return null;
@@ -495,40 +498,40 @@ export async function handleIncomingMessage(sock, msg) {
 
 export async function sendWelcomeMenu(sock, jid, config, pushName) {
   const ownPhone = sock.user?.id ? sock.user.id.split(':')[0].replace(/[^0-9]/g, '') : '916369134270';
-  const studioName = config.studio_name || 'Apex Software & Digital Marketing';
-  const welcomeText = (config.welcome_message || "Welcome to *Software & Digital Marketing Solutions* 🚀💻\n\nWe build high-converting websites, run ROI-driven Meta ad campaigns, and rank your business on Google.\n\nSwipe through our service cards below to select a plan:")
+  const studioName = config.studio_name || 'InstaPics Photobooks & Frames';
+  const welcomeText = (config.welcome_message || "Welcome to *InstaPics*! 📸✨\n\nWe craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.\n\nSwipe through our products below to choose your package:")
     .replace('{name}', pushName || 'there');
 
   const fullBody = `${welcomeText}\n\n🛍️ *Official WhatsApp Catalogue:*\nhttps://wa.me/c/${ownPhone}`;
 
   const carouselCards = [
     {
-      title: '🎯 Meta Ads (₹999)',
-      imagePath: path.resolve('assets/services/meta_ads.jpg'),
-      body: 'High-ROI Facebook & Instagram ad campaigns with targeted leads.',
-      buttonText: '🎯 Select Meta Ads',
-      buttonId: 'prod_meta_ads'
+      title: '📖 A4 Photobook (₹1,750)',
+      imagePath: path.resolve('assets/products/photobook_a4.jpg'),
+      body: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.',
+      buttonText: '📖 Select A4 Book',
+      buttonId: 'prod_photobook_a4'
     },
     {
-      title: '🚀 Digital Marketing (₹14,999)',
-      imagePath: path.resolve('assets/services/digital_marketing.jpg'),
-      body: 'Complete 360° omnichannel growth, brand scaling & management.',
-      buttonText: '🚀 Select 360° Plan',
-      buttonId: 'prod_digital_marketing'
+      title: '📚 A3 Jumbo Album (₹2,500)',
+      imagePath: path.resolve('assets/products/photobook_a3.jpg'),
+      body: 'Luxury oversized photobook for weddings & family memories. Up to 300 photos.',
+      buttonText: '📚 Select A3 Jumbo',
+      buttonId: 'prod_photobook_a3'
     },
     {
-      title: '📍 SEO Enhancement (₹999)',
-      imagePath: path.resolve('assets/services/seo.jpg'),
-      body: 'Google Search & Google Maps Page 1 local keyword ranking.',
-      buttonText: '📍 Select SEO',
-      buttonId: 'prod_seo'
+      title: '🖼️ Custom Frames (₹499)',
+      imagePath: path.resolve('assets/products/photo_frame.jpg'),
+      body: 'Crystal clear acrylic & wooden frames for table or wall decor.',
+      buttonText: '🖼️ Select Frames',
+      buttonId: 'prod_frames'
     },
     {
-      title: '💻 Web Development (₹4,999)',
-      imagePath: path.resolve('assets/services/website_dev.jpg'),
-      body: 'Fast, modern & responsive business website with WhatsApp chat.',
-      buttonText: '💻 Select Web Dev',
-      buttonId: 'prod_web_dev'
+      title: '🏷️ Price List & Offers',
+      imagePath: path.resolve('assets/products/price_list.jpg'),
+      body: 'View complete non-tearable & waterproof photobook discount price list.',
+      buttonText: '🏷️ View Offers',
+      buttonId: 'prod_price_list'
     }
   ];
 
@@ -548,28 +551,28 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
       },
       {
         type: 'quick_reply',
-        text: '🎯 Meta Ads (₹999)',
-        id: 'prod_meta_ads'
+        text: '📖 A4 Photobook (₹1,750)',
+        id: 'prod_photobook_a4'
       },
       {
         type: 'quick_reply',
-        text: '🚀 Digital Marketing',
-        id: 'prod_digital_marketing'
+        text: '📚 A3 Jumbo (₹2,500)',
+        id: 'prod_photobook_a3'
       },
       {
         type: 'quick_reply',
-        text: '📍 SEO Management',
-        id: 'prod_seo'
+        text: '🖼️ Custom Frames',
+        id: 'prod_frames'
       },
       {
         type: 'quick_reply',
-        text: '💻 Web Development',
-        id: 'prod_web_dev'
+        text: '🏷️ Price List & Offers',
+        id: 'prod_price_list'
       }
     ];
 
     await sendInteractiveButtons(sock, jid, {
-      title: `🚀 ${studioName}`,
+      title: `📸 ${studioName}`,
       body: fullBody,
       footer: 'Tap an option below to proceed',
       buttons

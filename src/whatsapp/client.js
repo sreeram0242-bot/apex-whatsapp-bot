@@ -329,31 +329,56 @@ export async function sendListDemoToPhone(phoneNumber) {
     },
     {
       type: 'single_select',
-      title: '📋 Choose a Service',
+      title: '📖 Choose Photobook / Frame',
       sections: [
         {
-          title: 'Available Packages',
-          highlight_label: 'Popular',
+          title: '📖 A4 Premium (Non-Tearable)',
+          highlight_label: 'Best Seller',
           rows: [
             {
-              id: 'prod_meta_ads',
-              title: '🎯 Meta Ads',
-              description: '₹999 • High-ROI FB & IG Lead Campaigns'
+              id: 'prod_photobook_a4',
+              title: '📘 A4 • 40 Pages (60 Photos)',
+              description: '₹1,750 • Non-tearable & waterproof (was ₹3,600)'
             },
             {
-              id: 'prod_digital_marketing',
-              title: '🚀 Digital Marketing',
-              description: '₹14,999 • Complete 360° Omnichannel Growth'
+              id: 'prod_photobook_a4',
+              title: '📘 A4 • 60 Pages (100 Photos)',
+              description: '₹2,150 • Non-tearable & waterproof (was ₹4,500)'
             },
             {
-              id: 'prod_seo',
-              title: '📍 SEO Management',
-              description: '₹999 • Google Search & Maps Page 1'
+              id: 'prod_photobook_a4',
+              title: '📘 A4 • 80 Pages (140 Photos)',
+              description: '₹2,500 • Non-tearable & waterproof (was ₹5,200)'
+            }
+          ]
+        },
+        {
+          title: '📚 A3 Jumbo (Luxury Album)',
+          rows: [
+            {
+              id: 'prod_photobook_a3',
+              title: '📙 A3 • 40 Pages (130 Photos)',
+              description: '₹2,500 • Jumbo luxury album (was ₹5,000)'
             },
             {
-              id: 'prod_web_dev',
-              title: '💻 Web Development',
-              description: '₹4,999 • Modern High-Speed Business Website'
+              id: 'prod_photobook_a3',
+              title: '📙 A3 • 60 Pages (220 Photos)',
+              description: '₹3,300 • Jumbo luxury album (was ₹6,500)'
+            },
+            {
+              id: 'prod_photobook_a3',
+              title: '📙 A3 • 80 Pages (300 Photos)',
+              description: '₹4,200 • Jumbo luxury album (was ₹8,500)'
+            }
+          ]
+        },
+        {
+          title: '🖼️ Custom Photo Frames',
+          rows: [
+            {
+              id: 'prod_frames',
+              title: '🖼️ Acrylic / Wooden Frame',
+              description: 'From ₹499 • Custom sizes for wall & table'
             }
           ]
         }
@@ -362,8 +387,8 @@ export async function sendListDemoToPhone(phoneNumber) {
   ];
 
   return await sendInteractiveButtons(sock, jid, {
-    title: '🚀 Apex Software & Digital Marketing',
-    body: 'Welcome to *Apex Digital Solutions*!\n\nWe provide high-impact digital growth services for your business.\n\nTap *View WhatsApp Catalogue* or tap *Choose a Service* to select your package (No reply icons!):',
+    title: '📸 InstaPics Photobooks & Frames',
+    body: 'Welcome to *InstaPics*! 📸✨\n\nWe print premium *Non-Tearable & 100% Waterproof Photobooks* and personalized *Photo Frames* with lifetime durability.\n\nTap *Choose Photobook / Frame* to select your package:',
     footer: 'Select an option below',
     buttons
   });
@@ -383,36 +408,36 @@ export async function sendCarouselDemoToPhone(phoneNumber) {
   const jid = `${cleanPhone}@s.whatsapp.net`;
 
   return await sendCarouselMessage(sock, jid, {
-    bodyText: "🚀 *Apex Software & Digital Solutions*\n\nExplore our service packages below. Swipe through the cards to view each plan with its photo and tap the button to choose:",
+    bodyText: "📸 *InstaPics Photobooks & Frames*\n\nExplore our custom photobook and frame collections below. Swipe through the cards to view each product and tap the button to customize:",
     footerText: "◄ Swipe Left / Right to Browse ►",
     cards: [
       {
-        title: '🎯 Meta Ads (₹999)',
-        imagePath: path.resolve('assets/services/meta_ads.jpg'),
-        body: 'High-ROI Facebook & Instagram ad campaigns with targeted leads.',
-        buttonText: '🎯 Select Meta Ads',
-        buttonId: 'prod_meta_ads'
+        title: '📖 A4 Photobook (₹1,750)',
+        imagePath: path.resolve('assets/products/photobook_a4.jpg'),
+        body: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.',
+        buttonText: '📖 Select A4 Book',
+        buttonId: 'prod_photobook_a4'
       },
       {
-        title: '🚀 Digital Marketing (₹14,999)',
-        imagePath: path.resolve('assets/services/digital_marketing.jpg'),
-        body: 'Complete 360° omnichannel growth, brand scaling & management.',
-        buttonText: '🚀 Select 360° Plan',
-        buttonId: 'prod_digital_marketing'
+        title: '📚 A3 Jumbo Album (₹2,500)',
+        imagePath: path.resolve('assets/products/photobook_a3.jpg'),
+        body: 'Luxury oversized photobook for weddings & family memories. Up to 300 photos.',
+        buttonText: '📚 Select A3 Jumbo',
+        buttonId: 'prod_photobook_a3'
       },
       {
-        title: '📍 SEO Enhancement (₹999)',
-        imagePath: path.resolve('assets/services/seo.jpg'),
-        body: 'Google Search & Google Maps Page 1 local keyword ranking.',
-        buttonText: '📍 Select SEO',
-        buttonId: 'prod_seo'
+        title: '🖼️ Custom Frames (₹499)',
+        imagePath: path.resolve('assets/products/photo_frame.jpg'),
+        body: 'Crystal clear acrylic & wooden frames for table or wall decor.',
+        buttonText: '🖼️ Select Frames',
+        buttonId: 'prod_frames'
       },
       {
-        title: '💻 Web Development (₹4,999)',
-        imagePath: path.resolve('assets/services/website_dev.jpg'),
-        body: 'Fast, modern & responsive business website with WhatsApp chat.',
-        buttonText: '💻 Select Web Dev',
-        buttonId: 'prod_web_dev'
+        title: '🏷️ Price List & Offers',
+        imagePath: path.resolve('assets/products/price_list.jpg'),
+        body: 'View complete non-tearable & waterproof photobook discount price list.',
+        buttonText: '🏷️ View Offers',
+        buttonId: 'prod_price_list'
       }
     ]
   });
