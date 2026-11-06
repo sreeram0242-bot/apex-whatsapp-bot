@@ -1,8 +1,11 @@
 import express from 'express';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   getOrders,
   getOrderById,
   updateOrderStatus,
+  updateOrderPaymentStatus,
   getAllOrdersByPhone,
   getRevenueStats,
   approveOrder,
@@ -214,6 +217,63 @@ router.patch('/orders/:id/status', async (req, res) => {
     order: updatedOrder,
     notificationSent
   });
+});
+
+// Update Order Payment Status anytime independently of fulfillment status
+router.patch('/orders/:id/payment-status', async (req, res) => {
+  const { id } = req.params;
+  const { payment_status } = req.body || {};
+
+  if (!payment_status) return res.status(400).json({ error: 'payment_status is required' });
+
+  const updatedOrder = updateOrderPaymentStatus(id, payment_status);
+  if (!updatedOrder) return res.status(404).json({ error: 'Order not found' });
+
+  res.json({
+    success: true,
+    message: `Payment status updated to ${payment_status}`,
+    order: updatedOrder
+  });
+});
+
+// Upload Product Image (Base64 data or data URL saved to uploads/products/)
+router.post('/upload-product-image', async (req, res) => {
+  try {
+    const { image, filename } = req.body || {};
+    if (!image) return res.status(400).json({ error: 'Image data is required' });
+
+    const uploadsDir = path.resolve('uploads', 'products');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    let buffer;
+    let ext = 'jpg';
+    const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (matches && matches.length === 3) {
+      const mime = matches[1];
+      if (mime.includes('png')) ext = 'png';
+      else if (mime.includes('webp')) ext = 'webp';
+      else if (mime.includes('jpeg') || mime.includes('jpg')) ext = 'jpg';
+      buffer = Buffer.from(matches[2], 'base64');
+    } else {
+      buffer = Buffer.from(image, 'base64');
+    }
+
+    const safeFilename = `prod_${Date.now()}_${Math.floor(Math.random() * 1000)}.${ext}`;
+    const filePath = path.join(uploadsDir, safeFilename);
+    fs.writeFileSync(filePath, buffer);
+
+    const publicUrl = `/uploads/products/${safeFilename}`;
+    res.json({
+      success: true,
+      url: publicUrl,
+      filename: safeFilename
+    });
+  } catch (err) {
+    console.error('[API] Error in /upload-product-image:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Approve Order Endpoint (Admin Action: "orders will place only if i approve")

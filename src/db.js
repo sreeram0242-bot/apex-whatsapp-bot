@@ -42,6 +42,12 @@ try {
   // column already exists
 }
 
+try {
+  db.exec("ALTER TABLE orders ADD COLUMN payment_status TEXT DEFAULT 'Payment Pending'");
+} catch {
+  // column already exists
+}
+
 export const DEFAULT_CONFIG = {
   studio_name: "InstaPics Photobooks & Frames",
   studio_phone: "+91 6369134270",
@@ -49,30 +55,39 @@ export const DEFAULT_CONFIG = {
   upi_id: "6369134270@okbizaxis",
   upi_name: "InstaPics Studio",
   welcome_message: "Welcome to *InstaPics*! 📸✨\n\nWe craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.\n\nSwipe through our products below to choose your package:",
+  welcome_greeting: "Welcome to *InstaPics*! 📸✨",
+  welcome_body: "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.",
+  welcome_instruction: "Swipe through our products below to choose your package:",
+  catalogue_link: "https://wa.me/c/916369134270",
+  carousel_footer: "◄ Swipe Left / Right to Choose ►",
   products: [
     {
       id: "prod_photobook_a4",
       title: "📖 A4 Premium Photobook",
       description: "Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.",
-      price: "From ₹1,750"
+      price: "From ₹1,750",
+      image: "/assets/products/photobook_a4.jpg"
     },
     {
       id: "prod_photobook_a3",
       title: "📚 A3 Jumbo Photobook",
       description: "Large luxury album for weddings, birthdays & family memories. Up to 300 photos.",
-      price: "From ₹2,500"
+      price: "From ₹2,500",
+      image: "/assets/products/photobook_a3.jpg"
     },
     {
       id: "prod_frames",
       title: "🖼️ Custom Photo Frames",
       description: "Crystal acrylic & wooden photo frames for wall & tabletop display.",
-      price: "From ₹499"
+      price: "From ₹499",
+      image: "/assets/products/photo_frame.jpg"
     },
     {
       id: "prod_price_list",
       title: "🏷️ Full Price List & Offers",
       description: "Non-tearable photobook complete offer price sheet with discounts.",
-      price: "Special Offers"
+      price: "Special Offers",
+      image: "/assets/products/price_list.jpg"
     }
   ],
   product_flows: {
@@ -392,9 +407,10 @@ export function getRevenueStats() {
       }
     }
 
-    // Payment modes
-    const pay = (ord.payment_type || '').toLowerCase();
-    if (pay.includes('upi') || pay.includes('qr') || pay.includes('online')) {
+    // Payment modes - check payment_status first, fallback to payment_type
+    const payStat = (ord.payment_status || '').toLowerCase();
+    const payType = (ord.payment_type || '').toLowerCase();
+    if (payStat.includes('upi') || (!payStat && (payType.includes('upi') || payType.includes('qr')))) {
       paymentModes.upi.count++;
       paymentModes.upi.amount += amt;
     } else {
@@ -436,10 +452,13 @@ export function getRevenueStats() {
 export function createOrder(orderData) {
   const stmt = db.prepare(`
     INSERT INTO orders (
-      id, phone, customer_name, product_id, product_name, details, photos, address, payment_type, status, amount, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      id, phone, customer_name, product_id, product_name, details, photos, address, payment_type, payment_status, status, amount, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   const now = new Date().toISOString();
+  const defaultPayStatus = (orderData.payment_status) ||
+    (orderData.payment_type?.toLowerCase().includes('upi') ? 'Paid via UPI' : 'Payment Pending');
+
   stmt.run(
     orderData.id,
     orderData.phone,
@@ -450,7 +469,8 @@ export function createOrder(orderData) {
     JSON.stringify(orderData.photos || []),
     orderData.address || '',
     orderData.payment_type || '',
-    orderData.status || 'Pending',
+    defaultPayStatus,
+    orderData.status || 'Pending Approval',
     orderData.amount || 0,
     now,
     now
@@ -461,6 +481,12 @@ export function createOrder(orderData) {
 export function updateOrderStatus(id, newStatus) {
   const stmt = db.prepare("UPDATE orders SET status = ?, updated_at = ? WHERE id = ?");
   stmt.run(newStatus, new Date().toISOString(), id);
+  return getOrderById(id);
+}
+
+export function updateOrderPaymentStatus(id, newPaymentStatus) {
+  const stmt = db.prepare("UPDATE orders SET payment_status = ?, updated_at = ? WHERE id = ?");
+  stmt.run(newPaymentStatus, new Date().toISOString(), id);
   return getOrderById(id);
 }
 

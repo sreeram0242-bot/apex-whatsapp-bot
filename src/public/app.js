@@ -1,5 +1,5 @@
 // ==========================================================================
-// INSTAPICS PHOTOBOOKS & FRAMES — ADMIN CONSOLE & REVENUE ENGINE (v4.0)
+// INSTAPICS PHOTOBOOKS & FRAMES — ADMIN CONSOLE & REVENUE ENGINE (v4.2)
 // ==========================================================================
 
 const DEFAULT_FALLBACK_CONFIG = {
@@ -9,30 +9,39 @@ const DEFAULT_FALLBACK_CONFIG = {
   upi_id: "6369134270@okbizaxis",
   upi_name: "InstaPics Studio",
   welcome_message: "Welcome to *InstaPics*! 📸✨\n\nWe craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.\n\nSwipe through our products below to choose your package:",
+  welcome_greeting: "Welcome to *InstaPics*! 📸✨",
+  welcome_body: "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.",
+  welcome_instruction: "Swipe through our products below to choose your package:",
+  catalogue_link: "https://wa.me/c/916369134270",
+  carousel_footer: "◄ Swipe Left / Right to Choose ►",
   products: [
     {
       id: "prod_photobook_a4",
       title: "📖 A4 Premium Photobook",
       description: "Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.",
-      price: "From ₹1,750"
+      price: "From ₹1,750",
+      image: "/assets/products/photobook_a4.jpg"
     },
     {
       id: "prod_photobook_a3",
       title: "📚 A3 Jumbo Photobook",
       description: "Large luxury album for weddings, birthdays & family memories. Up to 300 photos.",
-      price: "From ₹2,500"
+      price: "From ₹2,500",
+      image: "/assets/products/photobook_a3.jpg"
     },
     {
       id: "prod_frames",
       title: "🖼️ Custom Photo Frames",
       description: "Crystal acrylic & wooden photo frames for wall & tabletop display.",
-      price: "From ₹499"
+      price: "From ₹499",
+      image: "/assets/products/photo_frame.jpg"
     },
     {
       id: "prod_price_list",
       title: "🏷️ Full Price List & Offers",
       description: "Non-tearable photobook complete offer price sheet with discounts.",
-      price: "Special Offers"
+      price: "Special Offers",
+      image: "/assets/products/price_list.jpg"
     }
   ],
   product_flows: {
@@ -41,6 +50,7 @@ const DEFAULT_FALLBACK_CONFIG = {
       title: "📖 A4 Premium Photobook",
       description: "Non-tearable, waterproof pages with lifetime durability",
       price: "From ₹1,750",
+      image: "/assets/products/photobook_a4.jpg",
       step1_title: "📖 Choose A4 Package",
       step1_prompt: "Select your desired *A4 Photobook Page Count*:\n\n✨ *Non-Tearable | Waterproof | Lifetime Durability*",
       step1_options: [
@@ -55,6 +65,7 @@ const DEFAULT_FALLBACK_CONFIG = {
       title: "📚 A3 Jumbo Photobook",
       description: "Large luxury album for weddings & family memories",
       price: "From ₹2,500",
+      image: "/assets/products/photobook_a3.jpg",
       step1_title: "📚 Choose A3 Jumbo Package",
       step1_prompt: "Select your desired *A3 Jumbo Photobook Page Count*:\n\n✨ *Jumbo Size | Non-Tearable | Waterproof | Lifetime Durability*",
       step1_options: [
@@ -69,6 +80,7 @@ const DEFAULT_FALLBACK_CONFIG = {
       title: "🖼️ Custom Photo Frames",
       description: "Crystal acrylic & wooden photo frames",
       price: "From ₹499",
+      image: "/assets/products/photo_frame.jpg",
       step1_title: "🖼️ Choose Frame Style",
       step1_prompt: "Select your *Frame Style & Placement*:\n\n✨ *High-Gloss Crystal Acrylic & Premium Wooden Borders*",
       step1_options: [
@@ -83,6 +95,7 @@ const DEFAULT_FALLBACK_CONFIG = {
       title: "🏷️ Full Price List & Offers",
       description: "View all photobook sizes, page counts, and offer prices",
       price: "Special Offers",
+      image: "/assets/products/price_list.jpg",
       step1_title: "🏷️ Photobook Offers",
       step1_prompt: "Here are our current offer prices:\n\n📘 *A4 Premium Photobooks:*\n• 40 Pgs (60 Photos): *₹1,750* (was ₹3,600)\n• 60 Pgs (100 Photos): *₹2,150* (was ₹4,500)\n• 80 Pgs (140 Photos): *₹2,500* (was ₹5,200)\n\n📚 *A3 Jumbo Photobooks:*\n• 40 Pgs (130 Photos): *₹2,500* (was ₹5,000)\n• 60 Pgs (220 Photos): *₹3,300* (was ₹6,500)\n• 80 Pgs (300 Photos): *₹4,200* (was ₹8,500)\n\nTap below to start your order:",
       step1_options: [
@@ -105,6 +118,7 @@ const SAMPLE_FALLBACK_ORDERS = [
     photos: ["assets/products/photobook_a4.jpg"],
     address: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
     payment_type: "Instant UPI / Online QR",
+    payment_status: "Payment Pending",
     amount: 1750,
     status: "Pending Approval",
     created_at: new Date(Date.now() - 1500000).toISOString()
@@ -118,6 +132,7 @@ const SAMPLE_FALLBACK_ORDERS = [
     photos: ["assets/products/photobook_a3.jpg"],
     address: "12 Gandhi Road, Karur - 639002",
     payment_type: "Instant UPI / Online QR",
+    payment_status: "Paid via UPI",
     amount: 4299,
     status: "Approved & Designing",
     created_at: new Date(Date.now() - 7200000).toISOString()
@@ -131,6 +146,7 @@ const SAMPLE_FALLBACK_ORDERS = [
     photos: ["assets/products/photobook_a4.jpg"],
     address: "45 TTK Road, Alwarpet, Chennai - 600018",
     payment_type: "Pay on Pickup / Delivery",
+    payment_status: "Paid Cash / COD",
     amount: 2150,
     status: "Printing",
     created_at: new Date(Date.now() - 21600000).toISOString()
@@ -144,6 +160,7 @@ const SAMPLE_FALLBACK_ORDERS = [
     photos: ["assets/products/photo_frame.jpg"],
     address: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
     payment_type: "Instant UPI / Online QR",
+    payment_status: "Paid via UPI",
     amount: 999,
     status: "Completed",
     created_at: new Date(Date.now() - 86400000).toISOString()
@@ -157,13 +174,16 @@ let currentRevenueStats = null;
 let statusPollInterval = null;
 let activeProductFlowId = 'prod_photobook_a4';
 let simCart = [];
+let currentOrderFilter = 'ALL';
+let currentOrderSearch = '';
 
 // Instantaneous synchronous render (zero latency, zero blank screen)
 function bootConsole() {
-  console.log('[Console] Booting InstaPics Admin Console v4.0...');
+  console.log('[Console] Booting InstaPics Admin Console v4.2...');
   try { populateSettingsFields(currentConfig); } catch (e) {}
   try { renderProductFlowTabs(currentConfig.products, currentConfig.product_flows); } catch (e) {}
   try { renderSimulator(); } catch (e) {}
+  try { renderOrderFilterPills(currentOrders); } catch (e) {}
   try { renderOrdersTable(currentOrders); } catch (e) {}
   try { renderRevenueDashboard(computeOfflineRevenue(currentOrders)); } catch (e) {}
 
@@ -273,6 +293,7 @@ function renderActiveProductFlow(prodId, productFlows) {
     title: prodId,
     description: "",
     price: "",
+    image: "/assets/products/photobook_a4.jpg",
     step1_title: "Product Options",
     step1_prompt: "Please select your option:",
     step1_options: [],
@@ -287,6 +308,10 @@ function renderActiveProductFlow(prodId, productFlows) {
   setVal('flowTitleInput', product.title || flow.title || '');
   setVal('flowPriceInput', product.price || flow.price || '');
   setVal('flowDescInput', product.description || flow.description || '');
+
+  const imgUrl = product.image || flow.image || '/assets/products/photobook_a4.jpg';
+  setVal('flowImageInput', imgUrl);
+  updateFlowImagePreview(imgUrl);
 
   setVal('flowStep1PromptInput', flow.step1_prompt || '');
   setVal('flowPhotoPromptInput', flow.photo_prompt || '');
@@ -324,6 +349,59 @@ function renderActiveProductFlow(prodId, productFlows) {
     </tr>
   `).join('');
 }
+
+window.updateFlowImagePreview = function(url) {
+  const preview = document.getElementById('flowImagePreview');
+  if (preview && url) {
+    preview.src = url;
+  }
+};
+
+window.setFlowImagePreset = function(url) {
+  setVal('flowImageInput', url);
+  updateFlowImagePreview(url);
+  showToast('Preset image selected!');
+};
+
+window.handleProductImageUpload = async function(inputEl) {
+  const file = inputEl?.files?.[0];
+  if (!file) return;
+
+  if (file.size > 15 * 1024 * 1024) {
+    alert('File size exceeds 15MB. Please choose a smaller image.');
+    return;
+  }
+
+  showToast(`Uploading ${file.name}...`);
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64Data = e.target.result;
+    updateFlowImagePreview(base64Data);
+
+    try {
+      const res = await fetch('/api/upload-product-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64Data, filename: file.name })
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        setVal('flowImageInput', data.url);
+        updateFlowImagePreview(data.url);
+        showToast('📸 Product photo uploaded successfully!');
+      } else {
+        setVal('flowImageInput', base64Data);
+        showToast('Photo loaded (preview ready)');
+      }
+    } catch (err) {
+      console.warn('[Upload] Offline note:', err.message);
+      setVal('flowImageInput', base64Data);
+      showToast('Photo loaded locally');
+    }
+  };
+  reader.readAsDataURL(file);
+};
 
 window.addOptionRow = function() {
   const tbody = document.getElementById('optionsTableBody');
@@ -363,6 +441,7 @@ window.saveActiveProductFlow = async function() {
   const title = getVal('flowTitleInput');
   const price = getVal('flowPriceInput');
   const desc = getVal('flowDescInput');
+  const image = getVal('flowImageInput') || '/assets/products/photobook_a4.jpg';
   const prompt = getVal('flowStep1PromptInput');
   const photoPrompt = getVal('flowPhotoPromptInput');
 
@@ -386,6 +465,7 @@ window.saveActiveProductFlow = async function() {
     prod.title = title || prod.title;
     prod.price = price || prod.price;
     prod.description = desc || prod.description;
+    prod.image = image;
   }
 
   if (!currentConfig.product_flows) currentConfig.product_flows = {};
@@ -394,6 +474,7 @@ window.saveActiveProductFlow = async function() {
     title: title || activeProductFlowId,
     price: price || '',
     description: desc || '',
+    image: image,
     step1_title: title || activeProductFlowId,
     step1_prompt: prompt || 'Please select your desired option:',
     step1_options: options,
@@ -402,7 +483,7 @@ window.saveActiveProductFlow = async function() {
 
   renderProductFlowTabs(currentConfig.products, currentConfig.product_flows);
   renderSimulator();
-  showToast(`Saved flow for "${title}"!`);
+  showToast(`Saved flow & photo for "${title}"!`);
 
   // Persist to Server API
   try {
@@ -428,12 +509,13 @@ window.addNewProductPrompt = function() {
   const price = prompt("Enter Starting Price (e.g. From ₹399):", "From ₹399") || "₹399";
   const desc = prompt("Enter short description:", "Custom printed with lifetime photo durability.") || "";
 
-  const newProd = { id, title: name.trim(), price: price.trim(), description: desc.trim() };
+  const newProd = { id, title: name.trim(), price: price.trim(), description: desc.trim(), image: "/assets/products/photobook_a4.jpg" };
   const newFlow = {
     id: id,
     title: name.trim(),
     price: price.trim(),
     description: desc.trim(),
+    image: "/assets/products/photobook_a4.jpg",
     step1_title: name.trim(),
     step1_prompt: `Please select your preferred option for ${name.trim()}:`,
     step1_options: [
@@ -468,7 +550,7 @@ window.deleteCurrentProduct = function() {
 
   renderProductFlowTabs(currentConfig.products, currentConfig.product_flows);
   renderSimulator();
-  showToast('Product deleted!');
+  showToast("Product removed");
 
   fetch('/api/config', {
     method: 'PUT',
@@ -478,10 +560,8 @@ window.deleteCurrentProduct = function() {
 };
 
 window.testCurrentProductInSim = function() {
-  restartSimulator();
-  setTimeout(() => {
-    simClickProduct(activeProductFlowId);
-  }, 200);
+  window.simClickProduct(activeProductFlowId);
+  showToast(`Switched simulator to test ${activeProductFlowId}`);
 };
 
 // --------------------------------------------------------------------------
@@ -496,17 +576,27 @@ function renderSimulator() {
   const chatBody = document.getElementById('simulatorChatBody');
   if (!chatBody) return;
 
-  const welcomeText = (currentConfig?.welcome_message || DEFAULT_FALLBACK_CONFIG.welcome_message)
-    .replace('{name}', 'Customer');
+  const greeting = currentConfig?.welcome_greeting || "Welcome to *InstaPics*! 📸✨";
+  const body = currentConfig?.welcome_body || "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.";
+  const instruction = currentConfig?.welcome_instruction || "Swipe through our products below to choose your package:";
+  const carouselFooter = currentConfig?.carousel_footer || "◄ Swipe Left / Right to Choose ►";
+
+  const welcomeText = `${greeting}\n\n${body}\n\n${instruction}`.replace('{name}', 'Customer');
 
   const products = (currentConfig?.products && currentConfig.products.length > 0) ? currentConfig.products : DEFAULT_FALLBACK_CONFIG.products;
 
   const cardsHtml = products.slice(0, 4).map(p => `
-    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 6px;">
-      <div style="font-weight: 600; font-size: 13px; color: #09090b;">${escapeHtml(p.title)}</div>
-      <div style="font-size: 11px; color: #64748b; margin: 2px 0 6px 0;">${escapeHtml(p.description || '')}</div>
-      <div class="phone-btn" onclick="simClickProduct('${p.id}')" style="background: #0f172a; color: #fff; font-weight: 500;">
-        Select: ${escapeHtml(p.title.split(' ')[1] || p.title)} (${escapeHtml(p.price || '')})
+    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-top: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+      <div style="width: 100%; height: 95px; background: #f1f5f9; position: relative; overflow: hidden;">
+        <img src="${p.image || '/assets/products/photobook_a4.jpg'}" alt="${escapeHtml(p.title)}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/assets/products/photobook_a4.jpg'">
+        <span style="position: absolute; bottom: 6px; right: 6px; background: rgba(15,23,42,0.85); color: #fff; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px;">${escapeHtml(p.price || '')}</span>
+      </div>
+      <div style="padding: 8px 10px;">
+        <div style="font-weight: 600; font-size: 13px; color: #09090b;">${escapeHtml(p.title)}</div>
+        <div style="font-size: 11px; color: #64748b; margin: 2px 0 6px 0;">${escapeHtml(p.description || '')}</div>
+        <div class="phone-btn" onclick="simClickProduct('${p.id}')" style="background: #0f172a; color: #fff; font-weight: 500;">
+          Select: ${escapeHtml(p.title.split(' ')[1] || p.title)}
+        </div>
       </div>
     </div>
   `).join('');
@@ -518,7 +608,7 @@ function renderSimulator() {
 
     <div class="phone-msg-bubble incoming">
       <div style="white-space: pre-line;">${escapeHtml(welcomeText)}</div>
-      <div style="margin-top: 6px; font-weight: 600; font-size: 11px; color: #475569;">◄ Swipe Cards / Choose Product ►</div>
+      <div style="margin-top: 6px; font-weight: 600; font-size: 11px; color: #475569;">${escapeHtml(carouselFooter)}</div>
       ${cardsHtml}
 
       <div style="margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 6px; display: flex; flex-direction: column; gap: 4px;">
@@ -653,45 +743,25 @@ window.simStartCheckout = function() {
   chatBody.scrollTop = chatBody.scrollHeight;
 };
 
-window.simSendPhotos = function(link) {
+window.simSendPhotos = function(photosStr) {
   const chatBody = document.getElementById('simulatorChatBody');
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
-      ${escapeHtml(link)}
+      ${escapeHtml(photosStr)}
     </div>
     <div class="phone-msg-bubble incoming">
-      Photos noted! ✨<br><br>
-      <strong>Step 2/3: Customer Name</strong><br>
-      What is your <strong>Full Name</strong>?
+      ✅ <strong>Photos received!</strong> 📸<br><br>
+      Please reply with your <strong>Full Delivery Address & Pincode</strong> for shipping:
       <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simSendCustomerName('Priya Sharma')">Simulate: "Priya Sharma"</div>
+        <div class="phone-btn" onclick="simSendAddress('Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040')">📍 Use Sample Chennai Address</div>
+        <div class="phone-btn" onclick="simSendAddress('12 Gandhi Road, Karur - 639002')">📍 Studio Pickup (Karur)</div>
       </div>
     </div>
   `;
   chatBody.scrollTop = chatBody.scrollHeight;
 };
 
-window.simSendCustomerName = function(name) {
-  const chatBody = document.getElementById('simulatorChatBody');
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      ${escapeHtml(name)}
-    </div>
-    <div class="phone-msg-bubble incoming">
-      Thank you, ${escapeHtml(name)}! 🏠<br><br>
-      <strong>Step 3/3: Delivery Address</strong><br>
-      Please share your complete <strong>Delivery Address with Pincode</strong> for courier shipping:
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simSendDeliveryAddress('Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040')">
-          Simulate: Chennai Address
-        </div>
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simSendDeliveryAddress = function(addr) {
+window.simSendAddress = function(addr) {
   const chatBody = document.getElementById('simulatorChatBody');
   const cartTotal = simCart.reduce((s, i) => s + (i.price || 0), 0) || 1750;
 
@@ -716,6 +786,7 @@ window.simCompleteOrder = function(paymentType) {
   const chatBody = document.getElementById('simulatorChatBody');
   const orderId = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
   const cartTotal = simCart.reduce((s, i) => s + (i.price || 0), 0) || 1750;
+  const payStatus = paymentType.includes('UPI') ? 'Paid via UPI' : 'Payment Pending';
 
   chatBody.innerHTML += `
     <div class="phone-msg-bubble outgoing">
@@ -725,6 +796,7 @@ window.simCompleteOrder = function(paymentType) {
       🎉 <strong>Order Request Received!</strong> ⏳<br><br>
       <strong>Order ID:</strong> #${orderId}<br>
       <strong>Status:</strong> 🟡 <strong>PENDING STUDIO APPROVAL</strong><br>
+      <strong>Payment:</strong> ${payStatus}<br>
       <strong>Amount:</strong> ₹${cartTotal.toLocaleString('en-IN')}<br><br>
       Our studio manager is reviewing your order details & photos. We will notify you here with an approval confirmation once accepted! 📸✨
       <div class="phone-buttons-group">
@@ -746,12 +818,14 @@ window.simCompleteOrder = function(paymentType) {
     photos: ["assets/products/photobook_a4.jpg"],
     address: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
     payment_type: paymentType,
+    payment_status: payStatus,
     amount: cartTotal,
     status: "Pending Approval",
     created_at: new Date().toISOString()
   };
 
   currentOrders.unshift(newOrder);
+  renderOrderFilterPills(currentOrders);
   renderOrdersTable(currentOrders);
   renderRevenueDashboard(computeOfflineRevenue(currentOrders));
   showToast(`Simulated new order #${orderId} waiting for studio approval!`);
@@ -804,38 +878,40 @@ window.simShowPaymentInfo = function() {
 };
 
 // --------------------------------------------------------------------------
-// 4. ORDERS & APPROVAL MANAGEMENT
+// 4. ORDERS & APPROVAL MANAGEMENT (FILTERS & PAYMENT STATUS)
 // --------------------------------------------------------------------------
 async function fetchOrders() {
-  const filter = document.getElementById('orderStatusFilter')?.value || 'ALL';
-
   try {
-    const url = filter === 'ALL' ? '/api/orders' : `/api/orders?status=${encodeURIComponent(filter)}`;
-    const res = await fetch(url, { cache: 'no-store' });
+    const res = await fetch('/api/orders', { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    if (data.orders && data.orders.length > 0) {
+    if (data.orders && Array.isArray(data.orders)) {
       currentOrders = data.orders;
     }
-    renderOrdersTable(currentOrders);
   } catch (err) {
     console.warn('[Orders] Sync note:', err.message);
+  } finally {
+    renderOrderFilterPills(currentOrders);
     renderOrdersTable(currentOrders);
   }
 }
 
-function renderOrdersTable(orders) {
-  const tbody = document.getElementById('ordersTableBody');
-  if (!tbody) return;
+function renderOrderFilterPills(orders) {
+  const container = document.getElementById('orderFilterPills');
+  if (!container) return;
 
   const validOrders = (orders && orders.length > 0) ? orders : SAMPLE_FALLBACK_ORDERS;
 
-  // Filter based on dropdown
-  const filter = document.getElementById('orderStatusFilter')?.value || 'ALL';
-  const filteredOrders = filter === 'ALL' ? validOrders : validOrders.filter(o => o.status === filter);
-
-  // Update Pending Approval Badge
+  const allCount = validOrders.length;
   const pendingCount = validOrders.filter(o => (o.status || '').toLowerCase().includes('pending')).length;
+  const approvedCount = validOrders.filter(o => o.status === 'Approved & Designing').length;
+  const printingCount = validOrders.filter(o => o.status === 'Printing').length;
+  const readyCount = validOrders.filter(o => o.status === 'Ready for Pickup').length;
+  const dispatchedCount = validOrders.filter(o => o.status === 'Dispatched').length;
+  const completedCount = validOrders.filter(o => o.status === 'Completed').length;
+  const cancelledCount = validOrders.filter(o => o.status === 'Cancelled').length;
+
+  // Header Nav Badge Update
   const badge = document.getElementById('pendingApprovalBadge');
   if (badge) {
     if (pendingCount > 0) {
@@ -846,16 +922,85 @@ function renderOrdersTable(orders) {
     }
   }
 
-  if (filteredOrders.length === 0) {
+  const pills = [
+    { id: 'ALL', label: 'All Orders', count: allCount },
+    { id: 'Pending Approval', label: '🟡 Pending Approval', count: pendingCount, isPending: true },
+    { id: 'Approved & Designing', label: '🎨 Approved & Designing', count: approvedCount },
+    { id: 'Printing', label: '🖨️ Printing', count: printingCount },
+    { id: 'Ready for Pickup', label: '📦 Ready for Pickup', count: readyCount },
+    { id: 'Dispatched', label: '🚚 Dispatched', count: dispatchedCount },
+    { id: 'Completed', label: '✅ Completed', count: completedCount },
+    { id: 'Cancelled', label: '❌ Cancelled', count: cancelledCount }
+  ];
+
+  container.innerHTML = pills.map(p => {
+    const isActive = currentOrderFilter === p.id;
+    let pillClass = 'order-filter-pill';
+    if (isActive) {
+      pillClass += p.isPending ? ' pending-active' : ' active';
+    }
+    if (p.isPending && !isActive && p.count > 0) {
+      pillClass += ' pending-pill';
+    }
+
+    return `
+      <button type="button" class="${pillClass}" onclick="setOrderFilter('${p.id}')">
+        <span>${p.label}</span>
+        <span class="order-pill-badge">${p.count}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+window.setOrderFilter = function(filterVal) {
+  currentOrderFilter = filterVal;
+  renderOrderFilterPills(currentOrders);
+  renderOrdersTable(currentOrders);
+};
+
+window.handleOrderSearch = function(query) {
+  currentOrderSearch = (query || '').toLowerCase().trim();
+  renderOrdersTable(currentOrders);
+};
+
+function renderOrdersTable(orders) {
+  const tbody = document.getElementById('ordersTableBody');
+  if (!tbody) return;
+
+  const validOrders = (orders && orders.length > 0) ? orders : SAMPLE_FALLBACK_ORDERS;
+
+  // Filter 1: Status Filter Pill
+  let filtered = validOrders;
+  if (currentOrderFilter !== 'ALL') {
+    if (currentOrderFilter === 'Pending Approval') {
+      filtered = filtered.filter(o => (o.status || '').toLowerCase().includes('pending'));
+    } else {
+      filtered = filtered.filter(o => o.status === currentOrderFilter);
+    }
+  }
+
+  // Filter 2: Live Search Text
+  if (currentOrderSearch) {
+    filtered = filtered.filter(o => {
+      const targetStr = `${o.id || ''} ${o.customer_name || ''} ${o.phone || ''} ${o.product_name || ''} ${o.details || ''} ${o.address || ''}`.toLowerCase();
+      return targetStr.includes(currentOrderSearch);
+    });
+  }
+
+  if (filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" class="empty-state">No orders found matching filter "${escapeHtml(filter)}".</td>
+        <td colspan="8" class="empty-state" style="padding: 32px 16px;">
+          <div style="font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 4px;">No orders found matching criteria</div>
+          <div style="font-size: 12px; color: #94a3b8;">Filter: "${escapeHtml(currentOrderFilter)}" ${currentOrderSearch ? `• Search: "${escapeHtml(currentOrderSearch)}"` : ''}</div>
+          <button class="btn btn-secondary btn-sm" style="margin-top: 12px;" onclick="setOrderFilter('ALL'); document.getElementById('orderSearchInput').value=''; handleOrderSearch('');">Reset Filters</button>
+        </td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = filteredOrders.map(order => {
+  tbody.innerHTML = filtered.map(order => {
     const photoCount = order.photos ? order.photos.length : 0;
     const formattedDate = new Date(order.created_at || Date.now()).toLocaleString([], {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -869,7 +1014,28 @@ function renderOrdersTable(orders) {
     const isPending = (order.status || '').toLowerCase().includes('pending');
 
     const statusBadgeColor = isPending ? '#FEF3C7; color: #92400E; border: 1px solid #FCD34D;' :
-      (order.status === 'Completed' ? '#DCFCE7; color: #166534;' : '#F1F5F9; color: #1E293B;');
+      (order.status === 'Completed' ? '#DCFCE7; color: #166534;' :
+      (order.status === 'Cancelled' ? '#FEE2E2; color: #991B1B;' : '#F1F5F9; color: #1E293B;'));
+
+    const payStatus = order.payment_status || (order.payment_type?.toLowerCase().includes('upi') ? 'Paid via UPI' : 'Payment Pending');
+
+    let payStatusBg = '#FEF3C7';
+    let payStatusColor = '#92400E';
+    let payStatusBorder = '#FCD34D';
+
+    if (payStatus.includes('UPI')) {
+      payStatusBg = '#DCFCE7';
+      payStatusColor = '#166534';
+      payStatusBorder = '#86EFAC';
+    } else if (payStatus.includes('Cash') || payStatus.includes('COD')) {
+      payStatusBg = '#E0F2FE';
+      payStatusColor = '#0369A1';
+      payStatusBorder = '#BAE6FD';
+    } else if (payStatus.includes('Refund')) {
+      payStatusBg = '#F3F4F6';
+      payStatusColor = '#4B5563';
+      payStatusBorder = '#E5E7EB';
+    }
 
     return `
       <tr style="${isPending ? 'background-color: #FFFDF5;' : ''}">
@@ -898,7 +1064,14 @@ function renderOrdersTable(orders) {
         </td>
         <td>
           <div class="badge-amount">${order.amount ? '₹' + Number(order.amount).toLocaleString('en-IN') : '₹0'}</div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${escapeHtml(order.payment_type || 'UPI')}</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin: 2px 0 4px 0;">${escapeHtml(order.payment_type || 'UPI')}</div>
+          <!-- Dedicated Payment Status Selector (Changeable anytime) -->
+          <select class="payment-status-select" onchange="changeOrderPaymentStatus('${order.id}', this.value)" style="background: ${payStatusBg}; color: ${payStatusColor}; border-color: ${payStatusBorder};">
+            <option value="Payment Pending" ${payStatus === 'Payment Pending' ? 'selected' : ''}>🟡 Payment Pending</option>
+            <option value="Paid via UPI" ${payStatus === 'Paid via UPI' ? 'selected' : ''}>🟢 Paid via UPI</option>
+            <option value="Paid Cash / COD" ${payStatus === 'Paid Cash / COD' ? 'selected' : ''}>💵 Paid Cash / COD</option>
+            <option value="Refunded" ${payStatus === 'Refunded' ? 'selected' : ''}>⚪ Refunded</option>
+          </select>
         </td>
         <td>
           <select class="select-input" style="font-size: 11px; padding: 4px 6px; background:${statusBadgeColor}" onchange="updateOrderStatus('${order.id}', this.value)">
@@ -914,13 +1087,17 @@ function renderOrdersTable(orders) {
         <td>
           <div style="display: flex; flex-direction: column; gap: 4px;">
             ${isPending ? `
-              <button class="btn btn-sm btn-approve" onclick="approveOrderAction('${order.id}')">
+              <button class="btn btn-sm btn-approve" onclick="approveOrderAction('${order.id}')" title="Approve order and notify customer">
                 ✅ Approve Order
               </button>
-            ` : ''}
-            <button class="btn btn-secondary btn-sm" onclick="notifyOrderUpdate('${order.id}', '${order.status}')">
-              📱 WhatsApp Notify
-            </button>
+              <button class="btn btn-danger btn-sm" onclick="rejectOrderAction('${order.id}')" style="font-size: 11px; padding: 3px 6px;">
+                ❌ Cancel Order
+              </button>
+            ` : `
+              <button class="btn btn-secondary btn-sm" onclick="notifyOrderUpdate('${order.id}', '${order.status}')">
+                📱 WhatsApp Notify
+              </button>
+            `}
           </div>
         </td>
       </tr>
@@ -928,6 +1105,7 @@ function renderOrdersTable(orders) {
   }).join('');
 }
 
+// Dedicated Order Approval
 window.approveOrderAction = async function(id) {
   try {
     showToast(`Approving order #${id}...`);
@@ -937,7 +1115,7 @@ window.approveOrderAction = async function(id) {
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`🎉 Order #${id} Approved! WhatsApp notification sent to customer.`);
+      showToast(`🎉 Order #${id} Approved! WhatsApp confirmation sent to customer.`);
       fetchOrders();
       fetchRevenue();
     } else {
@@ -948,10 +1126,66 @@ window.approveOrderAction = async function(id) {
     const ord = currentOrders.find(o => o.id === id);
     if (ord) {
       ord.status = 'Approved & Designing';
+      renderOrderFilterPills(currentOrders);
       renderOrdersTable(currentOrders);
       renderRevenueDashboard(computeOfflineRevenue(currentOrders));
     }
     showToast(`Order #${id} marked Approved (offline sync)`);
+  }
+};
+
+// Dedicated Order Rejection / Cancellation
+window.rejectOrderAction = async function(id) {
+  const reason = prompt("Enter cancellation reason for customer (optional):", "Photos need higher resolution");
+  try {
+    showToast(`Cancelling order #${id}...`);
+    const res = await fetch(`/api/orders/${encodeURIComponent(id)}/reject`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason, notifyCustomer: true })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Order #${id} cancelled.`);
+      fetchOrders();
+      fetchRevenue();
+    } else {
+      showToast(`Error: ${data.error || 'Failed to cancel'}`);
+    }
+  } catch (err) {
+    const ord = currentOrders.find(o => o.id === id);
+    if (ord) {
+      ord.status = 'Cancelled';
+      renderOrderFilterPills(currentOrders);
+      renderOrdersTable(currentOrders);
+      renderRevenueDashboard(computeOfflineRevenue(currentOrders));
+    }
+    showToast(`Order #${id} cancelled locally.`);
+  }
+};
+
+// Independent Payment Status Change Anytime
+window.changeOrderPaymentStatus = async function(id, newPaymentStatus) {
+  const ord = currentOrders.find(o => o.id === id);
+  if (ord) ord.payment_status = newPaymentStatus;
+
+  renderOrdersTable(currentOrders);
+  renderRevenueDashboard(computeOfflineRevenue(currentOrders));
+  showToast(`Updating payment status for #${id} to "${newPaymentStatus}"...`);
+
+  try {
+    const res = await fetch(`/api/orders/${encodeURIComponent(id)}/payment-status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payment_status: newPaymentStatus })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`💳 Order #${id} payment status set to "${newPaymentStatus}"`);
+      fetchRevenue();
+    }
+  } catch (err) {
+    console.warn('[PaymentStatus] Sync note:', err.message);
   }
 };
 
@@ -971,6 +1205,7 @@ window.updateOrderStatus = async function(id, newStatus) {
   } catch (err) {
     const ord = currentOrders.find(o => o.id === id);
     if (ord) ord.status = newStatus;
+    renderOrderFilterPills(currentOrders);
     renderOrdersTable(currentOrders);
     showToast(`Status updated locally to "${newStatus}"`);
   }
@@ -978,6 +1213,7 @@ window.updateOrderStatus = async function(id, newStatus) {
 
 window.notifyOrderUpdate = async function(id, status) {
   try {
+    showToast(`Sending WhatsApp status update for #${id}...`);
     const res = await fetch(`/api/orders/${encodeURIComponent(id)}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -985,12 +1221,12 @@ window.notifyOrderUpdate = async function(id, status) {
     });
     const data = await res.json();
     if (data.notificationSent) {
-      showToast(`WhatsApp status notification sent for #${id}!`);
+      showToast(`📲 WhatsApp update dispatched to customer for #${id}!`);
     } else {
-      showToast(`Notice: WhatsApp notification queued for #${id}`);
+      showToast(`Status saved, but WhatsApp notification could not be sent.`);
     }
   } catch (err) {
-    showToast(`Notice: ${err.message}`);
+    showToast(`Error: ${err.message}`);
   }
 };
 
@@ -1005,14 +1241,11 @@ async function fetchRevenue() {
     if (data.stats) {
       currentRevenueStats = data.stats;
       renderRevenueDashboard(currentRevenueStats);
-      return;
     }
   } catch (err) {
-    console.warn('[Revenue] API sync note:', err.message);
+    console.warn('[Revenue] Sync note:', err.message);
+    renderRevenueDashboard(computeOfflineRevenue(currentOrders));
   }
-
-  // Fallback: Compute offline from currentOrders
-  renderRevenueDashboard(computeOfflineRevenue(currentOrders));
 }
 
 function computeOfflineRevenue(orders) {
@@ -1048,8 +1281,9 @@ function computeOfflineRevenue(orders) {
       }
     }
 
-    const pay = (ord.payment_type || '').toLowerCase();
-    if (pay.includes('upi') || pay.includes('qr') || pay.includes('online')) {
+    const payStat = (ord.payment_status || '').toLowerCase();
+    const payType = (ord.payment_type || '').toLowerCase();
+    if (payStat.includes('upi') || (!payStat && (payType.includes('upi') || payType.includes('qr')))) {
       paymentModes.upi.count++;
       paymentModes.upi.amount += amt;
     } else {
@@ -1145,7 +1379,7 @@ function renderRevenueDashboard(stats) {
           </td>
           <td>${escapeHtml(ord.product_name)}</td>
           <td>
-            <span style="font-size: 12px; font-weight: 500;">${escapeHtml(ord.payment_type || 'UPI')}</span>
+            <span style="font-size: 12px; font-weight: 600;">${escapeHtml(ord.payment_status || ord.payment_type || 'Payment Pending')}</span>
           </td>
           <td>
             <span style="font-size: 13px; font-weight: 700; color: #047857;">
@@ -1221,7 +1455,7 @@ window.showCustomerHistory = async function(phone, customerName) {
           <div style="font-size: 11px; color: #475569;">${escapeHtml(ord.details || '')}</div>
         </td>
         <td><strong>₹${Number(ord.amount || 0).toLocaleString('en-IN')}</strong></td>
-        <td>${escapeHtml(ord.payment_type || 'UPI')}</td>
+        <td>${escapeHtml(ord.payment_status || ord.payment_type || 'UPI')}</td>
         <td><span class="badge-amount" style="background:#f1f5f9; color:#0f172a;">${escapeHtml(ord.status)}</span></td>
         <td>${new Date(ord.created_at || Date.now()).toLocaleDateString()}</td>
       </tr>
@@ -1235,7 +1469,7 @@ window.closeCustomerHistoryModal = function() {
 };
 
 // --------------------------------------------------------------------------
-// 7. STUDIO SETTINGS
+// 7. STUDIO SETTINGS & MAIN MENU TEMPLATE CUSTOMIZER
 // --------------------------------------------------------------------------
 function populateSettingsFields(cfg) {
   setVal('cfgStudioName', cfg.studio_name);
@@ -1243,20 +1477,59 @@ function populateSettingsFields(cfg) {
   setVal('cfgStudioAddress', cfg.studio_address);
   setVal('cfgUpiId', cfg.upi_id);
   setVal('cfgWelcomeMessage', cfg.welcome_message);
+  setVal('cfgWelcomeGreeting', cfg.welcome_greeting || 'Welcome to *InstaPics*! 📸✨');
+  setVal('cfgWelcomeBody', cfg.welcome_body || 'We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.');
+  setVal('cfgWelcomeInstruction', cfg.welcome_instruction || 'Swipe through our products below to choose your package:');
+  setVal('cfgCarouselFooter', cfg.carousel_footer || '◄ Swipe Left / Right to Choose ►');
+  setVal('cfgCatalogueLink', cfg.catalogue_link || 'https://wa.me/c/916369134270');
   setVal('cfgPromptName', cfg.prompt_name);
   setVal('cfgPromptAddress', cfg.prompt_address);
   setVal('cfgOrderConfirmedMessage', cfg.order_confirmed_message);
   setVal('cfgTrackingMessage', cfg.tracking_message);
+
+  updateWelcomeTemplatePreview();
 }
 
+window.updateWelcomeTemplatePreview = function() {
+  const previewBox = document.getElementById('welcomeTemplatePreviewBox');
+  if (!previewBox) return;
+
+  const greeting = getVal('cfgWelcomeGreeting') || 'Welcome to *InstaPics*! 📸✨';
+  const body = getVal('cfgWelcomeBody') || 'We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.';
+  const instruction = getVal('cfgWelcomeInstruction') || 'Swipe through our products below to choose your package:';
+  const catalogue = getVal('cfgCatalogueLink') || 'https://wa.me/c/916369134270';
+  const footer = getVal('cfgCarouselFooter') || '◄ Swipe Left / Right to Choose ►';
+
+  previewBox.innerHTML = `
+    <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px;">${escapeHtml(greeting)}</div>
+    <div style="margin-bottom: 8px;">${escapeHtml(body)}</div>
+    <div style="margin-bottom: 8px; font-weight: 500;">${escapeHtml(instruction)}</div>
+    <div style="background: #f1f5f9; padding: 6px 10px; border-radius: 6px; font-size: 11px; margin-bottom: 8px;">
+      🛍️ <strong>Catalogue:</strong> <span style="color: #0284c7;">${escapeHtml(catalogue)}</span>
+    </div>
+    <div style="font-size: 11px; color: #64748b; font-weight: 600;">${escapeHtml(footer)}</div>
+  `;
+};
+
 window.saveSettings = async function() {
+  const greeting = getVal('cfgWelcomeGreeting');
+  const body = getVal('cfgWelcomeBody');
+  const instruction = getVal('cfgWelcomeInstruction');
+  const carouselFooter = getVal('cfgCarouselFooter');
+  const catalogueLink = getVal('cfgCatalogueLink');
+
   const config = {
     ...currentConfig,
     studio_name: getVal('cfgStudioName'),
     studio_phone: getVal('cfgStudioPhone'),
     studio_address: getVal('cfgStudioAddress'),
     upi_id: getVal('cfgUpiId'),
-    welcome_message: getVal('cfgWelcomeMessage'),
+    welcome_message: `${greeting}\n\n${body}\n\n${instruction}`,
+    welcome_greeting: greeting,
+    welcome_body: body,
+    welcome_instruction: instruction,
+    carousel_footer: carouselFooter,
+    catalogue_link: catalogueLink,
     prompt_name: getVal('cfgPromptName'),
     prompt_address: getVal('cfgPromptAddress'),
     order_confirmed_message: getVal('cfgOrderConfirmedMessage'),
@@ -1264,7 +1537,8 @@ window.saveSettings = async function() {
   };
 
   currentConfig = config;
-  showToast('Settings saved!');
+  renderSimulator();
+  showToast('Studio settings & MainMenu template saved successfully!');
 
   try {
     const res = await fetch('/api/config', {
@@ -1312,7 +1586,7 @@ window.requestPairingCode = async function() {
     const data = await res.json();
     if (data.pairingCode) {
       document.getElementById('pairingCodeValue').textContent = data.pairingCode;
-      document.getElementById('pairingCodeDisplay').classList.remove('hidden');
+      document.getElementById('pairingCodeDisplay')?.classList.remove('hidden');
       showToast('Pairing code generated! Check your phone.');
     } else {
       alert(data.error || 'Failed to generate code');

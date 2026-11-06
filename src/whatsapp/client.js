@@ -407,39 +407,40 @@ export async function sendCarouselDemoToPhone(phoneNumber) {
   }
   const jid = `${cleanPhone}@s.whatsapp.net`;
 
+  const config = getAllConfig();
+  const ownPhone = sock.user?.id ? sock.user.id.split(':')[0].replace(/[^0-9]/g, '') : '916369134270';
+  const greeting = config.welcome_greeting || "Welcome to *InstaPics*! 📸✨";
+  const body = config.welcome_body || "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.";
+  const instruction = config.welcome_instruction || "Swipe through our products below to choose your package:";
+  const catalogueLink = config.catalogue_link || `https://wa.me/c/${ownPhone}`;
+  const carouselFooter = config.carousel_footer || '◄ Swipe Left / Right to Choose ►';
+  const fullBody = `${greeting}\n\n${body}\n\n${instruction}\n\n🛍️ *Official WhatsApp Catalogue:*\n${catalogueLink}`;
+
+  const products = (config.products && config.products.length > 0) ? config.products : [
+    { id: 'prod_photobook_a4', title: '📖 A4 Premium Photobook', price: 'From ₹1,750', description: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.', image: '/assets/products/photobook_a4.jpg' },
+    { id: 'prod_photobook_a3', title: '📚 A3 Jumbo Photobook', price: 'From ₹2,500', description: 'Large luxury album for weddings, birthdays & family memories. Up to 300 photos.', image: '/assets/products/photobook_a3.jpg' },
+    { id: 'prod_frames', title: '🖼️ Custom Photo Frames', price: 'From ₹499', description: 'Crystal acrylic & wooden photo frames for wall & tabletop display.', image: '/assets/products/photo_frame.jpg' },
+    { id: 'prod_price_list', title: '🏷️ Full Price List & Offers', price: 'Special Offers', description: 'Non-tearable photobook complete offer price sheet with discounts.', image: '/assets/products/price_list.jpg' }
+  ];
+
+  const carouselCards = products.slice(0, 5).map(p => {
+    let imgPath = p.image || '/assets/products/photobook_a4.jpg';
+    if (imgPath.startsWith('/')) imgPath = imgPath.slice(1);
+    const resolvedPath = path.resolve(imgPath);
+
+    return {
+      title: `${p.title} (${p.price || ''})`,
+      imagePath: fs.existsSync(resolvedPath) ? resolvedPath : path.resolve('assets/products/photobook_a4.jpg'),
+      body: p.description || 'Premium quality customized photo product.',
+      buttonText: `Select ${p.title.split(' ')[1] || 'Product'}`,
+      buttonId: p.id
+    };
+  });
+
   return await sendCarouselMessage(sock, jid, {
-    bodyText: "📸 *InstaPics Photobooks & Frames*\n\nExplore our custom photobook and frame collections below. Swipe through the cards to view each product and tap the button to customize:",
-    footerText: "◄ Swipe Left / Right to Browse ►",
-    cards: [
-      {
-        title: '📖 A4 Photobook (₹1,750)',
-        imagePath: path.resolve('assets/products/photobook_a4.jpg'),
-        body: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.',
-        buttonText: '📖 Select A4 Book',
-        buttonId: 'prod_photobook_a4'
-      },
-      {
-        title: '📚 A3 Jumbo Album (₹2,500)',
-        imagePath: path.resolve('assets/products/photobook_a3.jpg'),
-        body: 'Luxury oversized photobook for weddings & family memories. Up to 300 photos.',
-        buttonText: '📚 Select A3 Jumbo',
-        buttonId: 'prod_photobook_a3'
-      },
-      {
-        title: '🖼️ Custom Frames (₹499)',
-        imagePath: path.resolve('assets/products/photo_frame.jpg'),
-        body: 'Crystal clear acrylic & wooden frames for table or wall decor.',
-        buttonText: '🖼️ Select Frames',
-        buttonId: 'prod_frames'
-      },
-      {
-        title: '🏷️ Price List & Offers',
-        imagePath: path.resolve('assets/products/price_list.jpg'),
-        body: 'View complete non-tearable & waterproof photobook discount price list.',
-        buttonText: '🏷️ View Offers',
-        buttonId: 'prod_price_list'
-      }
-    ]
+    bodyText: fullBody,
+    footerText: carouselFooter,
+    cards: carouselCards
   });
 }
 

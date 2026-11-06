@@ -695,72 +695,51 @@ async function sendCartReview(sock, jid, draft) {
 export async function sendWelcomeMenu(sock, jid, config, pushName) {
   const ownPhone = sock.user?.id ? sock.user.id.split(':')[0].replace(/[^0-9]/g, '') : '916369134270';
   const studioName = config.studio_name || 'InstaPics Photobooks & Frames';
-  const welcomeText = (config.welcome_message || "Welcome to *InstaPics*! 📸✨\n\nWe craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.\n\nSwipe through our products below to choose your package:")
-    .replace('{name}', pushName || 'there');
 
-  const fullBody = `${welcomeText}\n\n🛍️ *Official WhatsApp Catalogue:*\nhttps://wa.me/c/${ownPhone}`;
+  // Build welcome copy from customizable parts or defaults
+  const greeting = (config.welcome_greeting || "Welcome to *InstaPics*! 📸✨").replace('{name}', pushName || 'there');
+  const body = config.welcome_body || "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.";
+  const instruction = config.welcome_instruction || "Swipe through our products below to choose your package:";
+  const catalogueLink = config.catalogue_link || `https://wa.me/c/${ownPhone}`;
+  const carouselFooter = config.carousel_footer || '◄ Swipe Left / Right to Choose ►';
 
-  const carouselCards = [
-    {
-      title: '📖 A4 Photobook (₹1,750)',
-      imagePath: path.resolve('assets/products/photobook_a4.jpg'),
-      body: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.',
-      buttonText: '📖 Select A4 Book',
-      buttonId: 'prod_photobook_a4'
-    },
-    {
-      title: '📚 A3 Jumbo Album (₹2,500)',
-      imagePath: path.resolve('assets/products/photobook_a3.jpg'),
-      body: 'Luxury oversized photobook for weddings & family memories. Up to 300 photos.',
-      buttonText: '📚 Select A3 Jumbo',
-      buttonId: 'prod_photobook_a3'
-    },
-    {
-      title: '🖼️ Custom Frames (₹599)',
-      imagePath: path.resolve('assets/products/photo_frame.jpg'),
-      body: 'Crystal clear acrylic & wooden frames for table or wall decor.',
-      buttonText: '🖼️ Select Frames',
-      buttonId: 'prod_frames'
-    },
-    {
-      title: '🏷️ Price List & Offers',
-      imagePath: path.resolve('assets/products/price_list.jpg'),
-      body: 'View complete non-tearable & waterproof photobook discount price list.',
-      buttonText: '🏷️ View Offers',
-      buttonId: 'prod_price_list'
-    }
+  const fullBody = `${greeting}\n\n${body}\n\n${instruction}\n\n🛍️ *Official WhatsApp Catalogue:*\n${catalogueLink}`;
+
+  // Build carousel cards dynamically from configured products
+  const products = (config.products && config.products.length > 0) ? config.products : [
+    { id: 'prod_photobook_a4', title: '📖 A4 Premium Photobook', price: 'From ₹1,750', description: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.', image: '/assets/products/photobook_a4.jpg' },
+    { id: 'prod_photobook_a3', title: '📚 A3 Jumbo Photobook', price: 'From ₹2,500', description: 'Large luxury album for weddings, birthdays & family memories. Up to 300 photos.', image: '/assets/products/photobook_a3.jpg' },
+    { id: 'prod_frames', title: '🖼️ Custom Photo Frames', price: 'From ₹499', description: 'Crystal acrylic & wooden photo frames for wall & tabletop display.', image: '/assets/products/photo_frame.jpg' },
+    { id: 'prod_price_list', title: '🏷️ Full Price List & Offers', price: 'Special Offers', description: 'Non-tearable photobook complete offer price sheet with discounts.', image: '/assets/products/price_list.jpg' }
   ];
+
+  const carouselCards = products.slice(0, 5).map(p => {
+    let imgPath = p.image || '/assets/products/photobook_a4.jpg';
+    if (imgPath.startsWith('/')) imgPath = imgPath.slice(1);
+    const resolvedPath = path.resolve(imgPath);
+
+    return {
+      title: `${p.title} (${p.price || ''})`,
+      imagePath: fs.existsSync(resolvedPath) ? resolvedPath : path.resolve('assets/products/photobook_a4.jpg'),
+      body: p.description || 'Premium quality customized photo product.',
+      buttonText: `Select ${p.title.split(' ')[1] || 'Product'}`,
+      buttonId: p.id
+    };
+  });
 
   try {
     await sendCarouselMessage(sock, jid, {
       bodyText: fullBody,
-      footerText: '◄ Swipe Left / Right to Choose ►',
+      footerText: carouselFooter,
       cards: carouselCards
     });
   } catch (err) {
     console.warn('[WelcomeMenu] Carousel fallback to buttons:', err.message);
-    const buttons = [
-      {
-        type: 'quick_reply',
-        text: '📖 A4 Photobook (₹1,750)',
-        id: 'prod_photobook_a4'
-      },
-      {
-        type: 'quick_reply',
-        text: '📚 A3 Jumbo (₹2,500)',
-        id: 'prod_photobook_a3'
-      },
-      {
-        type: 'quick_reply',
-        text: '🖼️ Custom Frames (₹599)',
-        id: 'prod_frames'
-      },
-      {
-        type: 'quick_reply',
-        text: '🏷️ Price List & Offers',
-        id: 'prod_price_list'
-      }
-    ];
+    const buttons = products.slice(0, 4).map(p => ({
+      type: 'quick_reply',
+      text: `${p.title.slice(0, 20)} (${p.price || ''})`,
+      id: p.id
+    }));
 
     await sendInteractiveButtons(sock, jid, {
       title: `📸 ${studioName}`,
