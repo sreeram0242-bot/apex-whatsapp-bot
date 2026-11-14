@@ -20,20 +20,42 @@ export async function serializeMessage(sock, m) {
   if (jid.endsWith('@lid')) {
     const lid = phone;
     if (key.participant && !key.participant.endsWith('@lid')) {
-      phone = key.participant.split('@')[0];
+      phone = key.participant.split('@')[0].replace(/[^0-9]/g, '');
     } else if (key.remoteJidAlt && !key.remoteJidAlt.endsWith('@lid')) {
-      phone = key.remoteJidAlt.split('@')[0];
+      phone = key.remoteJidAlt.split('@')[0].replace(/[^0-9]/g, '');
+    } else if (m.participantPn && !m.participantPn.endsWith('@lid')) {
+      phone = m.participantPn.split('@')[0].replace(/[^0-9]/g, '');
+    } else if (key.participantPn && !key.participantPn.endsWith('@lid')) {
+      phone = key.participantPn.split('@')[0].replace(/[^0-9]/g, '');
     } else {
       try {
         const sessionDir = path.resolve(process.env.SESSION_DIR || 'sessions');
         const mappingPath = path.join(sessionDir, `lid-mapping-${lid}_reverse.json`);
+        const mappingPathAlt = path.join(sessionDir, `lid-mapping-${lid}.json`);
         if (fs.existsSync(mappingPath)) {
           const mappedPhone = JSON.parse(fs.readFileSync(mappingPath, 'utf8'));
+          if (mappedPhone) phone = String(mappedPhone).replace(/[^0-9]/g, '');
+        } else if (fs.existsSync(mappingPathAlt)) {
+          const mappedPhone = JSON.parse(fs.readFileSync(mappingPathAlt, 'utf8'));
           if (mappedPhone) phone = String(mappedPhone).replace(/[^0-9]/g, '');
         }
       } catch {}
     }
+
+    // Persist discovered mapping for future messages
+    if (phone && phone !== lid && phone.length >= 8) {
+      try {
+        const sessionDir = path.resolve(process.env.SESSION_DIR || 'sessions');
+        fs.writeFileSync(path.join(sessionDir, `lid-mapping-${lid}_reverse.json`), JSON.stringify(phone));
+      } catch {}
+    }
   }
+
+  // CRITICAL FIX: In 1-on-1 chats, WhatsApp DOES NOT deliver replies sent to an @lid address.
+  // We MUST route all outgoing bot messages to the recipient's deliverable @s.whatsapp.net chat JID!
+  const targetJid = (!isGroup && !isNewsletter && phone && !phone.endsWith('@lid') && phone.length >= 8)
+    ? `${phone}@s.whatsapp.net`
+    : jid;
 
   const raw = m.message;
   // Unwrap viewOnceMessage or ephemeralMessage if present
@@ -229,7 +251,8 @@ export async function serializeMessage(sock, m) {
   return {
     raw: m,
     key,
-    jid,
+    jid: targetJid,
+    originalJid: jid,
     phone,
     fromMe,
     isGroup,

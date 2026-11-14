@@ -141,6 +141,36 @@ export async function initWhatsApp() {
 
   sock.ev.on('creds.update', saveCreds);
 
+  sock.ev.on('contacts.upsert', (contacts) => {
+    try {
+      const sessionDir = path.resolve(process.env.SESSION_DIR || 'sessions');
+      for (const c of contacts) {
+        if (c.id && c.lid) {
+          const cleanPhone = c.id.split('@')[0].replace(/[^0-9]/g, '');
+          const cleanLid = c.lid.split('@')[0];
+          if (cleanPhone && cleanLid && cleanPhone.length >= 8) {
+            fs.writeFileSync(path.join(sessionDir, `lid-mapping-${cleanLid}_reverse.json`), JSON.stringify(cleanPhone));
+          }
+        }
+      }
+    } catch {}
+  });
+
+  sock.ev.on('contacts.update', (updates) => {
+    try {
+      const sessionDir = path.resolve(process.env.SESSION_DIR || 'sessions');
+      for (const c of updates) {
+        if (c.id && c.lid) {
+          const cleanPhone = c.id.split('@')[0].replace(/[^0-9]/g, '');
+          const cleanLid = c.lid.split('@')[0];
+          if (cleanPhone && cleanLid && cleanPhone.length >= 8) {
+            fs.writeFileSync(path.join(sessionDir, `lid-mapping-${cleanLid}_reverse.json`), JSON.stringify(cleanPhone));
+          }
+        }
+      }
+    } catch {}
+  });
+
   sock.ev.on('messages.upsert', async ({ messages, type }) => {
     if (type !== 'notify') return;
     for (const m of messages) {

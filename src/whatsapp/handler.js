@@ -167,8 +167,13 @@ export async function handleIncomingMessage(sock, msg) {
     }
   }
 
-  const jid = msg.jid;
   const phone = msg.phone;
+  // CRITICAL FIX: Ensure destination JID is ALWAYS deliverable (@s.whatsapp.net for 1-on-1 chats, never @lid)
+  let jid = msg.jid;
+  if (!msg.isGroup && !msg.isNewsletter && phone && !phone.endsWith('@lid') && phone.replace(/[^0-9]/g, '').length >= 8) {
+    jid = `${phone.replace(/[^0-9]/g, '')}@s.whatsapp.net`;
+  }
+
   const incomingText = (msg.text || '').trim();
   const lowerText = incomingText.toLowerCase();
   const buttonId = msg.buttonId;
@@ -180,7 +185,7 @@ export async function handleIncomingMessage(sock, msg) {
     return;
   }
 
-  console.log(`[Handler] Processing message from ${phone}: "${incomingText}" (buttonId: "${buttonId}", product: "${productInfo?.title || ''}")`);
+  console.log(`[Handler] Processing message from ${phone} (destJid: ${jid}): "${incomingText}" (buttonId: "${buttonId}", product: "${productInfo?.title || ''}")`);
 
   const config = getAllConfig();
   const products = config.products || [];
@@ -202,31 +207,31 @@ export async function handleIncomingMessage(sock, msg) {
     return;
   }
 
-  // 2. Check for Products / Catalogue Request
+  // 2. Check for Products / Catalogue Request (Button or Option 1)
   const isProductsCmd =
     buttonId === 'menu_products' ||
-    ['products', 'browse products', 'all products', 'catalogue', 'catalog', 'shop', 'our products', 'albums', 'photobooks', 'frames'].some(k => lowerText === k);
+    ['1', 'products', 'browse products', 'all products', 'catalogue', 'catalog', 'shop', 'our products', 'albums', 'photobooks', 'frames'].some(k => lowerText === k);
 
   if (isProductsCmd && !productInfo && !orderInfo) {
     await sendProductCarousel(sock, jid, config);
     return;
   }
 
-  // 3. Check for Payment Info Request
+  // 3. Check for Payment Info Request (Button or Option 3)
   const isPaymentCmd =
     buttonId === 'btn_payment_info' ||
-    ['payment', 'payments', 'upi', 'pay', 'bank', 'account', 'qr', 'gpay', 'phonepe'].some(k => lowerText === k || lowerText.includes(k + ' info') || lowerText.includes(k + ' details'));
+    ['3', 'payment', 'payments', 'upi', 'pay', 'bank', 'account', 'qr', 'gpay', 'phonepe'].some(k => lowerText === k || lowerText.includes(k + ' info') || lowerText.includes(k + ' details'));
 
   if (isPaymentCmd && !productInfo && !orderInfo) {
     await sendPaymentInfoMessage(sock, jid, config);
     return;
   }
 
-  // 4. Check for Order Tracking & History Request
+  // 4. Check for Order Tracking & History Request (Button or Option 2)
   const isTrackCmd =
     buttonId === 'btn_track' ||
     buttonId === 'btn_history' ||
-    ['track', 'status', 'history', 'my orders', 'order history', 'orders'].some(k => lowerText === k || lowerText.includes(k));
+    ['2', 'track', 'status', 'history', 'my orders', 'order history', 'orders'].some(k => lowerText === k || lowerText.includes(k));
 
   if (isTrackCmd && !productInfo && !orderInfo) {
     await handleOrderHistory(sock, jid, phone, config);
@@ -723,7 +728,12 @@ export async function sendWelcomeMenu(sock, jid, config, pushName) {
   const body = config.welcome_body || "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.";
   const catalogueLink = config.catalogue_link || `https://wa.me/c/${ownPhone}`;
 
-  const fullBody = `${greeting}\n\n${body}\n\n🛍️ *Official WhatsApp Catalogue:*\n${catalogueLink}\n\nPlease choose an option below to proceed:`;
+  const optionsText = `*Choose an option below (tap a button or reply with 1, 2, or 3):*\n` +
+    `1️⃣ 📖 *Browse Products*\n` +
+    `2️⃣ 📦 *Order History & Tracking*\n` +
+    `3️⃣ 💳 *Payment Info*`;
+
+  const fullBody = `${greeting}\n\n${body}\n\n🛍️ *Official WhatsApp Catalogue:*\n${catalogueLink}\n\n${optionsText}`;
 
   const buttons = [
     { type: 'quick_reply', text: '📖 Browse Products', id: 'menu_products' },

@@ -18,6 +18,24 @@ export async function sendInteractiveButtons(sock, jid, {
   buttons = []
 }) {
   try {
+    // Safety check: Never route interactive stanzas to @lid, always resolve to @s.whatsapp.net
+    let targetJid = jid;
+    if (targetJid && targetJid.endsWith('@lid')) {
+      const lidNum = targetJid.split('@')[0];
+      try {
+        const sessionDir = path.resolve(process.env.SESSION_DIR || 'sessions');
+        const m1 = path.join(sessionDir, `lid-mapping-${lidNum}_reverse.json`);
+        const m2 = path.join(sessionDir, `lid-mapping-${lidNum}.json`);
+        if (fs.existsSync(m1)) {
+          const p = JSON.parse(fs.readFileSync(m1, 'utf8'));
+          if (p) targetJid = `${String(p).replace(/[^0-9]/g, '')}@s.whatsapp.net`;
+        } else if (fs.existsSync(m2)) {
+          const p = JSON.parse(fs.readFileSync(m2, 'utf8'));
+          if (p) targetJid = `${String(p).replace(/[^0-9]/g, '')}@s.whatsapp.net`;
+        }
+      } catch {}
+    }
+
     const ownPhone = sock.user?.id ? sock.user.id.split(':')[0].replace(/[^0-9]/g, '') : '916369134270';
 
     // Build interactive buttons array
@@ -95,8 +113,8 @@ export async function sendInteractiveButtons(sock, jid, {
       };
     });
 
-    console.log(`[Buttons] Sending interactive message to ${jid} (buttons: ${interactiveButtons.length})`);
-    const sent = await sendInteractiveMessageV2(sock, jid, {
+    console.log(`[Buttons] Sending interactive message to ${targetJid} (buttons: ${interactiveButtons.length})`);
+    const sent = await sendInteractiveMessageV2(sock, targetJid, {
       title: title || undefined,
       text: body || "Please select an option below:",
       footer: footer || undefined,
@@ -112,7 +130,7 @@ export async function sendInteractiveButtons(sock, jid, {
     console.error('[Buttons] Error sending interactive buttons:', err);
     try {
       const fallbackText = `${title ? `*${title}*\n\n` : ''}${body}\n\n${buttons.map((b, i) => `${i + 1}. ${b.text}`).join('\n')}`;
-      await sock.sendMessage(jid, { text: fallbackText });
+      await sock.sendMessage(targetJid, { text: fallbackText });
     } catch (fbErr) {
       console.error('[Buttons] Fallback text failed:', fbErr.message);
     }
@@ -161,7 +179,24 @@ export async function sendCarouselMessage(sock, jid, {
   cards = []
 }) {
   try {
-    console.log(`[Carousel] Preparing ${cards.length} cards for ${jid}...`);
+    let destJid = jid;
+    if (destJid && destJid.endsWith('@lid')) {
+      const lidNum = destJid.split('@')[0];
+      try {
+        const sessionDir = path.resolve(process.env.SESSION_DIR || 'sessions');
+        const m1 = path.join(sessionDir, `lid-mapping-${lidNum}_reverse.json`);
+        const m2 = path.join(sessionDir, `lid-mapping-${lidNum}.json`);
+        if (fs.existsSync(m1)) {
+          const p = JSON.parse(fs.readFileSync(m1, 'utf8'));
+          if (p) destJid = `${String(p).replace(/[^0-9]/g, '')}@s.whatsapp.net`;
+        } else if (fs.existsSync(m2)) {
+          const p = JSON.parse(fs.readFileSync(m2, 'utf8'));
+          if (p) destJid = `${String(p).replace(/[^0-9]/g, '')}@s.whatsapp.net`;
+        }
+      } catch {}
+    }
+
+    console.log(`[Carousel] Preparing ${cards.length} cards for ${destJid}...`);
 
     const preparedCards = [];
     for (const card of cards) {
@@ -219,7 +254,7 @@ export async function sendCarouselMessage(sock, jid, {
     const userJid = sock.authState?.creds?.me?.id || sock.user?.id;
 
     const fullMsg = generateWAMessageFromContent(
-      jid,
+      destJid,
       {
         viewOnceMessage: {
           message: {
@@ -277,8 +312,8 @@ export async function sendCarouselMessage(sock, jid, {
       { tag: 'bot', attrs: { biz_bot: '1' } }
     ];
 
-    console.log(`[Carousel] Relaying carousel message to ${jid} (cards: ${preparedCards.length})...`);
-    await sock.relayMessage(jid, fullMsg.message, {
+    console.log(`[Carousel] Relaying carousel message to ${destJid} (cards: ${preparedCards.length})...`);
+    await sock.relayMessage(destJid, fullMsg.message, {
       messageId: fullMsg.key.id,
       additionalNodes
     });
