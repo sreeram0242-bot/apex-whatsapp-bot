@@ -283,6 +283,27 @@ export async function sendCustomerNotification(phone, messageText) {
   return await sock.sendMessage(jid, { text: messageText });
 }
 
+export async function sendCustomerImage(phone, imagePath, caption = '') {
+  if (!sock) {
+    throw new Error('WhatsApp is not initialized');
+  }
+  if (currentStatus !== 'connected') {
+    throw new Error('WhatsApp is not connected');
+  }
+
+  let cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+  if (cleanPhone.length === 10) {
+    cleanPhone = '91' + cleanPhone;
+  }
+  const jid = `${cleanPhone}@s.whatsapp.net`;
+  const resolvedPath = path.resolve(imagePath);
+  const buffer = fs.readFileSync(resolvedPath);
+  return await sock.sendMessage(jid, {
+    image: buffer,
+    caption
+  });
+}
+
 export async function fetchBusinessCatalog() {
   if (!sock) throw new Error('WhatsApp is not initialized');
   if (currentStatus !== 'connected') throw new Error('WhatsApp is not connected');

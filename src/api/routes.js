@@ -23,6 +23,7 @@ import {
   restartWhatsApp,
   logoutWhatsApp,
   sendCustomerNotification,
+  sendCustomerImage,
   fetchBusinessCatalog,
   sendWelcomeToOwner,
   sendWelcomeToPhone,
@@ -80,6 +81,144 @@ router.post('/send-text', async (req, res) => {
     const result = await sendCustomerNotification(phone, message || 'Hello from Apex Software & Digital Marketing!');
     res.json({ success: true, messageId: result?.key?.id });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/send-image', async (req, res) => {
+  try {
+    const { phone, imagePath, caption } = req.body || {};
+    if (!phone) return res.status(400).json({ error: 'Phone number is required' });
+    const result = await sendCustomerImage(phone, imagePath, caption);
+    res.json({ success: true, messageId: result?.key?.id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/send-all-ideas', async (req, res) => {
+  try {
+    const { phone } = req.body || {};
+    const targetPhone = phone || '9629661668';
+
+    // 1. Intro Notice
+    await sendCustomerNotification(
+      targetPhone,
+      '🎨 *Here are 4 Different Ideas to Show Your Products & Prices on WhatsApp!*\n' +
+      'Review each presentation style below directly on your screen to choose your favorite:\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━━━'
+    );
+    await new Promise(r => setTimeout(r, 1200));
+
+    // 2. IDEA 1: Modern Typography & Price Card
+    const idea1 =
+      '━━━━━━━━━━━━━━━━━━━━━━\n' +
+      '💡 *IDEA 1: Modern WhatsApp Typography & Price Card*\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+      '📸 *INSTAPICS PHOTOBOOKS & FRAMES* ✨\n' +
+      '_Premium Non-Tearable & Waterproof Photo Albums_\n\n' +
+      '✨ *Features:* 100% Waterproof | Tear-Proof | Lifetime Durability | HD Print\n\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n' +
+      '📚 *A3 JUMBO PHOTOBOOKS* (Weddings & Big Events)\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n' +
+      '• *40 Pages* (20 Sheets / 130 Photos)\n' +
+      '  ~₹5,000~ ➔ *₹2,500* (50% OFF)\n\n' +
+      '• *60 Pages* (30 Sheets / 220 Photos)\n' +
+      '  ~₹6,500~ ➔ *₹3,300* (49% OFF)\n\n' +
+      '• *80 Pages* (40 Sheets / 300 Photos)\n' +
+      '  ~₹8,500~ ➔ *₹4,200* (51% OFF)\n\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n' +
+      '📖 *A4 PREMIUM PHOTOBOOKS* (Birthdays & Memories)\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n' +
+      '• *40 Pages* (20 Sheets / 60 Photos)\n' +
+      '  ~₹3,600~ ➔ *₹1,750* (51% OFF)\n\n' +
+      '• *60 Pages* (30 Sheets / 100 Photos)\n' +
+      '  ~₹4,500~ ➔ *₹2,150* (52% OFF)\n\n' +
+      '• *80 Pages* (40 Sheets / 140 Photos)\n' +
+      '  ~₹5,200~ ➔ *₹2,500* (52% OFF)\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n\n' +
+      '📦 *Free doorstep delivery on orders above ₹2,000!*\n\n' +
+      '📲 *To order:* Reply here with your chosen size or send photos via Google Drive / WhatsApp.\n' +
+      '📞 *Studio Helpline:* +91 7598475668';
+    await sendCustomerNotification(targetPhone, idea1);
+    await new Promise(r => setTimeout(r, 1500));
+
+    // 3. IDEA 2A: A4 Photo with Specs Caption
+    const a4Caption =
+      '━━━━━━━━━━━━━━━━━━━━━━\n' +
+      '💡 *IDEA 2 (Part A): A4 Photobook Photo + Specs*\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+      '📖 *A4 Premium Photobook* (Non-Tearable & Waterproof)\n' +
+      '✨ 20-40 Sheets | Up to 140 Photos | Lifetime Durability\n\n' +
+      '• *40 Pages (60 Photos)*  ➔ *₹1,750* (was ~₹3,600~)\n' +
+      '• *60 Pages (100 Photos)* ➔ *₹2,150* (was ~₹4,500~)\n' +
+      '• *80 Pages (140 Photos)* ➔ *₹2,500* (was ~₹5,200~)\n\n' +
+      '📲 Reply to order or call: +91 7598475668';
+    await sendCustomerImage(targetPhone, 'assets/products/photobook_a4.jpg', a4Caption);
+    await new Promise(r => setTimeout(r, 1500));
+
+    // 4. IDEA 2B: A3 Photo with Specs Caption
+    const a3Caption =
+      '━━━━━━━━━━━━━━━━━━━━━━\n' +
+      '💡 *IDEA 2 (Part B): A3 Jumbo Photo + Specs*\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+      '📚 *A3 Jumbo Photobook* (Luxury Wedding & Family Edition)\n' +
+      '✨ 20-40 Sheets | Up to 300 Photos | Large Format Album\n\n' +
+      '• *40 Pages (130 Photos)* ➔ *₹2,500* (was ~₹5,000~)\n' +
+      '• *60 Pages (220 Photos)* ➔ *₹3,300* (was ~₹6,500~)\n' +
+      '• *80 Pages (300 Photos)* ➔ *₹4,200* (was ~₹8,500~)\n\n' +
+      '📲 Reply to order or call: +91 7598475668';
+    await sendCustomerImage(targetPhone, 'assets/products/photobook_a3.jpg', a3Caption);
+    await new Promise(r => setTimeout(r, 1500));
+
+    // 5. IDEA 3: Graphic Price List Flyer Image + Caption
+    const flyerCaption =
+      '━━━━━━━━━━━━━━━━━━━━━━\n' +
+      '💡 *IDEA 3: Graphic Official Rate Card Flyer*\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+      '🏷️ *InstaPics Complete Introductory Price List Flyer*\n' +
+      'Save this image to your phone gallery for reference anytime!\n\n' +
+      '• A4 Photobooks: From *₹1,750*\n' +
+      '• A3 Jumbo Albums: From *₹2,500*\n\n' +
+      '📞 Order Helpline: +91 7598475668';
+    await sendCustomerImage(targetPhone, 'assets/products/price_list.jpg', flyerCaption);
+    await new Promise(r => setTimeout(r, 1500));
+
+    // 6. IDEA 4: Clean Monospace Grid Table
+    const idea4 =
+      '━━━━━━━━━━━━━━━━━━━━━━\n' +
+      '💡 *IDEA 4: Clean Monospace Grid Table*\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+      '📸 *INSTAPICS OFFICIAL RATE CARD* 📸\n' +
+      '_Non-Tearable | Waterproof | Lifetime Durability_\n\n' +
+      '```\n' +
+      '┌─────────────────────────────────┐\n' +
+      '│ A4 PREMIUM PHOTOBOOK            │\n' +
+      '├─────────┬────────┬──────┬───────┤\n' +
+      '│ Pages   │ Photos │ Reg. │ Offer │\n' +
+      '├─────────┼────────┼──────┼───────┤\n' +
+      '│ 40 Pgs  │ 60     │ 3600 │ ₹1750 │\n' +
+      '│ 60 Pgs  │ 100    │ 4500 │ ₹2150 │\n' +
+      '│ 80 Pgs  │ 140    │ 5200 │ ₹2500 │\n' +
+      '└─────────┴────────┴──────┴───────┘\n' +
+      '┌─────────────────────────────────┐\n' +
+      '│ A3 JUMBO PHOTOBOOK              │\n' +
+      '├─────────┬────────┬──────┬───────┤\n' +
+      '│ Pages   │ Photos │ Reg. │ Offer │\n' +
+      '├─────────┼────────┼──────┼───────┤\n' +
+      '│ 40 Pgs  │ 130    │ 5000 │ ₹2500 │\n' +
+      '│ 60 Pgs  │ 220    │ 6500 │ ₹3300 │\n' +
+      '│ 80 Pgs  │ 300    │ 8500 │ ₹4200 │\n' +
+      '└─────────┴────────┴──────┴───────┘\n' +
+      '```\n\n' +
+      '📞 *Call/WhatsApp to order:* +91 7598475668\n' +
+      '━━━━━━━━━━━━━━━━━━━━━━\n' +
+      '✨ *Which idea do you like best? Reply here with Idea 1, 2, 3, or 4!*';
+    await sendCustomerNotification(targetPhone, idea4);
+
+    res.json({ success: true, message: `All 4 ideas sent successfully to +${targetPhone}!` });
+  } catch (err) {
+    console.error('[API] Error sending all ideas:', err);
     res.status(500).json({ error: err.message });
   }
 });
