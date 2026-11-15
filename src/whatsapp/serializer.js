@@ -16,9 +16,11 @@ export async function serializeMessage(sock, m) {
   const pushName = m.pushName || 'Customer';
 
   // Extract phone number from JID (resolve @lid to real phone number if mapped)
-  let phone = jid.split('@')[0];
-  if (jid.endsWith('@lid')) {
-    const lid = phone;
+  let phone = null;
+  const isLid = jid.endsWith('@lid');
+  const lid = isLid ? jid.split('@')[0] : null;
+
+  if (isLid) {
     if (key.participant && !key.participant.endsWith('@lid')) {
       phone = key.participant.split('@')[0].replace(/[^0-9]/g, '');
     } else if (key.remoteJidAlt && !key.remoteJidAlt.endsWith('@lid')) {
@@ -49,11 +51,15 @@ export async function serializeMessage(sock, m) {
         fs.writeFileSync(path.join(sessionDir, `lid-mapping-${lid}_reverse.json`), JSON.stringify(phone));
       } catch {}
     }
+  } else {
+    // Normal 1-on-1 or group JID
+    phone = jid.split('@')[0].replace(/[^0-9]/g, '');
   }
 
-  // CRITICAL FIX: In 1-on-1 chats, WhatsApp DOES NOT deliver replies sent to an @lid address.
-  // We MUST route all outgoing bot messages to the recipient's deliverable @s.whatsapp.net chat JID!
-  const targetJid = (!isGroup && !isNewsletter && phone && !phone.endsWith('@lid') && phone.length >= 8)
+  // Deliverable target JID:
+  // If we know a verified real phone number (>= 8 digits), target `${phone}@s.whatsapp.net`
+  // Otherwise, fallback directly to the original conversation JID (jid)
+  const targetJid = (!isGroup && !isNewsletter && phone && phone !== lid && phone.length >= 8)
     ? `${phone}@s.whatsapp.net`
     : jid;
 
