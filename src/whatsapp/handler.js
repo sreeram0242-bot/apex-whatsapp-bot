@@ -1,6 +1,7 @@
 import {
   getAllConfig,
-  getAllOrdersByPhone
+  getAllOrdersByPhone,
+  registerUserMessage
 } from '../db.js';
 
 /**
@@ -85,6 +86,16 @@ export async function sendProductSpecsList(sock, jid, config = null, customerNam
     `1️⃣ Reply here with your preferred album size (e.g. *A4 40 Pages* or *A3 60 Pages*)\n` +
     `2️⃣ Send your photos directly here on WhatsApp or share a Google Drive / Photos link.\n` +
     `3️⃣ Our designers will design your digital album preview for your approval before printing! 🎨✨\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `💡 *QUICK KEYWORDS FOR DETAILS:*\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `Reply with any keyword below for instant details:\n` +
+    `• *A4* — View A4 Photobook Packages & Offers\n` +
+    `• *A3* — View A3 Jumbo Wedding Album Packages\n` +
+    `• *Frame* — View Photo Frames Collection\n` +
+    `• *Pay* — View UPI ID & Payment QR Details\n` +
+    `• *Track* — Check your live order status\n` +
+    `• *Contact* — Talk to our studio designer\n\n` +
     `📞 *Studio Helpline:* ${phone}\n` +
     `📍 *InstaPics Custom Print Studio*`;
 
@@ -187,6 +198,8 @@ export async function sendPaymentInfo(sock, jid, config = null, fallbackJid = nu
 /**
  * Handles incoming WhatsApp messages.
  * Pure text responder — 0% buttons, 100% reliable delivery.
+ * Automatically sends complete specs to all new users on first message,
+ * and responds to keywords for any user.
  */
 export async function handleIncomingMessage(sock, msg) {
   try {
@@ -198,11 +211,28 @@ export async function handleIncomingMessage(sock, msg) {
     const jid = msg.jid;
     const fallbackJid = msg.originalJid;
     const phone = msg.phone || (jid ? jid.split('@')[0] : 'Customer');
+    const pushName = msg.pushName || 'Customer';
 
     const incomingText = (msg.text || '').trim();
     const lowerText = incomingText.toLowerCase();
 
-    // If customer sent photos
+    // Track user message in database: checks if this is the user's very first message
+    const { isFirst, messageCount } = registerUserMessage(phone, pushName);
+    const config = getAllConfig();
+
+    console.log(`[Bot] Message from ${phone} (${pushName}) [msg #${messageCount}, isFirst: ${isFirst}]: "${incomingText}"`);
+
+    // =========================================================================
+    // 1. ALL NEW USERS ON THEIR FIRST MESSAGE:
+    // Send the complete, crystal-clear Product, Specs & Offer Price List!
+    // =========================================================================
+    if (isFirst) {
+      console.log(`[Bot] New user detected (${phone})! Sending complete product specs & price list...`);
+      await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
+      return;
+    }
+
+    // If customer sent photos without text
     if (msg.hasImage && !incomingText) {
       console.log(`[Bot] Received photo from ${phone}`);
       await safeSend(sock, jid, {
@@ -213,21 +243,53 @@ export async function handleIncomingMessage(sock, msg) {
 
     if (!incomingText) return;
 
-    console.log(`[Bot] Message from ${phone}: "${incomingText}"`);
-    const config = getAllConfig();
+    // =========================================================================
+    // 2. KEYWORD MATCHING ENGINE (For All Users)
+    // =========================================================================
 
-    // 1. A4 Photobook Keyword Matching
+    // Keyword Group A: Complete Catalog / Rate Card / Price List / Greetings
+    const isCatalogKeyword =
+      lowerText === 'price' ||
+      lowerText === 'prices' ||
+      lowerText === 'rate' ||
+      lowerText === 'rates' ||
+      lowerText.includes('rate card') ||
+      lowerText.includes('price list') ||
+      lowerText.includes('catalog') ||
+      lowerText.includes('catalogue') ||
+      lowerText.includes('specs') ||
+      lowerText === 'menu' ||
+      lowerText.includes('product') ||
+      lowerText.includes('products') ||
+      lowerText === 'album' ||
+      lowerText === 'albums' ||
+      lowerText.includes('photobook') ||
+      lowerText.includes('offer') ||
+      lowerText.includes('offers') ||
+      lowerText === 'hi' ||
+      lowerText === 'hello' ||
+      lowerText === 'hey' ||
+      lowerText === 'start' ||
+      lowerText === 'help' ||
+      lowerText === 'info';
+
+    if (isCatalogKeyword) {
+      await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
+      return;
+    }
+
+    // Keyword Group B: A4 Photobook Specs
     if (
       lowerText === 'a4' ||
       lowerText.includes('a4') ||
       lowerText.includes('small album') ||
-      lowerText.includes('standard')
+      lowerText.includes('standard album')
     ) {
       await sendA4Specs(sock, jid, config, fallbackJid);
       return;
     }
 
-    // 2. A3 Jumbo Photobook Keyword Matching
+    // Keyword Group C: A3 Jumbo Photobook Specs
     if (
       lowerText === 'a3' ||
       lowerText.includes('a3') ||
@@ -239,18 +301,20 @@ export async function handleIncomingMessage(sock, msg) {
       return;
     }
 
-    // 3. Photo Frames Keyword Matching
+    // Keyword Group D: Photo Frames Specs
     if (
       lowerText === 'frame' ||
       lowerText.includes('frame') ||
       lowerText.includes('frames') ||
-      lowerText.includes('acrylic')
+      lowerText.includes('acrylic') ||
+      lowerText.includes('tabletop') ||
+      lowerText.includes('collage')
     ) {
       await sendFramesSpecs(sock, jid, config, fallbackJid);
       return;
     }
 
-    // 4. Payment / UPI Keyword Matching
+    // Keyword Group E: Payment & UPI Details
     if (
       lowerText === 'pay' ||
       lowerText === 'payment' ||
@@ -259,13 +323,15 @@ export async function handleIncomingMessage(sock, msg) {
       lowerText.includes('phonepe') ||
       lowerText.includes('bank') ||
       lowerText.includes('account') ||
-      lowerText.includes('qr')
+      lowerText.includes('qr') ||
+      lowerText.includes('paytm') ||
+      lowerText.includes('cred')
     ) {
       await sendPaymentInfo(sock, jid, config, fallbackJid);
       return;
     }
 
-    // 5. Order History / Tracking Keyword Matching
+    // Keyword Group F: Order Tracking & History
     if (
       lowerText.includes('track') ||
       lowerText.includes('status') ||
@@ -292,9 +358,46 @@ export async function handleIncomingMessage(sock, msg) {
       return;
     }
 
-    // 6. Default Fallback for all greetings and other queries (Hi, Hello, Price, Rates, Menu, etc.)
-    // Sends the full, crystal-clear, beautifully formatted catalog!
-    await sendProductSpecsList(sock, jid, config, msg.pushName, fallbackJid);
+    // Keyword Group G: Contact / Helpline / Studio Location
+    if (
+      lowerText.includes('contact') ||
+      lowerText.includes('helpline') ||
+      lowerText.includes('call') ||
+      lowerText.includes('support') ||
+      lowerText.includes('phone') ||
+      lowerText.includes('number') ||
+      lowerText.includes('human') ||
+      lowerText.includes('designer') ||
+      lowerText.includes('location') ||
+      lowerText.includes('address')
+    ) {
+      await safeSend(sock, jid, {
+        text: `📞 *INSTAPICS STUDIO HELPLINE* 📍\n\n` +
+          `• *Phone / WhatsApp:* ${config.studio_phone || '+91 7598475668'}\n` +
+          `• *Address:* ${config.studio_address || 'InstaPics Custom Print Studio'}\n` +
+          `• *Design Hours:* 9:30 AM – 9:00 PM (Monday – Sunday)\n\n` +
+          `✨ Reply *Price* anytime to view our complete photobook rates!`
+      }, fallbackJid);
+      return;
+    }
+
+    // =========================================================================
+    // 3. RETURNING USER CUSTOM INQUIRY FALLBACK:
+    // Acknowledges their custom message AND gives them the instant keywords!
+    // =========================================================================
+    await safeSend(sock, jid, {
+      text: `👋 Hi *${pushName}*! Thank you for messaging InstaPics! ✨\n\n` +
+        `Our studio team has received your message and will reply to you shortly.\n\n` +
+        `💡 *Instant Details Keywords:*\n` +
+        `• Reply *Price* — View complete product & price list\n` +
+        `• Reply *A4* — View A4 Photobook options\n` +
+        `• Reply *A3* — View A3 Jumbo Album options\n` +
+        `• Reply *Frame* — View Photo frame options\n` +
+        `• Reply *Pay* — View UPI & Payment details\n` +
+        `• Reply *Track* — Check your order status\n\n` +
+        `📞 *Helpline:* ${config.studio_phone || '+91 7598475668'}`
+    }, fallbackJid);
+
   } catch (err) {
     console.error('[Bot] Error in handleIncomingMessage:', err);
   }

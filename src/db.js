@@ -34,6 +34,14 @@ db.exec(`
     draft_data TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS bot_users (
+    phone TEXT PRIMARY KEY,
+    name TEXT,
+    first_seen TEXT NOT NULL,
+    last_seen TEXT NOT NULL,
+    message_count INTEGER DEFAULT 1
+  );
 `);
 
 try {
@@ -533,6 +541,52 @@ export function clearSession(phone) {
 export function clearAllSessions() {
   const stmt = db.prepare("DELETE FROM customer_sessions");
   stmt.run();
+}
+
+/**
+ * Tracks every user message. Returns { isFirst: true } if this is their first message.
+ */
+export function registerUserMessage(phone, name = '') {
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+  if (!cleanPhone) return { isFirst: false, messageCount: 1 };
+
+  const now = new Date().toISOString();
+  try {
+    const selectStmt = db.prepare("SELECT phone, message_count FROM bot_users WHERE phone = ?");
+    const existing = selectStmt.get(cleanPhone);
+
+    if (!existing) {
+      const insertStmt = db.prepare(`
+        INSERT INTO bot_users (phone, name, first_seen, last_seen, message_count)
+        VALUES (?, ?, ?, ?, 1)
+      `);
+      insertStmt.run(cleanPhone, name || 'Customer', now, now);
+      return { isFirst: true, messageCount: 1 };
+    } else {
+      const updateStmt = db.prepare(`
+        UPDATE bot_users
+        SET last_seen = ?, message_count = message_count + 1, name = COALESCE(NULLIF(?, ''), name)
+        WHERE phone = ?
+      `);
+      updateStmt.run(now, name || '', cleanPhone);
+      return { isFirst: false, messageCount: (existing.message_count || 1) + 1 };
+    }
+  } catch (err) {
+    console.error('[DB] Error registering user message:', err);
+    return { isFirst: false, messageCount: 1 };
+  }
+}
+
+export function isNewUser(phone) {
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+  if (!cleanPhone) return false;
+  try {
+    const stmt = db.prepare("SELECT phone FROM bot_users WHERE phone = ?");
+    const row = stmt.get(cleanPhone);
+    return !row;
+  } catch {
+    return false;
+  }
 }
 
 export default db;
