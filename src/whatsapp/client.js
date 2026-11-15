@@ -12,8 +12,7 @@ import pino from 'pino';
 import fs from 'node:fs';
 import path from 'node:path';
 import { serializeMessage } from './serializer.js';
-import { handleIncomingMessage, sendWelcomeMenu } from './handler.js';
-import { sendCarouselMessage, sendInteractiveButtons, sendPriceListImageDemo } from './buttons.js';
+import { handleIncomingMessage, sendProductSpecsList } from './handler.js';
 import { saveMessage, getStoredMessage } from './store.js';
 import { getAllConfig } from '../db.js';
 
@@ -391,7 +390,7 @@ export async function sendWelcomeToOwner() {
   if (!userPhone) throw new Error('Could not determine connected phone number');
   const jid = `${userPhone}@s.whatsapp.net`;
   const config = getAllConfig();
-  await sendWelcomeMenu(sock, jid, config, sock.user?.name || 'Owner');
+  await sendProductSpecsList(sock, jid, config, sock.user?.name || 'Owner');
   return { success: true, phone: userPhone };
 }
 
@@ -418,163 +417,20 @@ export async function sendWelcomeToPhone(phoneNumber) {
   }
   const jid = `${cleanPhone}@s.whatsapp.net`;
   const config = getAllConfig();
-  await sendWelcomeMenu(sock, jid, config, 'Customer');
+  await sendProductSpecsList(sock, jid, config, 'Customer');
   return { success: true, phone: cleanPhone };
 }
 
 export async function sendListDemoToPhone(phoneNumber) {
-  if (!sock || currentStatus !== 'connected') {
-    throw new Error('WhatsApp is not connected');
-  }
-  let cleanPhone = (phoneNumber || '').replace(/[^0-9]/g, '');
-  if (cleanPhone.length === 10) {
-    cleanPhone = '91' + cleanPhone;
-  }
-  if (!cleanPhone || cleanPhone.length < 10) {
-    throw new Error('Invalid phone number provided');
-  }
-  const jid = `${cleanPhone}@s.whatsapp.net`;
-  const ownPhone = sock.user?.id ? sock.user.id.split(':')[0].replace(/[^0-9]/g, '') : '916369134270';
-
-  const buttons = [
-    {
-      type: 'catalog',
-      text: '🛍️ View WhatsApp Catalogue',
-      business_phone_number: ownPhone
-    },
-    {
-      type: 'single_select',
-      title: '📖 Choose Photobook / Frame',
-      sections: [
-        {
-          title: '📖 A4 Premium (Non-Tearable)',
-          highlight_label: 'Best Seller',
-          rows: [
-            {
-              id: 'prod_photobook_a4',
-              title: '📘 A4 • 40 Pages (60 Photos)',
-              description: '₹1,750 • Non-tearable & waterproof (was ₹3,600)'
-            },
-            {
-              id: 'prod_photobook_a4',
-              title: '📘 A4 • 60 Pages (100 Photos)',
-              description: '₹2,150 • Non-tearable & waterproof (was ₹4,500)'
-            },
-            {
-              id: 'prod_photobook_a4',
-              title: '📘 A4 • 80 Pages (140 Photos)',
-              description: '₹2,500 • Non-tearable & waterproof (was ₹5,200)'
-            }
-          ]
-        },
-        {
-          title: '📚 A3 Jumbo (Luxury Album)',
-          rows: [
-            {
-              id: 'prod_photobook_a3',
-              title: '📙 A3 • 40 Pages (130 Photos)',
-              description: '₹2,500 • Jumbo luxury album (was ₹5,000)'
-            },
-            {
-              id: 'prod_photobook_a3',
-              title: '📙 A3 • 60 Pages (220 Photos)',
-              description: '₹3,300 • Jumbo luxury album (was ₹6,500)'
-            },
-            {
-              id: 'prod_photobook_a3',
-              title: '📙 A3 • 80 Pages (300 Photos)',
-              description: '₹4,200 • Jumbo luxury album (was ₹8,500)'
-            }
-          ]
-        },
-        {
-          title: '🖼️ Custom Photo Frames',
-          rows: [
-            {
-              id: 'prod_frames',
-              title: '🖼️ Acrylic / Wooden Frame',
-              description: 'From ₹499 • Custom sizes for wall & table'
-            }
-          ]
-        }
-      ]
-    }
-  ];
-
-  return await sendInteractiveButtons(sock, jid, {
-    title: '📸 InstaPics Photobooks & Frames',
-    body: 'Welcome to *InstaPics*! 📸✨\n\nWe print premium *Non-Tearable & 100% Waterproof Photobooks* and personalized *Photo Frames* with lifetime durability.\n\nTap *Choose Photobook / Frame* to select your package:',
-    footer: 'Select an option below',
-    buttons
-  });
+  return await sendWelcomeToPhone(phoneNumber);
 }
 
 export async function sendCarouselDemoToPhone(phoneNumber) {
-  if (!sock || currentStatus !== 'connected') {
-    throw new Error('WhatsApp is not connected');
-  }
-  let cleanPhone = (phoneNumber || '').replace(/[^0-9]/g, '');
-  if (cleanPhone.length === 10) {
-    cleanPhone = '91' + cleanPhone;
-  }
-  if (!cleanPhone || cleanPhone.length < 10) {
-    throw new Error('Invalid phone number provided');
-  }
-  const jid = `${cleanPhone}@s.whatsapp.net`;
-
-  const config = getAllConfig();
-  const ownPhone = sock.user?.id ? sock.user.id.split(':')[0].replace(/[^0-9]/g, '') : '916369134270';
-  const greeting = config.welcome_greeting || "Welcome to *InstaPics*! 📸✨";
-  const body = config.welcome_body || "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.";
-  const instruction = config.welcome_instruction || "Swipe through our products below to choose your package:";
-  const catalogueLink = config.catalogue_link || `https://wa.me/c/${ownPhone}`;
-  const carouselFooter = config.carousel_footer || '◄ Swipe Left / Right to Choose ►';
-  const fullBody = `${greeting}\n\n${body}\n\n${instruction}\n\n🛍️ *Official WhatsApp Catalogue:*\n${catalogueLink}`;
-
-  const products = (config.products && config.products.length > 0) ? config.products : [
-    { id: 'prod_photobook_a4', title: '📖 A4 Premium Photobook', price: 'From ₹1,750', description: 'Non-tearable, waterproof pages with lifetime durability. Up to 140 photos.', image: '/assets/products/photobook_a4.jpg' },
-    { id: 'prod_photobook_a3', title: '📚 A3 Jumbo Photobook', price: 'From ₹2,500', description: 'Large luxury album for weddings, birthdays & family memories. Up to 300 photos.', image: '/assets/products/photobook_a3.jpg' },
-    { id: 'prod_frames', title: '🖼️ Custom Photo Frames', price: 'From ₹499', description: 'Crystal acrylic & wooden photo frames for wall & tabletop display.', image: '/assets/products/photo_frame.jpg' },
-    { id: 'prod_price_list', title: '🏷️ Full Price List & Offers', price: 'Special Offers', description: 'Non-tearable photobook complete offer price sheet with discounts.', image: '/assets/products/price_list.jpg' }
-  ];
-
-  const carouselCards = products.slice(0, 5).map(p => {
-    let imgPath = p.image || '/assets/products/photobook_a4.jpg';
-    if (imgPath.startsWith('/')) imgPath = imgPath.slice(1);
-    const resolvedPath = path.resolve(imgPath);
-
-    const shortWord = (p.title || '').replace(/[^a-zA-Z0-9\s]/g, '').trim().split(/\s+/)[0] || 'Item';
-    const buttonLabel = `Select ${shortWord}`.slice(0, 20);
-
-    return {
-      title: (p.title || 'Product').slice(0, 30),
-      imagePath: fs.existsSync(resolvedPath) ? resolvedPath : path.resolve('assets/products/photobook_a4.jpg'),
-      body: p.description || 'Premium quality customized photo product.',
-      buttonText: buttonLabel,
-      buttonId: p.id
-    };
-  });
-
-  return await sendCarouselMessage(sock, jid, {
-    bodyText: fullBody,
-    footerText: carouselFooter,
-    cards: carouselCards
-  });
+  return await sendWelcomeToPhone(phoneNumber);
 }
 
 export async function sendPriceListDemoToPhone(phoneNumber) {
-  if (!sock || currentStatus !== 'connected') {
-    throw new Error('WhatsApp is not connected');
-  }
-  let cleanPhone = (phoneNumber || '').replace(/[^0-9]/g, '');
-  if (cleanPhone.length === 10) {
-    cleanPhone = '91' + cleanPhone;
-  }
-  if (!cleanPhone || cleanPhone.length < 10) {
-    throw new Error('Invalid phone number provided');
-  }
-  const jid = `${cleanPhone}@s.whatsapp.net`;
-  return await sendPriceListImageDemo(sock, jid);
+  return await sendWelcomeToPhone(phoneNumber);
 }
 
 

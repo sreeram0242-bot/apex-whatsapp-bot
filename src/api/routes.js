@@ -228,7 +228,7 @@ router.post('/send-welcome', async (req, res) => {
     const { phone } = req.body || {};
     if (!phone) return res.status(400).json({ error: 'Phone number is required' });
     const result = await sendWelcomeToPhone(phone);
-    res.json({ success: true, message: `Welcome message with buttons sent to +${result.phone}!` });
+    res.json({ success: true, message: `Product & price specs list sent to +${result.phone}!` });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

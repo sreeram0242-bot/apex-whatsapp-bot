@@ -1395,11 +1395,11 @@ body {
 
         <!-- Send Direct Welcome Message -->
         <div class="card" style="grid-column: span 2;">
-          <h2 class="card-title">Send Interactive Carousel to Any Phone</h2>
-          <p class="card-subtitle">Test or initiate contact by sending the InstaPics swipeable carousel and buttons to any WhatsApp number.</p>
+          <h2 class="card-title">Send Product & Price Specs List to Any Phone</h2>
+          <p class="card-subtitle">Test or initiate contact by sending the clean InstaPics product specs and price list to any WhatsApp number.</p>
           <div style="display: flex; gap: 10px; margin-top: 14px; align-items: center; flex-wrap: wrap;">
             <input type="text" id="targetCustomerPhoneInput" class="text-input" placeholder="e.g. 9629661668 or 919629661668" style="max-width: 320px;">
-            <button class="btn btn-primary" onclick="sendWelcomeToCustomPhone()">Send Welcome Message & Carousel</button>
+            <button class="btn btn-primary" onclick="sendWelcomeToCustomPhone()">Send Product & Price List</button>
           </div>
         </div>
       </div>
@@ -3101,7 +3101,7 @@ window.sendWelcomeToCustomPhone = async function() {
     return;
   }
   try {
-    showToast(`Sending welcome carousel to +${phone}...`);
+    showToast(`Sending product & price specs list to +${phone}...`);
     const res = await fetch('/api/send-welcome', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -3109,7 +3109,7 @@ window.sendWelcomeToCustomPhone = async function() {
     });
     const data = await res.json();
     if (data.success) {
-      showToast(data.message || 'Carousel message sent successfully!');
+      showToast(data.message || 'Product & price list sent successfully!');
       setVal('targetCustomerPhoneInput', '');
     } else {
       showToast(`Error: ${data.error || 'Failed to send'}`);
