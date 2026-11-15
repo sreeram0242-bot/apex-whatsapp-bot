@@ -2,8 +2,7 @@ import makeWASocket, {
   DisconnectReason,
   fetchLatestBaileysVersion,
   useMultiFileAuthState,
-  Browsers,
-  getAggregateVotesInPollMessage
+  Browsers
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import qrcodeTerminal from 'qrcode-terminal';
@@ -183,49 +182,6 @@ export async function initWhatsApp() {
         }
       } catch (err) {
         console.error('[WhatsApp] Error processing message:', err);
-      }
-    }
-  });
-
-  sock.ev.on('messages.update', async (updates) => {
-    for (const { key, update } of updates) {
-      if (update.pollUpdates) {
-        console.log(`[WhatsApp] Poll update received for message: ${key.id}`);
-        const pollCreation = getStoredMessage(key.id);
-        if (pollCreation) {
-          try {
-            const votes = getAggregateVotesInPollMessage(
-              { message: pollCreation, pollUpdates: update.pollUpdates },
-              sock.user?.id
-            );
-            console.log('[WhatsApp Poll] Aggregated votes:', JSON.stringify(votes));
-            for (const opt of votes) {
-              if (opt.voters && opt.voters.length > 0) {
-                console.log(`[WhatsApp Poll] Tapped option: "${opt.name}"`);
-                const simulatedMsg = {
-                  key: {
-                    remoteJid: key.remoteJid,
-                    fromMe: false,
-                    id: `poll_vote_${Date.now()}`
-                  },
-                  jid: key.remoteJid,
-                  phone: key.remoteJid.split('@')[0],
-                  fromMe: false,
-                  isGroup: key.remoteJid.endsWith('@g.us'),
-                  isNewsletter: key.remoteJid.endsWith('@newsletter'),
-                  pushName: 'Customer',
-                  text: opt.name,
-                  buttonId: opt.name,
-                  hasImage: false,
-                  downloadMedia: async () => null
-                };
-                await handleIncomingMessage(sock, simulatedMsg);
-              }
-            }
-          } catch (pollErr) {
-            console.error('[WhatsApp] Error aggregating poll votes:', pollErr);
-          }
-        }
       }
     }
   });
@@ -419,18 +375,6 @@ export async function sendWelcomeToPhone(phoneNumber) {
   const config = getAllConfig();
   await sendProductSpecsList(sock, jid, config, 'Customer');
   return { success: true, phone: cleanPhone };
-}
-
-export async function sendListDemoToPhone(phoneNumber) {
-  return await sendWelcomeToPhone(phoneNumber);
-}
-
-export async function sendCarouselDemoToPhone(phoneNumber) {
-  return await sendWelcomeToPhone(phoneNumber);
-}
-
-export async function sendPriceListDemoToPhone(phoneNumber) {
-  return await sendWelcomeToPhone(phoneNumber);
 }
 
 

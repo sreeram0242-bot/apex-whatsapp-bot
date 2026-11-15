@@ -869,7 +869,7 @@ body {
           💰 Revenue & Payments
         </button>
         <button class="nav-tab" id="tabBtn-product-flows" onclick="switchTab('product-flows')">
-          Product Flows & Live Preview
+          📚 Product Specs & Live Simulator
         </button>
         <button class="nav-tab" id="tabBtn-settings" onclick="switchTab('settings')">
           Studio Settings
@@ -1043,168 +1043,194 @@ body {
       </div>
     </section>
 
-    <!-- 3. PRODUCT FLOWS & LIVE SIMULATOR -->
+    <!-- 3. PRODUCT SPECS & LIVE SIMULATOR -->
     <section id="tab-product-flows" class="tab-content">
       <div class="section-header">
         <div>
-          <h1 class="page-title">Individual Product Chatflows & Live Simulator</h1>
-          <p class="page-desc">Configure distinct options, questions, prices, and photo instructions for each product separately.</p>
+          <h1 class="page-title">InstaPics Product Catalog & Live WhatsApp Simulator</h1>
+          <p class="page-desc">Official product rates and specifications dispatched directly as clean text with emojis and bullet points to WhatsApp customers.</p>
         </div>
         <div class="header-actions">
-          <button class="btn btn-secondary btn-sm" onclick="restartSimulator()">↺ Restart Simulator</button>
-          <button class="btn btn-primary" onclick="saveActiveProductFlow()">💾 Save Current Flow</button>
+          <button class="btn btn-secondary btn-sm" onclick="restartSimulator()">↺ Reset Simulator</button>
+          <button class="btn btn-primary btn-sm" onclick="sendWelcomeToCustomPhone()">📲 Test on WhatsApp</button>
         </div>
       </div>
 
-      <div class="simulator-layout-grid">
-        <!-- Left: Product Flow Editor -->
-        <div>
-          <!-- Product Selector Pills Nav -->
-          <div class="card" style="margin-bottom: 16px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-              <span style="font-size: 13px; font-weight: 600;">Choose Product to Configure Flow:</span>
-              <button class="btn btn-secondary btn-sm" onclick="addNewProductPrompt()">+ Add New Product</button>
+      <div class="simulator-layout-grid" style="grid-template-columns: 1.15fr 0.85fr; gap: 20px;">
+        <!-- Left: Official Product Catalog & Rates Matrix -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Quality Highlights Card -->
+          <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 14px; letter-spacing: 0.05em; color: #38bdf8;">✨ QUALITY GUARANTEE</span>
+              <span style="background: rgba(56,189,248,0.2); color: #38bdf8; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px;">Active in Bot</span>
             </div>
-            <div id="productFlowTabs" class="product-pills-nav" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
-              <!-- Populated by JS -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; margin-top: 6px;">
+              <div>💧 <strong>100% Waterproof Pages</strong> (Spill-proof)</div>
+              <div>🛡️ <strong>Non-Tearable Synthetic</strong> (Lifetime)</div>
+              <div>🎨 <strong>Ultra HD 6-Color Studio</strong> (Lab print)</div>
+              <div>🌟 <strong>Seamless Lay-Flat Binding</strong> (Panoramic)</div>
             </div>
           </div>
 
-          <!-- Active Product Flow Details Card -->
-          <div class="card" id="flowEditorCard">
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 16px;">
+          <!-- A4 Photobooks Card -->
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; margin-bottom: 12px;">
               <div>
-                <h2 class="card-title" id="editorProductTitle">Product Configuration</h2>
-                <span class="card-subtitle" id="editorProductId" style="font-family: var(--font-mono); margin-bottom: 0;">prod_id</span>
+                <h3 style="font-size: 14px; font-weight: 700; color: var(--navy-dark); margin: 0;">📖 A4 Premium Photobooks (Standard Album)</h3>
+                <span class="field-hint" style="margin-top: 2px;">Birthdays, Anniversaries, Vacations & Baby Photos</span>
               </div>
-              <div style="display: flex; gap: 8px;">
-                <button class="btn btn-secondary btn-sm" onclick="testCurrentProductInSim()">📱 Test in Simulator</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteCurrentProduct()">🗑️ Delete</button>
-              </div>
+              <button class="btn btn-secondary btn-sm" onclick="simTriggerKeyword('A4')" style="font-size: 11px; padding: 4px 10px;">Preview in Sim</button>
             </div>
+            <table class="options-builder-table">
+              <thead>
+                <tr>
+                  <th>Pages / Sheets</th>
+                  <th>Photos Capacity</th>
+                  <th>Original Price</th>
+                  <th>Offer Price</th>
+                  <th>Discount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>40 Pages</strong> (20 Sheets)</td>
+                  <td>Up to 60 Photos</td>
+                  <td><del style="color: #94a3b8;">₹3,600</del></td>
+                  <td><strong style="color: #059669; font-size: 13px;">₹1,750</strong></td>
+                  <td><span class="badge" style="background: #ECFDF5; color: #047857; font-weight: 600;">51% OFF</span></td>
+                </tr>
+                <tr>
+                  <td><strong>60 Pages</strong> (30 Sheets)</td>
+                  <td>Up to 100 Photos</td>
+                  <td><del style="color: #94a3b8;">₹4,500</del></td>
+                  <td><strong style="color: #059669; font-size: 13px;">₹2,150</strong></td>
+                  <td><span class="badge" style="background: #ECFDF5; color: #047857; font-weight: 600;">52% OFF</span></td>
+                </tr>
+                <tr>
+                  <td><strong>80 Pages</strong> (40 Sheets)</td>
+                  <td>Up to 140 Photos</td>
+                  <td><del style="color: #94a3b8;">₹5,200</del></td>
+                  <td><strong style="color: #059669; font-size: 13px;">₹2,500</strong></td>
+                  <td><span class="badge" style="background: #ECFDF5; color: #047857; font-weight: 600;">52% OFF</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-            <!-- 1. Presentation & Carousel -->
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--navy-dark);">1. Product Presentation & Carousel Card</h3>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Product Display Title</label>
-                  <input type="text" id="flowTitleInput" class="text-input" placeholder="e.g. 📖 A4 Premium Photobook">
-                </div>
-                <div class="form-group">
-                  <label>Starting Price Label</label>
-                  <input type="text" id="flowPriceInput" class="text-input" placeholder="e.g. From ₹1,750">
-                </div>
+          <!-- A3 Jumbo Photobooks Card -->
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; margin-bottom: 12px;">
+              <div>
+                <h3 style="font-size: 14px; font-weight: 700; color: var(--navy-dark); margin: 0;">📚 A3 Jumbo Photobooks (Luxury Large Album)</h3>
+                <span class="field-hint" style="margin-top: 2px;">Ideal for Weddings, Grand Receptions & Family Memories</span>
               </div>
-              <div class="form-group">
-                <label>Card Description (Benefits / Photo Capacity)</label>
-                <textarea id="flowDescInput" class="textarea-input" rows="2" placeholder="e.g. Non-tearable, waterproof pages with lifetime durability. Up to 140 photos."></textarea>
-              </div>
-
-              <!-- Product Photo Selector & Uploader -->
-              <div class="form-group" style="margin-top: 14px; background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 8px; padding: 12px;">
-                <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <span style="font-weight: 600; color: var(--navy-dark);">📸 Product Photo (Carousel & Catalog Card)</span>
-                  <span class="field-hint" style="margin-top:0;">Image shown on customer's WhatsApp</span>
-                </label>
-                <div style="display: flex; gap: 14px; align-items: flex-start;">
-                  <!-- Live Preview Thumbnail -->
-                  <div style="width: 84px; height: 84px; border-radius: 8px; border: 1px solid var(--border-color); background: #FFFFFF; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-                    <img id="flowImagePreview" src="/assets/products/photobook_a4.jpg" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/assets/products/photobook_a4.jpg'">
-                  </div>
-
-                  <!-- Path Input & Action Buttons -->
-                  <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                    <div style="display: flex; gap: 8px;">
-                      <input type="text" id="flowImageInput" class="text-input" placeholder="e.g. /assets/products/photobook_a4.jpg or paste image URL" oninput="updateFlowImagePreview(this.value)" style="font-size: 12px; font-family: var(--font-mono);">
-                      <label class="btn btn-secondary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; margin-bottom: 0;">
-                        📁 Upload Photo
-                        <input type="file" id="productImageFileInput" accept="image/*" style="display: none;" onchange="handleProductImageUpload(this)">
-                      </label>
-                    </div>
-
-                    <!-- Preset Selector Buttons -->
-                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                      <span style="font-size: 11px; color: var(--text-muted);">Quick Presets:</span>
-                      <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 2px 8px; height: auto;" onclick="setFlowImagePreset('/assets/products/photobook_a4.jpg')">📘 A4 Book</button>
-                      <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 2px 8px; height: auto;" onclick="setFlowImagePreset('/assets/products/photobook_a3.jpg')">📚 A3 Jumbo</button>
-                      <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 2px 8px; height: auto;" onclick="setFlowImagePreset('/assets/products/photo_frame.jpg')">🖼️ Frame</button>
-                      <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 2px 8px; height: auto;" onclick="setFlowImagePreset('/assets/products/price_list.jpg')">🏷️ Price List</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <button class="btn btn-secondary btn-sm" onclick="simTriggerKeyword('A3')" style="font-size: 11px; padding: 4px 10px;">Preview in Sim</button>
             </div>
+            <table class="options-builder-table">
+              <thead>
+                <tr>
+                  <th>Pages / Sheets</th>
+                  <th>Photos Capacity</th>
+                  <th>Original Price</th>
+                  <th>Offer Price</th>
+                  <th>Discount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>40 Pages</strong> (20 Sheets)</td>
+                  <td>Up to 130 Photos</td>
+                  <td><del style="color: #94a3b8;">₹5,000</del></td>
+                  <td><strong style="color: #059669; font-size: 13px;">₹2,500</strong></td>
+                  <td><span class="badge" style="background: #ECFDF5; color: #047857; font-weight: 600;">50% OFF</span></td>
+                </tr>
+                <tr>
+                  <td><strong>60 Pages</strong> (30 Sheets)</td>
+                  <td>Up to 220 Photos</td>
+                  <td><del style="color: #94a3b8;">₹6,500</del></td>
+                  <td><strong style="color: #059669; font-size: 13px;">₹3,300</strong></td>
+                  <td><span class="badge" style="background: #ECFDF5; color: #047857; font-weight: 600;">49% OFF</span></td>
+                </tr>
+                <tr>
+                  <td><strong>80 Pages</strong> (40 Sheets)</td>
+                  <td>Up to 300 Photos</td>
+                  <td><del style="color: #94a3b8;">₹8,500</del></td>
+                  <td><strong style="color: #059669; font-size: 13px;">₹4,200</strong></td>
+                  <td><span class="badge" style="background: #ECFDF5; color: #047857; font-weight: 600;">51% OFF</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-            <!-- 2. Step 1 Options & Pricing -->
-            <div style="margin-bottom: 20px; border-top: 1px solid var(--border-light); padding-top: 16px;">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                <h3 style="font-size: 13px; font-weight: 600; color: var(--navy-dark);">2. Step 1: Package / Page Count Options & Pricing</h3>
-                <button class="btn btn-secondary btn-sm" onclick="addOptionRow()">+ Add Option</button>
+          <!-- Custom Photo Frames Card -->
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; margin-bottom: 12px;">
+              <div>
+                <h3 style="font-size: 14px; font-weight: 700; color: var(--navy-dark); margin: 0;">🖼️ Custom Photo Frames</h3>
+                <span class="field-hint" style="margin-top: 2px;">Crystal Acrylic & Wooden Border Display Frames</span>
               </div>
-              <div class="form-group">
-                <label>WhatsApp Prompt Question to Customer</label>
-                <textarea id="flowStep1PromptInput" class="textarea-input" rows="2" placeholder="e.g. Select your desired A4 Photobook Page Count:"></textarea>
-                <span class="field-hint">Sent as message body above the interactive selection buttons.</span>
-              </div>
-
-              <!-- Options Table -->
-              <table class="options-builder-table">
-                <thead>
-                  <tr>
-                    <th>Button Display Text (with price)</th>
-                    <th style="width: 110px;">Price (₹)</th>
-                    <th style="width: 120px;">Button ID</th>
-                    <th style="width: 40px;"></th>
-                  </tr>
-                </thead>
-                <tbody id="optionsTableBody">
-                  <!-- Rows populated by JS -->
-                </tbody>
-              </table>
+              <button class="btn btn-secondary btn-sm" onclick="simTriggerKeyword('Frame')" style="font-size: 11px; padding: 4px 10px;">Preview in Sim</button>
             </div>
-
-            <!-- 3. Photo Instructions -->
-            <div style="border-top: 1px solid var(--border-light); padding-top: 16px; margin-bottom: 20px;">
-              <h3 style="font-size: 13px; font-weight: 600; color: var(--navy-dark); margin-bottom: 8px;">3. Photo Upload Instructions</h3>
-              <div class="form-group">
-                <label>Prompt Question When Requesting Photos</label>
-                <textarea id="flowPhotoPromptInput" class="textarea-input" rows="2" placeholder="e.g. Please upload your photos here on WhatsApp, or send a Google Drive link:"></textarea>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px;">
+                <div style="font-weight: 600; font-size: 13px; color: #0F172A;">Tabletop Frame</div>
+                <div style="font-size: 11px; color: #64748B;">Size 8x12 • Desk / Table Display</div>
+                <div style="font-weight: 700; font-size: 15px; color: #059669; margin-top: 6px;">₹599</div>
               </div>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-              <button class="btn btn-secondary" onclick="fetchConfig()">Cancel Changes</button>
-              <button class="btn btn-primary" onclick="saveActiveProductFlow()">💾 Save This Product Flow</button>
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px;">
+                <div style="font-weight: 600; font-size: 13px; color: #0F172A;">Acrylic Wall Frame</div>
+                <div style="font-size: 11px; color: #64748B;">Size 12x18 • High-Gloss Acrylic</div>
+                <div style="font-weight: 700; font-size: 15px; color: #059669; margin-top: 6px;">₹999</div>
+              </div>
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px;">
+                <div style="font-weight: 600; font-size: 13px; color: #0F172A;">Family Collage Frame</div>
+                <div style="font-size: 11px; color: #64748B;">Multi-photo Designer Border</div>
+                <div style="font-weight: 700; font-size: 15px; color: #059669; margin-top: 6px;">₹1,299</div>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Right: Live WhatsApp Chat Simulator -->
-        <div class="card phone-simulator-card">
-          <div class="card-header-flex" style="margin-bottom: 12px;">
+        <div class="card phone-simulator-card" style="position: sticky; top: 80px; align-self: flex-start;">
+          <div class="card-header-flex" style="margin-bottom: 8px;">
             <div>
-              <h2 class="card-title">Live WhatsApp Simulator</h2>
-              <p class="card-subtitle">Test how customers experience your products, page choices & cart live.</p>
+              <h2 class="card-title" style="margin-bottom: 2px;">Live WhatsApp Simulator</h2>
+              <p class="card-subtitle" style="margin-bottom: 0;">Click any quick keyword below or type a message to test.</p>
             </div>
           </div>
 
+          <!-- Quick Test Keyword Buttons -->
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Price')" style="padding: 4px 10px; font-size: 11px;">📸 All Prices</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('A4')" style="padding: 4px 10px; font-size: 11px;">📖 A4</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('A3')" style="padding: 4px 10px; font-size: 11px;">📚 A3</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Frame')" style="padding: 4px 10px; font-size: 11px;">🖼️ Frame</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Pay')" style="padding: 4px 10px; font-size: 11px;">💳 Pay</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Track')" style="padding: 4px 10px; font-size: 11px;">📦 Track</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Contact')" style="padding: 4px 10px; font-size: 11px;">📞 Contact</button>
+          </div>
+
           <!-- Phone Mockup Container -->
-          <div class="phone-frame">
-            <div class="phone-topbar">
-              <div class="phone-avatar">📸</div>
+          <div class="phone-frame" style="max-width: 360px; margin: 0 auto; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);">
+            <div class="phone-topbar" style="background: #075E54;">
+              <div class="phone-avatar" style="background: #128C7E;">📸</div>
               <div class="phone-contact">
-                <span id="simPhoneTitle" class="phone-contact-name">InstaPics Photobooks</span>
-                <span class="phone-contact-status">online • WhatsApp Business</span>
+                <span id="simPhoneTitle" class="phone-contact-name" style="color: #fff;">InstaPics Photobooks</span>
+                <span class="phone-contact-status" style="color: #A7F3D0;">online • WhatsApp Business</span>
               </div>
             </div>
 
-            <div id="simulatorChatBody" class="phone-chat-body">
+            <div id="simulatorChatBody" class="phone-chat-body" style="height: 420px; overflow-y: auto; background: #ECE5DD; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
               <!-- Populated by JS -->
             </div>
 
-            <div class="phone-footer">
-              <span class="field-hint" style="color: var(--text-muted); font-size: 11px;">Tap any button in the phone to test the live chatflow</span>
+            <div class="phone-footer" style="background: #F0F2F5; padding: 8px 10px; border-top: 1px solid #E2E8F0;">
+              <form onsubmit="handleSimulatorSubmit(event)" style="display: flex; gap: 6px; align-items: center; width: 100%;">
+                <input type="text" id="simulatorInput" class="text-input" placeholder="Type a keyword (e.g. A4, pay, track)..." style="font-size: 12px; padding: 8px 12px; border-radius: 20px; background: #FFFFFF; flex: 1; border: 1px solid #CBD5E1;">
+                <button type="submit" class="btn btn-primary btn-sm" style="border-radius: 50%; width: 34px; height: 34px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #128C7E; border-color: #128C7E;">➤</button>
+              </form>
             </div>
           </div>
         </div>
@@ -1228,8 +1254,8 @@ body {
         <div class="card" style="grid-column: span 2;">
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 16px;">
             <div>
-              <h2 class="card-title" style="margin-bottom: 2px;">💬 Main Menu & Welcome Carousel Customizer</h2>
-              <p class="card-subtitle" style="margin-bottom: 0;">Customize the exact greetings, hooks, call-to-actions, and catalog links dispatched when customers text your WhatsApp number.</p>
+              <h2 class="card-title" style="margin-bottom: 2px;">💬 WhatsApp Welcome & Catalog Message Customizer</h2>
+              <p class="card-subtitle" style="margin-bottom: 0;">Customize greetings, quality highlights, helpline, and payment details dispatched to WhatsApp customers.</p>
             </div>
             <button type="button" class="btn btn-secondary btn-sm" onclick="switchTab('product-flows')">📱 Test in Simulator</button>
           </div>
@@ -1244,25 +1270,14 @@ body {
               </div>
 
               <div class="form-group">
-                <label for="cfgWelcomeBody">2. Studio Story & Value Proposition (Body Text)</label>
+                <label for="cfgWelcomeBody">2. Studio Value Proposition & Quality Guarantee</label>
                 <textarea id="cfgWelcomeBody" class="textarea-input" rows="3" placeholder="e.g. We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability." oninput="updateWelcomeTemplatePreview()"></textarea>
                 <span class="field-hint">Highlights what makes your products special (non-tearable, waterproof, etc.)</span>
               </div>
 
               <div class="form-group">
-                <label for="cfgWelcomeInstruction">3. Action Prompt / Call to Action</label>
-                <input type="text" id="cfgWelcomeInstruction" class="text-input" placeholder="e.g. Swipe through our products below to choose your package:" oninput="updateWelcomeTemplatePreview()">
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="cfgCarouselFooter">4. Carousel Footer Hint</label>
-                  <input type="text" id="cfgCarouselFooter" class="text-input" placeholder="e.g. ◄ Swipe Left / Right to Choose ►" oninput="updateWelcomeTemplatePreview()">
-                </div>
-                <div class="form-group">
-                  <label for="cfgCatalogueLink">5. Official WhatsApp Catalogue Link</label>
-                  <input type="text" id="cfgCatalogueLink" class="text-input" placeholder="e.g. https://wa.me/c/916369134270" oninput="updateWelcomeTemplatePreview()">
-                </div>
+                <label for="cfgWelcomeInstruction">3. Catalog Intro Prompt</label>
+                <input type="text" id="cfgWelcomeInstruction" class="text-input" placeholder="e.g. Here is our complete product, specs & special offer price list:" oninput="updateWelcomeTemplatePreview()">
               </div>
             </div>
 
@@ -2016,314 +2031,214 @@ window.testCurrentProductInSim = function() {
 // --------------------------------------------------------------------------
 // 3. LIVE WHATSAPP PHONE SIMULATOR
 // --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
+// 3. LIVE WHATSAPP PHONE SIMULATOR (Specs & Keyword Engine)
+// --------------------------------------------------------------------------
 window.restartSimulator = function() {
-  simCart = [];
   renderSimulator();
 };
+
+function formatWhatsAppText(txt) {
+  if (!txt) return '';
+  return escapeHtml(txt)
+    .replace(/\*([^\*]+)\*/g, '<strong>$1</strong>')
+    .replace(/_([^_]+)_/g, '<em>$1</em>')
+    .replace(/~([^~]+)~/g, '<del>$1</del>')
+    .replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;padding:2px 4px;border-radius:4px;font-size:11px;">$1</code>')
+    .replace(/\n/g, '<br>');
+}
+
+function getFullSpecsCatalogText() {
+  const phone = currentConfig?.studio_phone || '+91 7598475668';
+  return `📸 *INSTAPICS PHOTOBOOKS & FRAMES* ✨\n` +
+    `_Premium Non-Tearable & 100% Waterproof Photo Albums_\n\n` +
+    `Welcome to InstaPics! Here is our complete product, specs & special offer price list:\n\n` +
+    `✨ *QUALITY GUARANTEE:*\n` +
+    `• 💧 *100% Waterproof Pages* (spill-proof & washable)\n` +
+    `• 🛡️ *Non-Tearable Synthetic Paper* (lifetime durability)\n` +
+    `• 🎨 *Ultra HD 6-Color Studio Printing*\n` +
+    `• 🌟 *Seamless Lay-Flat Panoramic Binding*\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `📖 *A4 PREMIUM PHOTOBOOKS* (Standard Album)\n` +
+    `_Best for Birthdays, Anniversaries, Vacations & Baby Photos_\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `• *40 Pages* (20 Sheets • up to 60 Photos)\n` +
+    `  ~₹3,600~ ➔ *₹1,750* (51% OFF)\n\n` +
+    `• *60 Pages* (30 Sheets • up to 100 Photos)\n` +
+    `  ~₹4,500~ ➔ *₹2,150* (52% OFF)\n\n` +
+    `• *80 Pages* (40 Sheets • up to 140 Photos)\n` +
+    `  ~₹5,200~ ➔ *₹2,500* (52% OFF)\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `📚 *A3 JUMBO PHOTOBOOKS* (Luxury Large Album)\n` +
+    `_Ideal for Weddings, Grand Receptions & Family Memories_\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `• *40 Pages* (20 Sheets • up to 130 Photos)\n` +
+    `  ~₹5,000~ ➔ *₹2,500* (50% OFF)\n\n` +
+    `• *60 Pages* (30 Sheets • up to 220 Photos)\n` +
+    `  ~₹6,500~ ➔ *₹3,300* (49% OFF)\n\n` +
+    `• *80 Pages* (40 Sheets • up to 300 Photos)\n` +
+    `  ~₹8,500~ ➔ *₹4,200* (51% OFF)\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `🖼️ *CUSTOM PHOTO FRAMES* (Acrylic & Wood)\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `• *Tabletop Display Frame (8x12)* ➔ *₹599*\n` +
+    `• *Crystal Acrylic Wall Frame (12x18)* ➔ *₹999*\n` +
+    `• *Designer Family Collage Frame* ➔ *₹1,299*\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `💳 *PAYMENT DETAILS:*\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `• *Official UPI ID:* \`6369134270@okbizaxis\`\n` +
+    `• *Payee:* InstaPics Custom Print Studio\n` +
+    `• *Accepted Apps:* Google Pay, PhonePe, Paytm, Cred, BHIM UPI\n` +
+    `• *Pay on Pickup / Studio Collection Available*\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `📲 *HOW TO ORDER (3 EASY STEPS):*\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `1️⃣ Reply here with your preferred album size (e.g. *A4 40 Pages* or *A3 60 Pages*)\n` +
+    `2️⃣ Send your photos directly here on WhatsApp or share a Google Drive / Photos link.\n` +
+    `3️⃣ Our designers will design your digital album preview for your approval before printing! 🎨✨\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `💡 *QUICK KEYWORDS FOR DETAILS:*\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `Reply with any keyword below for instant details:\n` +
+    `• *A4* — View A4 Photobook Packages & Offers\n` +
+    `• *A3* — View A3 Jumbo Wedding Album Packages\n` +
+    `• *Frame* — View Photo Frames Collection\n` +
+    `• *Pay* — View UPI ID & Payment QR Details\n` +
+    `• *Track* — Check your live order status\n` +
+    `• *Contact* — Talk to our studio designer\n\n` +
+    `📞 *Studio Helpline:* ${phone}\n` +
+    `📍 *InstaPics Custom Print Studio*`;
+}
 
 function renderSimulator() {
   const chatBody = document.getElementById('simulatorChatBody');
   if (!chatBody) return;
 
-  const greeting = currentConfig?.welcome_greeting || "Welcome to *InstaPics*! 📸✨";
-  const body = currentConfig?.welcome_body || "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.";
-  const instruction = currentConfig?.welcome_instruction || "Swipe through our products below to choose your package:";
-  const carouselFooter = currentConfig?.carousel_footer || "◄ Swipe Left / Right to Choose ►";
-
-  const welcomeText = `${greeting}\n\n${body}\n\n${instruction}`.replace('{name}', 'Customer');
-
-  const products = (currentConfig?.products && currentConfig.products.length > 0) ? currentConfig.products : DEFAULT_FALLBACK_CONFIG.products;
-
-  const cardsHtml = products.slice(0, 4).map(p => `
-    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-top: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-      <div style="width: 100%; height: 95px; background: #f1f5f9; position: relative; overflow: hidden;">
-        <img src="${p.image || '/assets/products/photobook_a4.jpg'}" alt="${escapeHtml(p.title)}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/assets/products/photobook_a4.jpg'">
-        <span style="position: absolute; bottom: 6px; right: 6px; background: rgba(15,23,42,0.85); color: #fff; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px;">${escapeHtml(p.price || '')}</span>
-      </div>
-      <div style="padding: 8px 10px;">
-        <div style="font-weight: 600; font-size: 13px; color: #09090b;">${escapeHtml(p.title)}</div>
-        <div style="font-size: 11px; color: #64748b; margin: 2px 0 6px 0;">${escapeHtml(p.description || '')}</div>
-        <div class="phone-btn" onclick="simClickProduct('${p.id}')" style="background: #0f172a; color: #fff; font-weight: 500;">
-          Select: ${escapeHtml(p.title.split(' ')[1] || p.title)}
-        </div>
-      </div>
-    </div>
-  `).join('');
-
   chatBody.innerHTML = `
-    <div class="phone-msg-bubble outgoing">
-      Hi! I want to order a photobook.
+    <div class="phone-msg-bubble outgoing" style="align-self: flex-end; background: #DCF8C6; padding: 6px 10px; border-radius: 8px; font-size: 12px; max-width: 80%; box-shadow: 0 1px 1px rgba(0,0,0,0.1);">
+      Hi! What are your photobook prices?
+      <span style="font-size: 10px; color: #8C8C8C; float: right; margin-left: 6px; margin-top: 4px;">10:00 AM ✓✓</span>
     </div>
 
-    <div class="phone-msg-bubble incoming">
-      <div style="white-space: pre-line;">${escapeHtml(welcomeText)}</div>
-      <div style="margin-top: 6px; font-weight: 600; font-size: 11px; color: #475569;">${escapeHtml(carouselFooter)}</div>
-      ${cardsHtml}
-
-      <div style="margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 6px; display: flex; flex-direction: column; gap: 4px;">
-        <div class="phone-btn" onclick="simShowMyOrders()">📦 Track My Orders / History</div>
-        <div class="phone-btn" onclick="simShowPaymentInfo()">💳 UPI & Payment Info</div>
-      </div>
+    <div class="phone-msg-bubble incoming" style="align-self: flex-start; background: #FFFFFF; padding: 8px 12px; border-radius: 8px; font-size: 12px; max-width: 90%; line-height: 1.45; color: #111; box-shadow: 0 1px 1px rgba(0,0,0,0.1);">
+      ${formatWhatsAppText(getFullSpecsCatalogText())}
+      <span style="font-size: 10px; color: #8C8C8C; float: right; margin-left: 6px; margin-top: 4px;">10:00 AM</span>
     </div>
   `;
 
-  chatBody.scrollTop = chatBody.scrollHeight;
+  chatBody.scrollTop = 0;
 }
 
-window.simClickProduct = function(prodId) {
+window.simTriggerKeyword = function(keyword) {
   const chatBody = document.getElementById('simulatorChatBody');
-  const product = (currentConfig?.products || DEFAULT_FALLBACK_CONFIG.products).find(p => p.id === prodId) || { title: prodId };
-  const flow = (currentConfig?.product_flows || DEFAULT_FALLBACK_CONFIG.product_flows)[prodId] || {
-    step1_prompt: "Please choose your page count:",
-    step1_options: [
-      { text: "📘 40 Pages ₹1,750", price: 1750 },
-      { text: "📘 60 Pages ₹2,150", price: 2150 }
-    ]
-  };
+  if (!chatBody) return;
 
+  const kw = (keyword || '').trim();
+  const lowerKw = kw.toLowerCase();
+
+  // Outgoing user bubble
   chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      Selected: ${escapeHtml(product.title)}
+    <div class="phone-msg-bubble outgoing" style="align-self: flex-end; background: #DCF8C6; padding: 6px 10px; border-radius: 8px; font-size: 12px; max-width: 80%; margin-top: 8px; box-shadow: 0 1px 1px rgba(0,0,0,0.1);">
+      ${escapeHtml(kw)}
+      <span style="font-size: 10px; color: #8C8C8C; float: right; margin-left: 6px; margin-top: 4px;">10:01 AM ✓✓</span>
     </div>
   `;
 
-  const options = flow.step1_options || [];
-  const buttonsHtml = options.map(opt => `
-    <div class="phone-btn" onclick="simChooseOption('${prodId}', '${escapeHtml(opt.text)}', ${opt.price || extractPrice(opt.text)})">
-      ${escapeHtml(opt.text)}
-    </div>
-  `).join('');
+  let replyText = '';
+
+  if (lowerKw === 'a4' || lowerKw.includes('a4')) {
+    replyText = `📖 *A4 PREMIUM PHOTOBOOK — SPECS & OFFERS* 📸\n` +
+      `_Non-Tearable | 100% Waterproof | Lifetime Durability_\n\n` +
+      `✨ *Specs & Special Offer Pricing:*\n` +
+      `• *40 Pages* (20 Sheets • up to 60 Photos)\n` +
+      `  ~₹3,600~ ➔ *₹1,750* (51% OFF)\n\n` +
+      `• *60 Pages* (30 Sheets • up to 100 Photos)\n` +
+      `  ~₹4,500~ ➔ *₹2,150* (52% OFF)\n\n` +
+      `• *80 Pages* (40 Sheets • up to 140 Photos)\n` +
+      `  ~₹5,200~ ➔ *₹2,500* (52% OFF)\n\n` +
+      `✨ *Features:* Non-tearable synthetic pages, waterproof, lay-flat binding, HD lab printing.\n\n` +
+      `📲 *To order:* Reply with your page count & send your photos here on WhatsApp or share a Google Drive link!\n` +
+      `📞 *Helpline:* +91 7598475668`;
+  } else if (lowerKw === 'a3' || lowerKw.includes('a3') || lowerKw.includes('jumbo')) {
+    replyText = `📚 *A3 JUMBO PHOTOBOOK — SPECS & OFFERS* 📸\n` +
+      `_Luxury Large Format Album for Weddings & Family Milestones_\n\n` +
+      `✨ *Specs & Special Offer Pricing:*\n` +
+      `• *40 Pages* (20 Sheets • up to 130 Photos)\n` +
+      `  ~₹5,000~ ➔ *₹2,500* (50% OFF)\n\n` +
+      `• *60 Pages* (30 Sheets • up to 220 Photos)\n` +
+      `  ~₹6,500~ ➔ *₹3,300* (49% OFF)\n\n` +
+      `• *80 Pages* (40 Sheets • up to 300 Photos)\n` +
+      `  ~₹8,500~ ➔ *₹4,200* (51% OFF)\n\n` +
+      `✨ *Features:* Jumbo size luxury photobook, non-tearable & waterproof, gold/silver foil cover options.\n\n` +
+      `📲 *To order:* Reply with your page count & send your photos here on WhatsApp or share a Google Drive link!\n` +
+      `📞 *Helpline:* +91 7598475668`;
+  } else if (lowerKw === 'frame' || lowerKw.includes('frame')) {
+    replyText = `🖼️ *CUSTOM PHOTO FRAMES — SPECS & OFFERS* ✨\n` +
+      `_High-Gloss Crystal Acrylic & Premium Wooden Borders_\n\n` +
+      `• *Tabletop Display Frame (8x12)* ➔ *₹599*\n` +
+      `• *Crystal Acrylic Wall Frame (12x18)* ➔ *₹999*\n` +
+      `• *Designer Family Collage Frame* ➔ *₹1,299*\n\n` +
+      `✨ *Features:* Fade-resistant archival inks, crystal clear acrylic, ready to hang or stand.\n\n` +
+      `📲 *To order:* Reply with your frame size & send your photo here on WhatsApp!\n` +
+      `📞 *Helpline:* +91 7598475668`;
+  } else if (lowerKw === 'pay' || lowerKw.includes('pay') || lowerKw.includes('upi')) {
+    replyText = `💳 *INSTAPICS — PAYMENT DETAILS* ✨\n\n` +
+      `• *Official UPI ID:* \`6369134270@okbizaxis\`\n` +
+      `• *Payee Name:* InstaPics Custom Print Studio\n` +
+      `• *Helpline Phone:* +91 7598475668\n\n` +
+      `📱 *Accepted Payment Apps:*\n` +
+      `• Google Pay (GPay)\n` +
+      `• PhonePe\n` +
+      `• Paytm\n` +
+      `• Cred / BHIM UPI\n\n` +
+      `💵 *Pay on Pickup:* Cash or UPI available when collecting your album at our studio.\n\n` +
+      `_After paying, reply here with your payment screenshot or transaction ID._`;
+  } else if (lowerKw.includes('track') || lowerKw.includes('status') || lowerKw.includes('order')) {
+    replyText = `📜 *Your InstaPics Order History:*\n\n` +
+      `1. *Order #ORD-98421*\n   • Items: 📖 A4 Premium Photobook (40 Pgs)\n   • Amount: *₹1,750*\n   • Status: *PENDING DESIGN APPROVAL*\n   • Date: Nov 15, 2026\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━\nTotal Orders: *1*\n\nFor any questions, call or reply here!`;
+  } else if (lowerKw.includes('contact') || lowerKw.includes('helpline') || lowerKw.includes('call')) {
+    replyText = `📞 *INSTAPICS STUDIO HELPLINE* 📍\n\n` +
+      `• *Phone / WhatsApp:* +91 7598475668\n` +
+      `• *Address:* InstaPics Custom Print Studio\n` +
+      `• *Design Hours:* 9:30 AM – 9:00 PM (Monday – Sunday)\n\n` +
+      `✨ Reply *Price* anytime to view our complete photobook rates!`;
+  } else {
+    if (lowerKw === 'price' || lowerKw === 'prices' || lowerKw === 'hi' || lowerKw === 'hello' || lowerKw === 'menu' || lowerKw === 'catalog') {
+      replyText = getFullSpecsCatalogText();
+    } else {
+      replyText = `👋 Hi there! Thank you for messaging InstaPics! ✨\n\n` +
+        `Our studio team has received your message and will reply to you shortly.\n\n` +
+        `💡 *Instant Details Keywords:*\n` +
+        `• Reply *Price* — View complete product & price list\n` +
+        `• Reply *A4* — View A4 Photobook options\n` +
+        `• Reply *A3* — View A3 Jumbo Album options\n` +
+        `• Reply *Frame* — View Photo frame options\n` +
+        `• Reply *Pay* — View UPI & Payment details\n` +
+        `• Reply *Track* — Check your order status\n\n` +
+        `📞 *Helpline:* +91 7598475668`;
+    }
+  }
 
   chatBody.innerHTML += `
-    <div class="phone-msg-bubble incoming">
-      <strong>Selected: ${escapeHtml(product.title)}</strong><br>
-      <span style="font-size: 12px; color: #475569;">${escapeHtml(flow.step1_prompt || 'Please choose your package:')}</span>
-      <div class="phone-buttons-group">
-        ${buttonsHtml || `<div class="phone-btn" onclick="simChooseOption('${prodId}', 'Standard Option ₹1,500', 1500)">Standard Option ₹1,500</div>`}
-      </div>
+    <div class="phone-msg-bubble incoming" style="align-self: flex-start; background: #FFFFFF; padding: 8px 12px; border-radius: 8px; font-size: 12px; max-width: 90%; margin-top: 6px; line-height: 1.45; color: #111; box-shadow: 0 1px 1px rgba(0,0,0,0.1);">
+      ${formatWhatsAppText(replyText)}
+      <span style="font-size: 10px; color: #8C8C8C; float: right; margin-left: 6px; margin-top: 4px;">10:01 AM</span>
     </div>
   `;
 
   chatBody.scrollTop = chatBody.scrollHeight;
 };
 
-window.simChooseOption = function(prodId, optionText, price) {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const product = (currentConfig?.products || DEFAULT_FALLBACK_CONFIG.products).find(p => p.id === prodId) || { title: "Photobook" };
-
-  simCart.push({
-    productId: prodId,
-    productName: product.title,
-    option: optionText,
-    price: price || extractPrice(optionText)
-  });
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      Selected: ${escapeHtml(optionText)}
-    </div>
-  `;
-
-  const cartTotal = simCart.reduce((s, i) => s + (i.price || 0), 0);
-  const cartLines = simCart.map((i, idx) => `${idx + 1}. *${escapeHtml(i.productName)}*\n   • ${escapeHtml(i.option)}`).join('\n\n');
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble incoming">
-      🛒 *Your InstaPics Cart (${simCart.length} item${simCart.length > 1 ? 's' : ''}):*\n\n
-      ${cartLines}\n\n
-      ━━━━━━━━━━━━━━━━━━━━\n
-      💰 *Total Cart Amount:* *₹${cartTotal.toLocaleString('en-IN')}*\n
-      ━━━━━━━━━━━━━━━━━━━━\n\n
-      Would you like to add another product, or upload photos & checkout?
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simAddAnotherItem()">➕ Add Another Item</div>
-        <div class="phone-btn" onclick="simStartCheckout()" style="background: #0f172a; color: #fff; font-weight: 500;">📸 Upload Photos & Order</div>
-      </div>
-    </div>
-  `;
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simAddAnotherItem = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const products = (currentConfig?.products && currentConfig.products.length > 0) ? currentConfig.products : DEFAULT_FALLBACK_CONFIG.products;
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      ➕ Add Another Item
-    </div>
-  `;
-
-  const cardsHtml = products.slice(0, 4).map(p => `
-    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; margin-top: 4px;">
-      <div style="font-weight: 600; font-size: 12px;">${escapeHtml(p.title)}</div>
-      <div class="phone-btn" onclick="simClickProduct('${p.id}')">
-        Select: ${escapeHtml(p.title.split(' ')[1] || p.title)} (${escapeHtml(p.price || '')})
-      </div>
-    </div>
-  `).join('');
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble incoming">
-      ✨ *Choose Next Item to Add:*
-      ${cardsHtml}
-    </div>
-  `;
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simStartCheckout = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      📸 Upload Photos & Order
-    </div>
-    <div class="phone-msg-bubble incoming">
-      📸 *Step 1/3: Send Photos* ✨<br><br>
-      Please upload your photos directly here on WhatsApp, or send a <strong>Google Drive / iCloud link</strong>.<br><br>
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simSendPhotos('https://drive.google.com/drive/folders/sample-photos')">📁 Share Google Drive Link</div>
-        <div class="phone-btn" onclick="simSendPhotos('Uploaded 60 High-Res Photos.zip')">📷 Upload Photos Directly</div>
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simSendPhotos = function(photosStr) {
-  const chatBody = document.getElementById('simulatorChatBody');
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      ${escapeHtml(photosStr)}
-    </div>
-    <div class="phone-msg-bubble incoming">
-      ✅ <strong>Photos received!</strong> 📸<br><br>
-      Please reply with your <strong>Full Delivery Address & Pincode</strong> for shipping:
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simSendAddress('Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040')">📍 Use Sample Chennai Address</div>
-        <div class="phone-btn" onclick="simSendAddress('12 Gandhi Road, Karur - 639002')">📍 Studio Pickup (Karur)</div>
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simSendAddress = function(addr) {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const cartTotal = simCart.reduce((s, i) => s + (i.price || 0), 0) || 1750;
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      ${escapeHtml(addr)}
-    </div>
-    <div class="phone-msg-bubble incoming">
-      💳 <strong>Payment Method</strong><br><br>
-      Order Total: <strong>₹${cartTotal.toLocaleString('en-IN')}</strong><br><br>
-      Please choose your payment option:
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simCompleteOrder('Instant UPI / Online QR')">📱 Instant UPI / QR Code</div>
-        <div class="phone-btn" onclick="simCompleteOrder('Pay on Pickup / Delivery')">💵 Pay on Pickup / Delivery</div>
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simCompleteOrder = function(paymentType) {
-  const chatBody = document.getElementById('simulatorChatBody');
-  const orderId = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
-  const cartTotal = simCart.reduce((s, i) => s + (i.price || 0), 0) || 1750;
-  const payStatus = paymentType.includes('UPI') ? 'Paid via UPI' : 'Payment Pending';
-
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      Payment: ${escapeHtml(paymentType)}
-    </div>
-    <div class="phone-msg-bubble incoming" style="border-left: 4px solid #f59e0b;">
-      🎉 <strong>Order Request Received!</strong> ⏳<br><br>
-      <strong>Order ID:</strong> #${orderId}<br>
-      <strong>Status:</strong> 🟡 <strong>PENDING STUDIO APPROVAL</strong><br>
-      <strong>Payment:</strong> ${payStatus}<br>
-      <strong>Amount:</strong> ₹${cartTotal.toLocaleString('en-IN')}<br><br>
-      Our studio manager is reviewing your order details & photos. We will notify you here with an approval confirmation once accepted! 📸✨
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="simShowMyOrders()">📦 Track Order Status</div>
-        <div class="phone-btn" onclick="simShowPaymentInfo()">💳 View Payment Info</div>
-        <div class="phone-btn" onclick="restartSimulator()">🛍️ Shop More</div>
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
-
-  // Add order to orders list and refresh view
-  const newOrder = {
-    id: orderId,
-    phone: "919629661668",
-    customer_name: "Priya Sharma",
-    product_name: simCart.map(i => i.productName).join(' + ') || "📖 A4 Premium Photobook",
-    details: simCart.map((i, idx) => `${idx+1}. ${i.productName} (${i.option})`).join('\n') || "A4 40 Pgs (60 Photos)",
-    photos: ["assets/products/photobook_a4.jpg"],
-    address: "Flat 4B, Lotus Apartments, Anna Nagar, Chennai - 600040",
-    payment_type: paymentType,
-    payment_status: payStatus,
-    amount: cartTotal,
-    status: "Pending Approval",
-    created_at: new Date().toISOString()
-  };
-
-  currentOrders.unshift(newOrder);
-  renderOrderFilterPills(currentOrders);
-  renderOrdersTable(currentOrders);
-  renderRevenueDashboard(computeOfflineRevenue(currentOrders));
-  showToast(`Simulated new order #${orderId} waiting for studio approval!`);
-};
-
-window.simShowMyOrders = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      📦 Track My Orders / History
-    </div>
-    <div class="phone-msg-bubble incoming">
-      📜 <strong>Your InstaPics Order History:</strong><br><br>
-      1. <strong>Order #ORD-98421</strong><br>
-         • Items: 📖 A4 Premium Photobook<br>
-         • Amount: ₹1,750<br>
-         • Status: 🟡 <strong>PENDING APPROVAL</strong><br><br>
-      2. <strong>Order #ORD-65201</strong><br>
-         • Items: 🖼️ Custom Photo Frames<br>
-         • Amount: ₹999<br>
-         • Status: ✅ <strong>COMPLETED</strong><br><br>
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="restartSimulator()">🛍️ New Order</div>
-        <div class="phone-btn" onclick="simShowPaymentInfo()">💳 Payment Info</div>
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
-};
-
-window.simShowPaymentInfo = function() {
-  const chatBody = document.getElementById('simulatorChatBody');
-  chatBody.innerHTML += `
-    <div class="phone-msg-bubble outgoing">
-      💳 UPI & Payment Info
-    </div>
-    <div class="phone-msg-bubble incoming">
-      💳 <strong>InstaPics Payment Details:</strong><br><br>
-      • <strong>UPI ID:</strong> 6369134270@okbizaxis<br>
-      • <strong>Studio Name:</strong> InstaPics Photobooks<br>
-      • <strong>Accepted Apps:</strong> GPay, PhonePe, Paytm, BHIM<br><br>
-      💡 Pay to the UPI ID above and share your screenshot here!<br>
-      <div class="phone-buttons-group">
-        <div class="phone-btn" onclick="restartSimulator()">📖 Browse Products</div>
-        <div class="phone-btn" onclick="simShowMyOrders()">📦 Track Orders</div>
-      </div>
-    </div>
-  `;
-  chatBody.scrollTop = chatBody.scrollHeight;
+window.handleSimulatorSubmit = function(e) {
+  if (e) e.preventDefault();
+  const input = document.getElementById('simulatorInput');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+  input.value = '';
+  window.simTriggerKeyword(val);
 };
 
 // --------------------------------------------------------------------------
@@ -2945,18 +2860,22 @@ window.updateWelcomeTemplatePreview = function() {
 
   const greeting = getVal('cfgWelcomeGreeting') || 'Welcome to *InstaPics*! 📸✨';
   const body = getVal('cfgWelcomeBody') || 'We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.';
-  const instruction = getVal('cfgWelcomeInstruction') || 'Swipe through our products below to choose your package:';
-  const catalogue = getVal('cfgCatalogueLink') || 'https://wa.me/c/916369134270';
-  const footer = getVal('cfgCarouselFooter') || '◄ Swipe Left / Right to Choose ►';
+  const instruction = getVal('cfgWelcomeInstruction') || 'Here is our complete product, specs & special offer price list:';
 
   previewBox.innerHTML = `
     <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px;">${escapeHtml(greeting)}</div>
-    <div style="margin-bottom: 8px;">${escapeHtml(body)}</div>
-    <div style="margin-bottom: 8px; font-weight: 500;">${escapeHtml(instruction)}</div>
-    <div style="background: #f1f5f9; padding: 6px 10px; border-radius: 6px; font-size: 11px; margin-bottom: 8px;">
-      🛍️ <strong>Catalogue:</strong> <span style="color: #0284c7;">${escapeHtml(catalogue)}</span>
+    <div style="margin-bottom: 8px; color: #475569;">${escapeHtml(body)}</div>
+    <div style="margin-bottom: 10px; font-weight: 600; color: #0f172a;">${escapeHtml(instruction)}</div>
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; font-size: 11px; line-height: 1.5; color: #334155;">
+      ✨ <strong>QUALITY GUARANTEE:</strong><br>
+      • 💧 100% Waterproof Pages (spill-proof)<br>
+      • 🛡️ Non-Tearable Material (lifetime durability)<br>
+      • 🎨 Ultra HD 6-Color Studio Printing<br><br>
+      📖 <strong>A4 PHOTOBOOKS:</strong> From <strong>₹1,750</strong> (was <del>₹3,600</del>)<br>
+      📚 <strong>A3 JUMBO ALBUMS:</strong> From <strong>₹2,500</strong> (was <del>₹5,000</del>)<br>
+      🖼️ <strong>PHOTO FRAMES:</strong> From <strong>₹599</strong><br><br>
+      💡 <em>Quick Keywords: Reply A4, A3, Frame, Pay, Track</em>
     </div>
-    <div style="font-size: 11px; color: #64748b; font-weight: 600;">${escapeHtml(footer)}</div>
   `;
 };
 
