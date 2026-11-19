@@ -63,6 +63,12 @@ export const DEFAULT_SPECS_TEMPLATE =
 `📍 *InstaPicss Custom Print Studio*`;
 
 /**
+ * In-memory in-flight lock to guarantee zero duplicate sends
+ * even during rapid-fire bursts from new contacts.
+ */
+const activeWelcomeDispatches = new Set();
+
+/**
  * Sends the complete, crystal-clear InstaPicss Welcome Offer & Specs List.
  * Pure normal text with emojis and bullet points — 100% universal across all WhatsApp clients.
  */
@@ -81,36 +87,60 @@ export async function sendProductSpecsList(sock, jid, config = null, customerNam
  */
 export async function handleIncomingMessage(sock, msg) {
   try {
+    // 1. Guard against null messages, group chats, newsletters, broadcasts, and status stories
     if (!msg || msg.isGroup || msg.isNewsletter) return;
+    if (msg.jid?.includes('@broadcast') || msg.originalJid?.includes('@broadcast')) return;
 
-    // Prevent bot from replying to its own automated messages
+    // 2. Prevent bot from replying to its own automated messages or staff outgoing messages
     if (msg.fromMe) return;
+
+    // 3. Ignore non-text protocol events (emoji reactions, deleted message notifications)
+    if (msg.raw?.message?.reactionMessage || msg.raw?.message?.protocolMessage) return;
 
     const jid = msg.jid;
     const fallbackJid = msg.originalJid;
-    const phone = msg.phone || (jid ? jid.split('@')[0] : 'Customer');
+    const rawPhone = msg.phone || (jid ? jid.split('@')[0] : '');
+    const cleanPhone = (rawPhone || '').replace(/[^0-9]/g, '');
+
+    // 4. Validate phone number format (minimum 7 digits for genuine mobile numbers)
+    if (!cleanPhone || cleanPhone.length < 7) {
+      return;
+    }
+
     const pushName = msg.pushName || 'Customer';
 
-    // Track user message in database: checks if this is the user's very first message
-    const { isFirst, messageCount } = registerUserMessage(phone, pushName);
+    // 5. Track user message in database: checks if this is the user's very first message
+    const { isFirst, messageCount } = registerUserMessage(cleanPhone, pushName);
     const config = getAllConfig();
 
-    console.log(`[Bot] Message received from ${phone} (${pushName}) [msg #${messageCount}, isFirst: ${isFirst}]`);
+    console.log(`[Bot] Message received from +${cleanPhone} (${pushName}) [msg #${messageCount}, isFirst: ${isFirst}]`);
 
     // =========================================================================
-    // 1. STRICT RULE: ONE-TIME AUTO-REPLY ON FIRST MESSAGE ONLY
+    // 6. STRICT RULE: ONE-TIME AUTO-REPLY ON FIRST MESSAGE ONLY
     // =========================================================================
     if (isFirst) {
-      console.log(`[Bot] New customer detected (+${phone})! Sending one-time welcome offer & specs list...`);
-      await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
+      // Concurrency guard: prevents race conditions if a user sends 4 messages in 100ms
+      if (activeWelcomeDispatches.has(cleanPhone)) {
+        console.log(`[Bot] Welcome dispatch already in-flight for +${cleanPhone}, skipping duplicate trigger.`);
+        return;
+      }
+      activeWelcomeDispatches.add(cleanPhone);
+
+      try {
+        console.log(`[Bot] New customer detected (+${cleanPhone})! Sending one-time welcome offer & specs list...`);
+        await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
+      } finally {
+        // Clear in-flight lock after safety window
+        setTimeout(() => activeWelcomeDispatches.delete(cleanPhone), 15000);
+      }
       return;
     }
 
     // =========================================================================
-    // 2. ALL SUBSEQUENT MESSAGES: NO AUTO-REPLY, NO KEYWORDS
+    // 7. ALL SUBSEQUENT MESSAGES: NO AUTO-REPLY, NO KEYWORDS
     // =========================================================================
     // Studio human team / staff will handle all follow-up messages and orders manually.
-    console.log(`[Bot] Subsequent message from existing customer (+${phone}) — silent pass-through for studio staff takeover.`);
+    console.log(`[Bot] Subsequent message from existing customer (+${cleanPhone}) — silent pass-through for studio staff takeover.`);
     return;
 
   } catch (err) {

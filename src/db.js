@@ -5,6 +5,17 @@ import fs from 'node:fs';
 const DB_PATH = path.resolve(process.env.DB_PATH || 'studio.db');
 const db = new DatabaseSync(DB_PATH);
 
+// High-concurrency WAL mode & busy timeout: eliminates SQLITE_BUSY under heavy load
+try {
+  db.exec(`
+    PRAGMA journal_mode = WAL;
+    PRAGMA busy_timeout = 5000;
+    PRAGMA synchronous = NORMAL;
+  `);
+} catch (e) {
+  console.warn('[DB] WAL mode note:', e.message);
+}
+
 // Initialize Tables
 db.exec(`
   CREATE TABLE IF NOT EXISTS orders (
