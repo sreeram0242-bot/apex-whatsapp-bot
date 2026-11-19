@@ -14,7 +14,9 @@ import {
   updateAllConfig,
   updateConfig,
   clearSession,
-  clearAllSessions
+  clearAllSessions,
+  resetBotUser,
+  resetAllBotUsers
 } from '../db.js';
 import {
   getWhatsAppStatus,
@@ -61,11 +63,31 @@ router.get(['/qr.png', '/qr'], async (req, res) => {
   }
 });
 
-router.post('/send-test-menu', async (req, res) => {
+router.post(['/send-test-menu', '/send-welcome'], async (req, res) => {
   try {
     const { phone } = req.body || {};
     const result = phone ? await sendWelcomeToPhone(phone) : await sendWelcomeToOwner();
-    res.json({ success: true, message: `Welcome menu sent to +${result.phone}!` });
+    res.json({ success: true, message: `Welcome offer message sent to +${result.phone}!` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/reset-user', (req, res) => {
+  try {
+    const { phone } = req.body || {};
+    if (!phone) return res.status(400).json({ error: 'Phone number is required' });
+    const success = resetBotUser(phone);
+    res.json({ success, message: `User tracking reset for +${phone}. Next message will receive welcome offer.` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/reset-all-users', (req, res) => {
+  try {
+    const success = resetAllBotUsers();
+    res.json({ success, message: 'All user history reset. All numbers will receive welcome offer on next message.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

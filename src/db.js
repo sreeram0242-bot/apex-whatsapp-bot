@@ -56,16 +56,48 @@ try {
   // column already exists
 }
 
+export const DEFAULT_SPECS_TEMPLATE =
+`📸 *INSTAPICSS PHOTOBOOKS & FRAMES* ✨\n\n` +
+`WELCOME OFFER ✨\n\n` +
+`✨ *QUALITY GUARANTEE:*\n` +
+`• 💧 *100% Waterproof Pages* (spill-proof & washable)\n` +
+`• 🛡️ *Non-Tearable Synthetic Paper* (lifetime durability)\n` +
+`• High Chroma imaging technology print\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`📖 *A4 PREMIUM PHOTOBOOKS* (Standard Album)\n\n` +
+`• *40 Pages* (20 Sheets • up to 60 Photos)\n` +
+`  ~₹3,600~ ➔ *₹1,750* (51% OFF)\n\n` +
+`• *60 Pages* (30 Sheets • up to 100 Photos)\n` +
+`  ~₹4,500~ ➔ *₹2,150* (52% OFF)\n\n` +
+`• *80 Pages* (40 Sheets • up to 140 Photos)\n` +
+`  ~₹5,200~ ➔ *₹2,500* (52% OFF)\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`📚 *A3 JUMBO PHOTOBOOKS* (Luxury Large Album)\n\n` +
+`• *40 Pages* (20 Sheets • up to 130 Photos)\n` +
+`  ~₹5,000~ ➔ *₹2,500* (50% OFF)\n\n` +
+`• *60 Pages* (30 Sheets • up to 220 Photos)\n` +
+`  ~₹6,500~ ➔ *₹3,300* (49% OFF)\n\n` +
+`• *80 Pages* (40 Sheets • up to 300 Photos)\n` +
+`  ~₹8,500~ ➔ *₹4,200* (51% OFF)\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`📲 *HOW TO ORDER (3 EASY STEPS):*\n\n` +
+`1️⃣ Reply here with your preferred album size (e.g. *A4 40 Pages* or *A3 60 Pages*)\n` +
+`2️⃣ Send your photos directly here on WhatsApp or share a Google Drive / Photos link.\n` +
+`3️⃣ Our designers will design your digital album preview for your approval before printing! 🎨✨\n\n` +
+`📞 *Studio Helpline:* +91 6369134270\n` +
+`📍 *InstaPicss Custom Print Studio*`;
+
 export const DEFAULT_CONFIG = {
-  studio_name: "InstaPics Photobooks & Frames",
+  studio_name: "InstaPicss Photobooks & Frames",
   studio_phone: "+91 6369134270",
-  studio_address: "InstaPics Custom Print Studio",
+  studio_address: "InstaPicss Custom Print Studio",
   upi_id: "6369134270@okbizaxis",
-  upi_name: "InstaPics Studio",
-  welcome_message: "Welcome to *InstaPics*! 📸✨\n\nWe craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.\n\nSwipe through our products below to choose your package:",
-  welcome_greeting: "Welcome to *InstaPics*! 📸✨",
-  welcome_body: "We craft premium *Non-Tearable & Waterproof Photobooks* and customized *Photo Frames* with lifetime durability.",
-  welcome_instruction: "Swipe through our products below to choose your package:",
+  upi_name: "InstaPicss Studio",
+  welcome_specs_template: DEFAULT_SPECS_TEMPLATE,
+  welcome_message: DEFAULT_SPECS_TEMPLATE,
+  welcome_greeting: "Welcome to *InstaPicss*! 📸✨",
+  welcome_body: "We craft premium *Non-Tearable & Waterproof Photobooks* with lifetime durability.",
+  welcome_instruction: "Here is our complete product, specs & special offer price list:",
   catalogue_link: "https://wa.me/c/916369134270",
   carousel_footer: "◄ Swipe Left / Right to Choose ►",
   products: [
@@ -585,6 +617,28 @@ export function isNewUser(phone) {
     const row = stmt.get(cleanPhone);
     return !row;
   } catch {
+    return false;
+  }
+}
+
+export function resetBotUser(phone) {
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+  if (!cleanPhone) return false;
+  try {
+    db.prepare("DELETE FROM bot_users WHERE phone = ?").run(cleanPhone);
+    return true;
+  } catch (err) {
+    console.error('[DB] Error resetting bot user:', err);
+    return false;
+  }
+}
+
+export function resetAllBotUsers() {
+  try {
+    db.prepare("DELETE FROM bot_users").run();
+    return true;
+  } catch (err) {
+    console.error('[DB] Error resetting all bot users:', err);
     return false;
   }
 }
