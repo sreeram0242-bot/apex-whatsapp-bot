@@ -1203,10 +1203,17 @@ body {
           </div>
 
           <!-- Simulator Engine Notice -->
-          <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; color: #166534; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <strong>✓ Pure Text Universal Specs:</strong> First message receives welcome offer. Zero bot keyword interruptions.
-            </div>
+          <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; font-size: 11px; color: #166534;">
+            <strong>✓ Products & Pricing Auto-Reply Only:</strong> Bot auto-replies ONLY for product pricing inquiries. All other messages go to manual studio takeover.
+          </div>
+
+          <!-- Quick Test Product Query Buttons -->
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Price')" style="padding: 4px 10px; font-size: 11px;">📸 Price</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('A4')" style="padding: 4px 10px; font-size: 11px;">📖 A4</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('A3')" style="padding: 4px 10px; font-size: 11px;">📚 A3</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Rate Card')" style="padding: 4px 10px; font-size: 11px;">🏷️ Rate Card</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('I have sent 50 photos on Drive')" style="padding: 4px 10px; font-size: 11px;">💬 Non-Pricing (Manual)</button>
           </div>
 
           <!-- Phone Mockup Container -->
@@ -2124,13 +2131,46 @@ window.simTriggerKeyword = function(keyword) {
     </div>
   `;
 
-  // Strict One-Time rule simulation: Bot is silent on subsequent messages
-  chatBody.innerHTML += `
-    <div style="align-self: center; background: #F1F5F9; border: 1px dashed #94A3B8; color: #475569; font-size: 11px; padding: 6px 12px; border-radius: 8px; margin: 6px 0; text-align: center; max-width: 90%;">
-      👤 <strong>Manual Studio Takeover Active:</strong><br>
-      The bot sent 0 auto-replies. Your studio designers can now chat with the customer normally from your phone!
-    </div>
-  `;
+  const isProductPricingQuery =
+    lowerKw === 'price' ||
+    lowerKw === 'prices' ||
+    lowerKw === 'rate' ||
+    lowerKw === 'rates' ||
+    lowerKw.includes('rate card') ||
+    lowerKw.includes('price list') ||
+    lowerKw.includes('cost') ||
+    lowerKw.includes('charges') ||
+    lowerKw.includes('product') ||
+    lowerKw.includes('catalog') ||
+    lowerKw.includes('menu') ||
+    lowerKw.includes('offer') ||
+    lowerKw.includes('photobook') ||
+    lowerKw.includes('album') ||
+    lowerKw === 'a4' ||
+    lowerKw === 'a3' ||
+    lowerKw.includes('a4') ||
+    lowerKw.includes('a3') ||
+    lowerKw.includes('jumbo') ||
+    lowerKw.includes('specs') ||
+    lowerKw === 'hi' ||
+    lowerKw === 'hello' ||
+    lowerKw === 'hey';
+
+  if (isProductPricingQuery) {
+    chatBody.innerHTML += `
+      <div class="phone-msg-bubble incoming" style="align-self: flex-start; background: #FFFFFF; padding: 8px 12px; border-radius: 8px; font-size: 12px; max-width: 90%; margin-top: 6px; line-height: 1.45; color: #111; box-shadow: 0 1px 1px rgba(0,0,0,0.1);">
+        ${formatWhatsAppText(getFullSpecsCatalogText())}
+        <span style="font-size: 10px; color: #8C8C8C; float: right; margin-left: 6px; margin-top: 4px;">10:01 AM</span>
+      </div>
+    `;
+  } else {
+    chatBody.innerHTML += `
+      <div style="align-self: center; background: #F1F5F9; border: 1px dashed #94A3B8; color: #475569; font-size: 11px; padding: 6px 12px; border-radius: 8px; margin: 6px 0; text-align: center; max-width: 90%;">
+        👤 <strong>Manual Studio Takeover Active:</strong><br>
+        No automated reply for non-product messages. Studio designers chat directly with customer from phone!
+      </div>
+    `;
+  }
 
   chatBody.scrollTop = chatBody.scrollHeight;
 };

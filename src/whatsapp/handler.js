@@ -29,7 +29,7 @@ async function safeSend(sock, primaryJid, content, fallbackJid = null) {
 }
 
 /**
- * Official InstaPicss Photobooks & Frames Welcome Offer & Specs List Template
+ * Official InstaPicss Photobooks Products List with Pricing Template
  */
 export const DEFAULT_SPECS_TEMPLATE =
 `📸 *INSTAPICSS PHOTOBOOKS & FRAMES* ✨\n\n` +
@@ -64,12 +64,12 @@ export const DEFAULT_SPECS_TEMPLATE =
 
 /**
  * In-memory in-flight lock to guarantee zero duplicate sends
- * even during rapid-fire bursts from new contacts.
+ * even during rapid-fire bursts from contacts.
  */
 const activeWelcomeDispatches = new Set();
 
 /**
- * Sends the complete, crystal-clear InstaPicss Welcome Offer & Specs List.
+ * Sends the complete, crystal-clear InstaPicss Products List with Pricing.
  * Pure normal text with emojis and bullet points — 100% universal across all WhatsApp clients.
  */
 export async function sendProductSpecsList(sock, jid, config = null, customerName = '', fallbackJid = null) {
@@ -80,10 +80,11 @@ export async function sendProductSpecsList(sock, jid, config = null, customerNam
 
 /**
  * Handles incoming WhatsApp messages.
- * STRICT ONE-TIME WELCOME AUTO-REPLY ENGINE:
- * - When a customer messages for the very first time: receives the Welcome Offer & Specs List once.
- * - All subsequent messages & keywords: 0 auto-replies (silent return).
- * - Studio human staff handles conversations manually without bot interference.
+ * RULES:
+ * 1. Auto-reply ONLY for the Products List with their Pricing:
+ *    - On customer's 1st message (welcome offer)
+ *    - On product/pricing keywords (price, a4, a3, rates, catalog, album, etc.)
+ * 2. ZERO auto-reply for all other messages (studio human team handles manually).
  */
 export async function handleIncomingMessage(sock, msg) {
   try {
@@ -108,39 +109,91 @@ export async function handleIncomingMessage(sock, msg) {
     }
 
     const pushName = msg.pushName || 'Customer';
+    const incomingText = (msg.text || '').trim();
+    const lowerText = incomingText.toLowerCase();
 
     // 5. Track user message in database: checks if this is the user's very first message
     const { isFirst, messageCount } = registerUserMessage(cleanPhone, pushName);
     const config = getAllConfig();
 
-    console.log(`[Bot] Message received from +${cleanPhone} (${pushName}) [msg #${messageCount}, isFirst: ${isFirst}]`);
+    console.log(`[Bot] Message received from +${cleanPhone} (${pushName}) [msg #${messageCount}, isFirst: ${isFirst}]: "${incomingText}"`);
 
     // =========================================================================
-    // 6. STRICT RULE: ONE-TIME AUTO-REPLY ON FIRST MESSAGE ONLY
+    // CASE A: NEW CUSTOMER ON FIRST MESSAGE
+    // Automatically send the complete Products List with Pricing
     // =========================================================================
     if (isFirst) {
-      // Concurrency guard: prevents race conditions if a user sends 4 messages in 100ms
       if (activeWelcomeDispatches.has(cleanPhone)) {
-        console.log(`[Bot] Welcome dispatch already in-flight for +${cleanPhone}, skipping duplicate trigger.`);
+        console.log(`[Bot] Product list dispatch already in-flight for +${cleanPhone}, skipping duplicate trigger.`);
         return;
       }
       activeWelcomeDispatches.add(cleanPhone);
 
       try {
-        console.log(`[Bot] New customer detected (+${cleanPhone})! Sending one-time welcome offer & specs list...`);
+        console.log(`[Bot] New customer detected (+${cleanPhone})! Sending products list with pricing...`);
         await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
       } finally {
-        // Clear in-flight lock after safety window
-        setTimeout(() => activeWelcomeDispatches.delete(cleanPhone), 15000);
+        setTimeout(() => activeWelcomeDispatches.delete(cleanPhone), 10000);
       }
       return;
     }
 
     // =========================================================================
-    // 7. ALL SUBSEQUENT MESSAGES: NO AUTO-REPLY, NO KEYWORDS
+    // CASE B: PRODUCT & PRICING KEYWORDS (ANY USER)
+    // Auto-reply ONLY when customer asks for products, prices, or photobook rates
     // =========================================================================
-    // Studio human team / staff will handle all follow-up messages and orders manually.
-    console.log(`[Bot] Subsequent message from existing customer (+${cleanPhone}) — silent pass-through for studio staff takeover.`);
+    const isProductPricingQuery =
+      lowerText === 'price' ||
+      lowerText === 'prices' ||
+      lowerText === 'rate' ||
+      lowerText === 'rates' ||
+      lowerText.includes('rate card') ||
+      lowerText.includes('price list') ||
+      lowerText.includes('pricelist') ||
+      lowerText.includes('cost') ||
+      lowerText.includes('charges') ||
+      lowerText.includes('amount') ||
+      lowerText.includes('product') ||
+      lowerText.includes('products') ||
+      lowerText.includes('catalog') ||
+      lowerText.includes('catalogue') ||
+      lowerText === 'menu' ||
+      lowerText.includes('offer') ||
+      lowerText.includes('offers') ||
+      lowerText.includes('photobook') ||
+      lowerText.includes('album') ||
+      lowerText === 'a4' ||
+      lowerText === 'a3' ||
+      lowerText.includes('a4') ||
+      lowerText.includes('a3') ||
+      lowerText.includes('jumbo') ||
+      lowerText.includes('specs') ||
+      lowerText === 'hi' ||
+      lowerText === 'hello' ||
+      lowerText === 'hey' ||
+      lowerText === 'start' ||
+      lowerText === 'info';
+
+    if (isProductPricingQuery) {
+      if (activeWelcomeDispatches.has(cleanPhone)) {
+        return;
+      }
+      activeWelcomeDispatches.add(cleanPhone);
+
+      try {
+        console.log(`[Bot] Product/pricing keyword matched ("${incomingText}") from +${cleanPhone}. Sending products list with pricing...`);
+        await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
+      } finally {
+        setTimeout(() => activeWelcomeDispatches.delete(cleanPhone), 10000);
+      }
+      return;
+    }
+
+    // =========================================================================
+    // CASE C: ALL OTHER MESSAGES (PHOTOS, DRIVE LINKS, CUSTOM CHAT)
+    // ZERO auto-reply — Studio human team takes over the conversation manually.
+    // =========================================================================
+    console.log(`[Bot] Non-pricing message from +${cleanPhone} — manual studio takeover mode (no auto-reply).`);
     return;
 
   } catch (err) {
