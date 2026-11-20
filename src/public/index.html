@@ -2142,19 +2142,13 @@ window.simTriggerKeyword = function(keyword) {
     lowerKw.includes('charges') ||
     lowerKw.includes('product') ||
     lowerKw.includes('catalog') ||
-    lowerKw.includes('menu') ||
     lowerKw.includes('offer') ||
-    lowerKw.includes('photobook') ||
-    lowerKw.includes('album') ||
     lowerKw === 'a4' ||
     lowerKw === 'a3' ||
     lowerKw.includes('a4') ||
     lowerKw.includes('a3') ||
     lowerKw.includes('jumbo') ||
-    lowerKw.includes('specs') ||
-    lowerKw === 'hi' ||
-    lowerKw === 'hello' ||
-    lowerKw === 'hey';
+    lowerKw.includes('specs');
 
   if (isProductPricingQuery) {
     chatBody.innerHTML += `

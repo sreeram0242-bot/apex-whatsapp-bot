@@ -140,7 +140,8 @@ export async function handleIncomingMessage(sock, msg) {
 
     // =========================================================================
     // CASE B: PRODUCT & PRICING KEYWORDS (ANY USER)
-    // Auto-reply ONLY when customer asks for products, prices, or photobook rates
+    // Auto-reply ONLY when customer explicitly asks for products, prices, or rates
+    // (photobook, album, menu, hi, hello are excluded)
     // =========================================================================
     const isProductPricingQuery =
       lowerText === 'price' ||
@@ -157,22 +158,14 @@ export async function handleIncomingMessage(sock, msg) {
       lowerText.includes('products') ||
       lowerText.includes('catalog') ||
       lowerText.includes('catalogue') ||
-      lowerText === 'menu' ||
       lowerText.includes('offer') ||
       lowerText.includes('offers') ||
-      lowerText.includes('photobook') ||
-      lowerText.includes('album') ||
       lowerText === 'a4' ||
       lowerText === 'a3' ||
       lowerText.includes('a4') ||
       lowerText.includes('a3') ||
       lowerText.includes('jumbo') ||
-      lowerText.includes('specs') ||
-      lowerText === 'hi' ||
-      lowerText === 'hello' ||
-      lowerText === 'hey' ||
-      lowerText === 'start' ||
-      lowerText === 'info';
+      lowerText.includes('specs');
 
     if (isProductPricingQuery) {
       if (activeWelcomeDispatches.has(cleanPhone)) {
