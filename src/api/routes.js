@@ -63,7 +63,7 @@ router.get(['/qr.png', '/qr'], async (req, res) => {
   }
 });
 
-router.post(['/send-test-menu', '/send-welcome'], async (req, res) => {
+router.post('/send-test-menu', async (req, res) => {
   try {
     const { phone } = req.body || {};
     const result = phone ? await sendWelcomeToPhone(phone) : await sendWelcomeToOwner();

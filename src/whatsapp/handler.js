@@ -212,18 +212,18 @@ export function isA3Query(text) {
  */
 export function isPaymentQuery(text) {
   const t = (text || '').toLowerCase().trim();
-  if (t === 'pay' || t === 'payment' || t === 'gpay' || t === 'upi') return true;
   if (
     t.includes('pay') ||
-    t.includes('payment') ||
     t.includes('gpay') ||
     t.includes('google pay') ||
     t.includes('googlepay') ||
     t.includes('phonepe') ||
     t.includes('paytm') ||
-    t.includes('upi') ||
-    t.includes('qr') ||
-    t.includes('bank') ||
+    /\bupi\b/i.test(t) ||
+    /\bqr\b/i.test(t) ||
+    t.includes('qr code') ||
+    t.includes('bank details') ||
+    t.includes('bank transfer') ||
     t.includes('account details') ||
     t.includes('how to pay')
   ) {
@@ -237,9 +237,10 @@ export function isPaymentQuery(text) {
  */
 export function isGeneralPriceQuery(text) {
   const t = (text || '').toLowerCase().trim();
-  if (t === 'price' || t === 'prices' || t === 'rate' || t === 'rates') return true;
   if (
-    t.includes('price list') ||
+    t.includes('price') ||
+    t.includes('pricing') ||
+    /\brates?\b/i.test(t) ||
     t.includes('rate card') ||
     t.includes('pricelist') ||
     t.includes('catalog') ||
@@ -247,8 +248,9 @@ export function isGeneralPriceQuery(text) {
     t.includes('offer') ||
     t.includes('offers') ||
     t.includes('specs') ||
-    t === 'cost' ||
-    t === 'charges'
+    /\bcosts?\b/i.test(t) ||
+    t.includes('how much') ||
+    t.includes('charges')
   ) {
     return true;
   }
@@ -314,7 +316,24 @@ export async function handleIncomingMessage(sock, msg) {
     }
 
     // =========================================================================
-    // CASE 2: KEYWORD "A4" (and alternative versions)
+    // CASE 2: BOTH A4 AND A3 REQUESTED
+    // If customer asks about both sizes or compares them, send complete rate card
+    // =========================================================================
+    if (isA4Query(incomingText) && isA3Query(incomingText)) {
+      if (activeDispatches.has(cleanPhone)) return;
+      activeDispatches.add(cleanPhone);
+
+      try {
+        console.log(`[Bot] Both A4 and A3 requested by +${cleanPhone}. Sending complete rate card...`);
+        await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
+      } finally {
+        setTimeout(() => activeDispatches.delete(cleanPhone), 8000);
+      }
+      return;
+    }
+
+    // =========================================================================
+    // CASE 3: KEYWORD "A4" (and alternative versions)
     // Sends dedicated A4 photobook packages, specs, and pricing
     // =========================================================================
     if (isA4Query(incomingText)) {
@@ -331,7 +350,7 @@ export async function handleIncomingMessage(sock, msg) {
     }
 
     // =========================================================================
-    // CASE 3: KEYWORD "A3" (and alternative versions)
+    // CASE 4: KEYWORD "A3" (and alternative versions)
     // Sends dedicated A3 Jumbo photobook packages, specs, and pricing
     // =========================================================================
     if (isA3Query(incomingText)) {
@@ -348,7 +367,7 @@ export async function handleIncomingMessage(sock, msg) {
     }
 
     // =========================================================================
-    // CASE 4: KEYWORD "PAY" / "PAYMENT" (and alternative versions)
+    // CASE 5: KEYWORD "PAY" / "PAYMENT" (and alternative versions)
     // Sends official GPay details (achu.yous@oksbi, 7708065667)
     // =========================================================================
     if (isPaymentQuery(incomingText)) {
@@ -365,7 +384,7 @@ export async function handleIncomingMessage(sock, msg) {
     }
 
     // =========================================================================
-    // CASE 5: GENERAL RATE CARD / PRICE CATALOG KEYWORDS
+    // CASE 6: GENERAL RATE CARD / PRICE CATALOG KEYWORDS
     // Sends complete Welcome Offer & Rate Card
     // =========================================================================
     if (isGeneralPriceQuery(incomingText)) {
@@ -382,7 +401,7 @@ export async function handleIncomingMessage(sock, msg) {
     }
 
     // =========================================================================
-    // CASE 6: ALL OTHER MESSAGES (PHOTOS, DRIVE LINKS, CUSTOM CHAT)
+    // CASE 7: ALL OTHER MESSAGES (PHOTOS, DRIVE LINKS, CUSTOM CHAT)
     // ZERO auto-reply — Studio human team takes over the conversation manually.
     // =========================================================================
     console.log(`[Bot] Non-keyword message from +${cleanPhone} — manual studio takeover mode (no auto-reply).`);

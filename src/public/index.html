@@ -2229,37 +2229,40 @@ window.simTriggerKeyword = function(keyword) {
     lowerKw.includes('large album');
 
   const isPayment =
-    lowerKw === 'pay' ||
-    lowerKw === 'payment' ||
-    lowerKw === 'payment details' ||
-    lowerKw.includes('payment') ||
+    lowerKw.includes('pay') ||
     lowerKw.includes('gpay') ||
     lowerKw.includes('google pay') ||
     lowerKw.includes('googlepay') ||
     lowerKw.includes('phonepe') ||
     lowerKw.includes('paytm') ||
-    lowerKw.includes('upi') ||
-    lowerKw.includes('qr') ||
-    lowerKw.includes('account details') ||
+    /\bupi\b/i.test(lowerKw) ||
+    /\bqr\b/i.test(lowerKw) ||
+    lowerKw.includes('qr code') ||
     lowerKw.includes('bank details') ||
+    lowerKw.includes('bank transfer') ||
+    lowerKw.includes('account details') ||
     lowerKw.includes('how to pay');
 
   const isGeneralPrice =
-    lowerKw === 'price' ||
-    lowerKw === 'prices' ||
-    lowerKw === 'rate' ||
-    lowerKw === 'rates' ||
+    lowerKw.includes('price') ||
+    lowerKw.includes('pricing') ||
+    /\brates?\b/i.test(lowerKw) ||
     lowerKw.includes('rate card') ||
     lowerKw.includes('price list') ||
-    lowerKw.includes('cost') ||
+    lowerKw.includes('pricelist') ||
+    /\bcosts?\b/i.test(lowerKw) ||
+    lowerKw.includes('how much') ||
     lowerKw.includes('charges') ||
     lowerKw.includes('product') ||
     lowerKw.includes('catalog') ||
+    lowerKw.includes('catalogue') ||
     lowerKw.includes('offer') ||
     lowerKw.includes('specs');
 
   let replyText = null;
-  if (isA4) {
+  if (isA4 && isA3) {
+    replyText = getFullSpecsCatalogText();
+  } else if (isA4) {
     replyText = DEFAULT_A4_TEMPLATE_STRING;
   } else if (isA3) {
     replyText = DEFAULT_A3_TEMPLATE_STRING;
