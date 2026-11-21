@@ -95,6 +95,13 @@ export const DEFAULT_SPECS_TEMPLATE =
 `1️⃣ Reply here with your preferred album size (e.g. *A4 40 Pages* or *A3 60 Pages*)\n` +
 `2️⃣ Send your photos directly here on WhatsApp or share a Google Drive / Photos link.\n` +
 `3️⃣ Our designers will design your digital album preview for your approval before printing! 🎨✨\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`💡 *QUICK KEYWORDS FOR DETAILS:*\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`Reply with any keyword below for instant details:\n` +
+`• *A4* — View A4 Photobook Packages & Offers\n` +
+`• *A3* — View A3 Jumbo Wedding Album Packages\n` +
+`• *Pay* — View UPI ID & Payment QR Details\n\n\n` +
 `📞 *Studio Helpline:* +91 6369134270\n` +
 `📍 *InstaPicss Custom Print Studio*`;
 
@@ -102,7 +109,8 @@ export const DEFAULT_CONFIG = {
   studio_name: "InstaPicss Photobooks & Frames",
   studio_phone: "+91 6369134270",
   studio_address: "InstaPicss Custom Print Studio",
-  upi_id: "6369134270@okbizaxis",
+  upi_id: "achu.yous@oksbi",
+  gpay_number: "7708065667",
   upi_name: "InstaPicss Studio",
   welcome_specs_template: DEFAULT_SPECS_TEMPLATE,
   welcome_message: DEFAULT_SPECS_TEMPLATE,
@@ -230,6 +238,13 @@ if (count === 0 || isOldDemo) {
     insertStmt.run('product_flows', JSON.stringify(DEFAULT_CONFIG.product_flows));
   }
 }
+
+// Always ensure current GPay UPI ID, GPay Phone, and Welcome Template are up to date
+try {
+  insertStmt.run('upi_id', JSON.stringify("achu.yous@oksbi"));
+  insertStmt.run('gpay_number', JSON.stringify("7708065667"));
+  insertStmt.run('welcome_specs_template', JSON.stringify(DEFAULT_SPECS_TEMPLATE));
+} catch {}
 
 // Seed initial sample InstaPics orders if database is brand new or lacks sample revenue
 try {

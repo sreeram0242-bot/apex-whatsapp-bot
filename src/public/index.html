@@ -1209,11 +1209,11 @@ body {
 
           <!-- Quick Test Product Query Buttons -->
           <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
-            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Price')" style="padding: 4px 10px; font-size: 11px;">📸 Price</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Price')" style="padding: 4px 10px; font-size: 11px;">📸 All Prices</button>
             <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('A4')" style="padding: 4px 10px; font-size: 11px;">📖 A4</button>
             <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('A3')" style="padding: 4px 10px; font-size: 11px;">📚 A3</button>
-            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Rate Card')" style="padding: 4px 10px; font-size: 11px;">🏷️ Rate Card</button>
-            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('I have sent 50 photos on Drive')" style="padding: 4px 10px; font-size: 11px;">💬 Non-Pricing (Manual)</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('Pay')" style="padding: 4px 10px; font-size: 11px;">💳 Pay (GPay)</button>
+            <button type="button" class="order-filter-pill" onclick="simTriggerKeyword('I have sent 50 photos on Drive')" style="padding: 4px 10px; font-size: 11px;">💬 Other (Manual)</button>
           </div>
 
           <!-- Phone Mockup Container -->
@@ -1311,7 +1311,13 @@ body {
           <div class="form-group">
             <label for="cfgUpiId">Official UPI ID for QR Code & Instant Payments</label>
             <input type="text" id="cfgUpiId" class="text-input">
-            <span class="field-hint">e.g. 6369134270@okbizaxis (GPay / PhonePe / Paytm / BHIM)</span>
+            <span class="field-hint">e.g. achu.yous@oksbi (GPay / PhonePe / Paytm / BHIM)</span>
+          </div>
+
+          <div class="form-group">
+            <label for="cfgGpayNumber">Official GPay Mobile Number</label>
+            <input type="text" id="cfgGpayNumber" class="text-input">
+            <span class="field-hint">e.g. 7708065667</span>
           </div>
         </div>
 
@@ -1491,14 +1497,85 @@ const DEFAULT_SPECS_TEMPLATE_STRING =
 `1️⃣ Reply here with your preferred album size (e.g. *A4 40 Pages* or *A3 60 Pages*)\n` +
 `2️⃣ Send your photos directly here on WhatsApp or share a Google Drive / Photos link.\n` +
 `3️⃣ Our designers will design your digital album preview for your approval before printing! 🎨✨\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`💡 *QUICK KEYWORDS FOR DETAILS:*\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`Reply with any keyword below for instant details:\n` +
+`• *A4* — View A4 Photobook Packages & Offers\n` +
+`• *A3* — View A3 Jumbo Wedding Album Packages\n` +
+`• *Pay* — View UPI ID & Payment QR Details\n\n\n` +
 `📞 *Studio Helpline:* +91 6369134270\n` +
 `📍 *InstaPicss Custom Print Studio*`;
+
+const DEFAULT_A4_TEMPLATE_STRING =
+`📖 *INSTAPICSS — A4 PREMIUM PHOTOBOOKS* 📸\n` +
+`_Standard Album • Best for Birthdays, Family & Travel Memories_\n\n` +
+`✨ *QUALITY GUARANTEE:*\n` +
+`• 💧 *100% Waterproof Pages* (spill-proof & washable)\n` +
+`• 🛡️ *Non-Tearable Synthetic Paper* (lifetime durability)\n` +
+`• High Chroma imaging technology print\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`🏷️ *A4 PACKAGES & OFFER PRICING:*\n\n` +
+`• *40 Pages* (20 Sheets • up to 60 Photos)\n` +
+`  ~₹3,600~ ➔ *₹1,750* (51% OFF)\n\n` +
+`• *60 Pages* (30 Sheets • up to 100 Photos)\n` +
+`  ~₹4,500~ ➔ *₹2,150* (52% OFF)\n\n` +
+`• *80 Pages* (40 Sheets • up to 140 Photos)\n` +
+`  ~₹5,200~ ➔ *₹2,500* (52% OFF)\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`📲 *HOW TO ORDER:*\n\n` +
+`1️⃣ Reply with your preferred page count (e.g. *A4 40 Pages*)\n` +
+`2️⃣ Send your photos directly here on WhatsApp or share a Google Drive / Photos link.\n` +
+`3️⃣ Our designers will design your digital album preview for your approval before printing! 🎨✨\n\n` +
+`📞 *Studio Helpline:* +91 6369134270\n` +
+`📍 *InstaPicss Custom Print Studio*`;
+
+const DEFAULT_A3_TEMPLATE_STRING =
+`📚 *INSTAPICSS — A3 JUMBO PHOTOBOOKS* 👑\n` +
+`_Luxury Large Album • Ideal for Weddings, Receptions & Grand Occasions_\n\n` +
+`✨ *QUALITY GUARANTEE:*\n` +
+`• 💧 *100% Waterproof Pages* (spill-proof & washable)\n` +
+`• 🛡️ *Non-Tearable Synthetic Paper* (lifetime durability)\n` +
+`• High Chroma imaging technology print\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`🏷️ *A3 JUMBO PACKAGES & OFFER PRICING:*\n\n` +
+`• *40 Pages* (20 Sheets • up to 130 Photos)\n` +
+`  ~₹5,000~ ➔ *₹2,500* (50% OFF)\n\n` +
+`• *60 Pages* (30 Sheets • up to 220 Photos)\n` +
+`  ~₹6,500~ ➔ *₹3,300* (49% OFF)\n\n` +
+`• *80 Pages* (40 Sheets • up to 300 Photos)\n` +
+`  ~₹8,500~ ➔ *₹4,200* (51% OFF)\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`📲 *HOW TO ORDER:*\n\n` +
+`1️⃣ Reply with your preferred page count (e.g. *A3 60 Pages*)\n` +
+`2️⃣ Send your photos directly here on WhatsApp or share a Google Drive / Photos link.\n` +
+`3️⃣ Our designers will design your digital album preview for your approval before printing! 🎨✨\n\n` +
+`📞 *Studio Helpline:* +91 6369134270\n` +
+`📍 *InstaPicss Custom Print Studio*`;
+
+const DEFAULT_PAYMENT_TEMPLATE_STRING =
+`💳 *INSTAPICSS — OFFICIAL PAYMENT DETAILS* ✨\n\n` +
+`You can make the payment easily via Google Pay (GPay), PhonePe, Paytm, or any UPI app:\n\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+`📱 *GPAY NUMBER:*\n` +
+`*7708065667*\n` +
+`*(Click & hold number to copy)*\n\n` +
+`🆔 *GPAY UPI ID:*\n` +
+`*achu.yous@oksbi*\n` +
+`*(Click & hold UPI ID to copy)*\n\n` +
+`👤 *Payee Name:* InstaPicss Custom Print Studio\n` +
+`━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+`📲 *AFTER PAYMENT:*\n` +
+`Please share a screenshot of the payment confirmation here on WhatsApp along with your order details.\n\n` +
+`Our studio team will verify and start processing your album right away! 🚀📸\n\n` +
+`📞 *Studio Helpline:* +91 6369134270`;
 
 const DEFAULT_FALLBACK_CONFIG = {
   studio_name: "InstaPicss Photobooks & Frames",
   studio_phone: "+91 6369134270",
   studio_address: "InstaPicss Custom Print Studio",
-  upi_id: "6369134270@okbizaxis",
+  upi_id: "achu.yous@oksbi",
+  gpay_number: "7708065667",
   upi_name: "InstaPicss Studio",
   welcome_specs_template: DEFAULT_SPECS_TEMPLATE_STRING,
   welcome_message: DEFAULT_SPECS_TEMPLATE_STRING,
@@ -2131,7 +2208,43 @@ window.simTriggerKeyword = function(keyword) {
     </div>
   `;
 
-  const isProductPricingQuery =
+  const lowerKw = kw.toLowerCase().replace(/[\r\n]+/g, ' ').trim();
+
+  const isA4 =
+    lowerKw === 'a4' ||
+    lowerKw === 'a 4' ||
+    lowerKw === 'a-4' ||
+    lowerKw.includes('a4') ||
+    lowerKw.includes('standard album') ||
+    lowerKw.includes('small album');
+
+  const isA3 =
+    lowerKw === 'a3' ||
+    lowerKw === 'a 3' ||
+    lowerKw === 'a-3' ||
+    lowerKw.includes('a3') ||
+    lowerKw.includes('jumbo') ||
+    lowerKw.includes('wedding album') ||
+    lowerKw.includes('big album') ||
+    lowerKw.includes('large album');
+
+  const isPayment =
+    lowerKw === 'pay' ||
+    lowerKw === 'payment' ||
+    lowerKw === 'payment details' ||
+    lowerKw.includes('payment') ||
+    lowerKw.includes('gpay') ||
+    lowerKw.includes('google pay') ||
+    lowerKw.includes('googlepay') ||
+    lowerKw.includes('phonepe') ||
+    lowerKw.includes('paytm') ||
+    lowerKw.includes('upi') ||
+    lowerKw.includes('qr') ||
+    lowerKw.includes('account details') ||
+    lowerKw.includes('bank details') ||
+    lowerKw.includes('how to pay');
+
+  const isGeneralPrice =
     lowerKw === 'price' ||
     lowerKw === 'prices' ||
     lowerKw === 'rate' ||
@@ -2143,17 +2256,23 @@ window.simTriggerKeyword = function(keyword) {
     lowerKw.includes('product') ||
     lowerKw.includes('catalog') ||
     lowerKw.includes('offer') ||
-    lowerKw === 'a4' ||
-    lowerKw === 'a3' ||
-    lowerKw.includes('a4') ||
-    lowerKw.includes('a3') ||
-    lowerKw.includes('jumbo') ||
     lowerKw.includes('specs');
 
-  if (isProductPricingQuery) {
+  let replyText = null;
+  if (isA4) {
+    replyText = DEFAULT_A4_TEMPLATE_STRING;
+  } else if (isA3) {
+    replyText = DEFAULT_A3_TEMPLATE_STRING;
+  } else if (isPayment) {
+    replyText = DEFAULT_PAYMENT_TEMPLATE_STRING;
+  } else if (isGeneralPrice) {
+    replyText = getFullSpecsCatalogText();
+  }
+
+  if (replyText) {
     chatBody.innerHTML += `
       <div class="phone-msg-bubble incoming" style="align-self: flex-start; background: #FFFFFF; padding: 8px 12px; border-radius: 8px; font-size: 12px; max-width: 90%; margin-top: 6px; line-height: 1.45; color: #111; box-shadow: 0 1px 1px rgba(0,0,0,0.1);">
-        ${formatWhatsAppText(getFullSpecsCatalogText())}
+        ${formatWhatsAppText(replyText)}
         <span style="font-size: 10px; color: #8C8C8C; float: right; margin-left: 6px; margin-top: 4px;">10:01 AM</span>
       </div>
     `;
@@ -2777,7 +2896,8 @@ function populateSettingsFields(cfg) {
   setVal('cfgStudioName', cfg.studio_name || 'InstaPicss Photobooks & Frames');
   setVal('cfgStudioPhone', cfg.studio_phone || '+91 6369134270');
   setVal('cfgStudioAddress', cfg.studio_address || 'InstaPicss Custom Print Studio');
-  setVal('cfgUpiId', cfg.upi_id || '6369134270@okbizaxis');
+  setVal('cfgUpiId', cfg.upi_id || 'achu.yous@oksbi');
+  setVal('cfgGpayNumber', cfg.gpay_number || '7708065667');
   setVal('cfgWelcomeSpecsTemplate', cfg.welcome_specs_template || DEFAULT_SPECS_TEMPLATE_STRING);
   setVal('cfgPromptName', cfg.prompt_name);
   setVal('cfgPromptAddress', cfg.prompt_address);
@@ -2811,6 +2931,7 @@ window.saveSettings = async function() {
     studio_phone: getVal('cfgStudioPhone'),
     studio_address: getVal('cfgStudioAddress'),
     upi_id: getVal('cfgUpiId'),
+    gpay_number: getVal('cfgGpayNumber'),
     welcome_specs_template: specsTemplate,
     welcome_message: specsTemplate,
     prompt_name: getVal('cfgPromptName'),
