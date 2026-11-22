@@ -4,27 +4,134 @@ import {
 } from '../db.js';
 
 /**
- * Universal safe message sender with automatic fallback routing.
- * Never throws uncaught errors.
+ * Rolling sliding window for tracking concurrency & burst traffic
  */
-async function safeSend(sock, primaryJid, content, fallbackJid = null) {
+const recentDispatchesTimestamps = [];
+let inFlightDispatches = 0;
+let lastGlobalDispatchAt = 0;
+
+/**
+ * Applies invisible zero-width unicode variation to text.
+ * Generates a distinct SHA-256 / MD5 cryptographic hash on Meta servers
+ * for every outgoing message to prevent repetitive broadcast spam flagging,
+ * while rendering 100% cleanly and identically on customer WhatsApp screens.
+ * Contains zero spam trigger keywords and zero contact/block references.
+ */
+function applyAntiSpamVariation(text) {
+  if (!text) return text;
+  const zeroWidthChars = ['\u200B', '\u200C', '\u200D', '\uFEFF'];
+  const count = 2 + Math.floor(Math.random() * 3);
+  let suffix = '';
+  for (let i = 0; i < count; i++) {
+    suffix += zeroWidthChars[Math.floor(Math.random() * zeroWidthChars.length)];
+  }
+  return text + suffix;
+}
+
+/**
+ * Universal safe message sender with built-in Anti-Ban Human Emulation:
+ * 1. Read receipt (Blue Ticks) on incoming customer message
+ * 2. Typing presence ('composing') on customer WhatsApp screen
+ * 3. Adaptive timing delay:
+ *    - 1 or few customers: Fast reply (600ms - 1100ms)
+ *    - Surge traffic (many customers): Protective time gap (2500ms - 4500ms) + queue spacing
+ * 4. Anti-Spam cryptographic payload variation (invisible zero-width hash randomizer)
+ * 5. Automatic fallback JID routing and zero uncaught crashes
+ */
+async function safeSend(sock, primaryJid, content, fallbackJid = null, incomingMsgKey = null) {
   if (!sock) {
     console.error('[WhatsApp] Socket is not initialized.');
     return null;
   }
+
+  inFlightDispatches++;
   try {
-    return await sock.sendMessage(primaryJid, content);
-  } catch (err) {
-    console.error(`[WhatsApp] Failed to send message to primary JID ${primaryJid}:`, err?.message || err);
-    if (fallbackJid && fallbackJid !== primaryJid) {
+    // 1. Blue Ticks: Send read receipt for incoming customer message
+    if (incomingMsgKey && typeof sock.readMessages === 'function') {
       try {
-        console.log(`[WhatsApp] Retrying message to fallback JID ${fallbackJid}...`);
-        return await sock.sendMessage(fallbackJid, content);
-      } catch (err2) {
-        console.error(`[WhatsApp] Fallback delivery to ${fallbackJid} also failed:`, err2?.message || err2);
+        await sock.readMessages([incomingMsgKey]);
+      } catch (e) {
+        // Non-blocking: continue even if read receipt is already acked
       }
     }
-    return null;
+
+    // 2. Typing Presence: Show "typing..." on WhatsApp chat
+    if (typeof sock.sendPresenceUpdate === 'function') {
+      try {
+        await sock.sendPresenceUpdate('composing', primaryJid);
+        if (fallbackJid && fallbackJid !== primaryJid) {
+          await sock.sendPresenceUpdate('composing', fallbackJid).catch(() => {});
+        }
+      } catch (e) {}
+    }
+
+    // 3. Adaptive Delay Engine
+    const now = Date.now();
+    while (recentDispatchesTimestamps.length > 0 && recentDispatchesTimestamps[0] < now - 20000) {
+      recentDispatchesTimestamps.shift();
+    }
+
+    const recentCount = recentDispatchesTimestamps.length;
+    // High surge: 3+ messages in last 20s OR multiple active senders
+    const isSurge = recentCount >= 3 || inFlightDispatches >= 2;
+
+    let typingDurationMs = 0;
+    if (isSurge) {
+      // Many customers at a time -> protective human reading/typing delay (2500ms - 4500ms)
+      typingDurationMs = 2500 + Math.floor(Math.random() * 2000);
+      console.log(`[Anti-Ban] High traffic surge (${recentCount} recent msgs, ${inFlightDispatches} in-flight). Protective time gap: ${typingDurationMs}ms to ${primaryJid}`);
+    } else {
+      // Only 1 or few customers -> fast, snappy human typing (600ms - 1100ms)
+      typingDurationMs = 600 + Math.floor(Math.random() * 500);
+      console.log(`[Anti-Ban] Normal traffic (${recentCount} recent msgs). Fast reply: ${typingDurationMs}ms to ${primaryJid}`);
+    }
+
+    // Emulate typing duration
+    await new Promise(resolve => setTimeout(resolve, typingDurationMs));
+
+    // During surge, ensure outgoing messages across the whole bot are spaced by at least ~1.2s - 2.0s
+    if (isSurge) {
+      const timeSinceLast = Date.now() - lastGlobalDispatchAt;
+      const minSurgeGap = 1200 + Math.floor(Math.random() * 800);
+      if (timeSinceLast < minSurgeGap) {
+        await new Promise(resolve => setTimeout(resolve, minSurgeGap - timeSinceLast));
+      }
+    }
+    lastGlobalDispatchAt = Date.now();
+    recentDispatchesTimestamps.push(Date.now());
+
+    // 4. Message Copy Anti-Spam Filtering: Apply invisible zero-width hash variation to text
+    const finalContent = { ...content };
+    if (typeof finalContent.text === 'string') {
+      finalContent.text = applyAntiSpamVariation(finalContent.text);
+    }
+
+    // 5. Send message
+    let result = null;
+    try {
+      result = await sock.sendMessage(primaryJid, finalContent);
+    } catch (err) {
+      console.error(`[WhatsApp] Failed to send message to primary JID ${primaryJid}:`, err?.message || err);
+      if (fallbackJid && fallbackJid !== primaryJid) {
+        try {
+          console.log(`[WhatsApp] Retrying message to fallback JID ${fallbackJid}...`);
+          result = await sock.sendMessage(fallbackJid, finalContent);
+        } catch (err2) {
+          console.error(`[WhatsApp] Fallback delivery to ${fallbackJid} also failed:`, err2?.message || err2);
+        }
+      }
+    }
+
+    // 6. Reset presence to paused
+    if (typeof sock.sendPresenceUpdate === 'function') {
+      try {
+        await sock.sendPresenceUpdate('paused', primaryJid);
+      } catch (e) {}
+    }
+
+    return result;
+  } finally {
+    inFlightDispatches = Math.max(0, inFlightDispatches - 1);
   }
 }
 
@@ -153,31 +260,31 @@ const activeDispatches = new Set();
 /**
  * Sends the complete, crystal-clear InstaPicss Products List with Pricing.
  */
-export async function sendProductSpecsList(sock, jid, config = null, customerName = '', fallbackJid = null) {
+export async function sendProductSpecsList(sock, jid, config = null, customerName = '', fallbackJid = null, incomingMsgKey = null) {
   const cfg = config || getAllConfig();
   const template = cfg.welcome_specs_template || DEFAULT_SPECS_TEMPLATE;
-  return await safeSend(sock, jid, { text: template }, fallbackJid);
+  return await safeSend(sock, jid, { text: template }, fallbackJid, incomingMsgKey);
 }
 
 /**
  * Sends focused A4 Photobook products & pricing.
  */
-export async function sendA4Specs(sock, jid, config = null, fallbackJid = null) {
-  return await safeSend(sock, jid, { text: DEFAULT_A4_TEMPLATE }, fallbackJid);
+export async function sendA4Specs(sock, jid, config = null, fallbackJid = null, incomingMsgKey = null) {
+  return await safeSend(sock, jid, { text: DEFAULT_A4_TEMPLATE }, fallbackJid, incomingMsgKey);
 }
 
 /**
  * Sends focused A3 Jumbo Photobook products & pricing.
  */
-export async function sendA3Specs(sock, jid, config = null, fallbackJid = null) {
-  return await safeSend(sock, jid, { text: DEFAULT_A3_TEMPLATE }, fallbackJid);
+export async function sendA3Specs(sock, jid, config = null, fallbackJid = null, incomingMsgKey = null) {
+  return await safeSend(sock, jid, { text: DEFAULT_A3_TEMPLATE }, fallbackJid, incomingMsgKey);
 }
 
 /**
  * Sends official GPay payment details.
  */
-export async function sendPaymentInfo(sock, jid, config = null, fallbackJid = null) {
-  return await safeSend(sock, jid, { text: DEFAULT_PAYMENT_TEMPLATE }, fallbackJid);
+export async function sendPaymentInfo(sock, jid, config = null, fallbackJid = null, incomingMsgKey = null) {
+  return await safeSend(sock, jid, { text: DEFAULT_PAYMENT_TEMPLATE }, fallbackJid, incomingMsgKey);
 }
 
 /**
@@ -308,7 +415,7 @@ export async function handleIncomingMessage(sock, msg) {
 
       try {
         console.log(`[Bot] New customer (+${cleanPhone})! Sending welcome offer & rate card...`);
-        await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
+        await sendProductSpecsList(sock, jid, config, pushName, fallbackJid, msg.key);
       } finally {
         setTimeout(() => activeDispatches.delete(cleanPhone), 8000);
       }
@@ -325,7 +432,7 @@ export async function handleIncomingMessage(sock, msg) {
 
       try {
         console.log(`[Bot] Both A4 and A3 requested by +${cleanPhone}. Sending complete rate card...`);
-        await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
+        await sendProductSpecsList(sock, jid, config, pushName, fallbackJid, msg.key);
       } finally {
         setTimeout(() => activeDispatches.delete(cleanPhone), 8000);
       }
@@ -342,7 +449,7 @@ export async function handleIncomingMessage(sock, msg) {
 
       try {
         console.log(`[Bot] A4 keyword matched from +${cleanPhone}. Sending A4 specs & prices...`);
-        await sendA4Specs(sock, jid, config, fallbackJid);
+        await sendA4Specs(sock, jid, config, fallbackJid, msg.key);
       } finally {
         setTimeout(() => activeDispatches.delete(cleanPhone), 8000);
       }
@@ -359,7 +466,7 @@ export async function handleIncomingMessage(sock, msg) {
 
       try {
         console.log(`[Bot] A3 keyword matched from +${cleanPhone}. Sending A3 Jumbo specs & prices...`);
-        await sendA3Specs(sock, jid, config, fallbackJid);
+        await sendA3Specs(sock, jid, config, fallbackJid, msg.key);
       } finally {
         setTimeout(() => activeDispatches.delete(cleanPhone), 8000);
       }
@@ -376,7 +483,7 @@ export async function handleIncomingMessage(sock, msg) {
 
       try {
         console.log(`[Bot] Payment keyword matched from +${cleanPhone}. Sending GPay details...`);
-        await sendPaymentInfo(sock, jid, config, fallbackJid);
+        await sendPaymentInfo(sock, jid, config, fallbackJid, msg.key);
       } finally {
         setTimeout(() => activeDispatches.delete(cleanPhone), 8000);
       }
@@ -393,7 +500,7 @@ export async function handleIncomingMessage(sock, msg) {
 
       try {
         console.log(`[Bot] Price keyword matched from +${cleanPhone}. Sending complete rate card...`);
-        await sendProductSpecsList(sock, jid, config, pushName, fallbackJid);
+        await sendProductSpecsList(sock, jid, config, pushName, fallbackJid, msg.key);
       } finally {
         setTimeout(() => activeDispatches.delete(cleanPhone), 8000);
       }

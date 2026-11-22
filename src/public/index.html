@@ -1204,7 +1204,7 @@ body {
 
           <!-- Simulator Engine Notice -->
           <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; font-size: 11px; color: #166534;">
-            <strong>✓ Products & Pricing Auto-Reply Only:</strong> Bot auto-replies ONLY for product pricing inquiries. All other messages go to manual studio takeover.
+            <strong>✓ Anti-Ban Protection Active:</strong> Human typing presence, blue ticks, adaptive time gap for surge traffic, and cryptographic payload anti-spam variation.
           </div>
 
           <!-- Quick Test Product Query Buttons -->
@@ -2273,12 +2273,19 @@ window.simTriggerKeyword = function(keyword) {
   }
 
   if (replyText) {
-    chatBody.innerHTML += `
-      <div class="phone-msg-bubble incoming" style="align-self: flex-start; background: #FFFFFF; padding: 8px 12px; border-radius: 8px; font-size: 12px; max-width: 90%; margin-top: 6px; line-height: 1.45; color: #111; box-shadow: 0 1px 1px rgba(0,0,0,0.1);">
-        ${formatWhatsAppText(replyText)}
-        <span style="font-size: 10px; color: #8C8C8C; float: right; margin-left: 6px; margin-top: 4px;">10:01 AM</span>
-      </div>
-    `;
+    const statusEl = document.querySelector('.phone-contact-status');
+    if (statusEl) statusEl.innerText = 'typing...';
+
+    setTimeout(() => {
+      if (statusEl) statusEl.innerText = 'online • WhatsApp Business';
+      chatBody.innerHTML += `
+        <div class="phone-msg-bubble incoming" style="align-self: flex-start; background: #FFFFFF; padding: 8px 12px; border-radius: 8px; font-size: 12px; max-width: 90%; margin-top: 6px; line-height: 1.45; color: #111; box-shadow: 0 1px 1px rgba(0,0,0,0.1);">
+          ${formatWhatsAppText(replyText)}
+          <span style="font-size: 10px; color: #8C8C8C; float: right; margin-left: 6px; margin-top: 4px;">10:01 AM</span>
+        </div>
+      `;
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }, 600);
   } else {
     chatBody.innerHTML += `
       <div style="align-self: center; background: #F1F5F9; border: 1px dashed #94A3B8; color: #475569; font-size: 11px; padding: 6px 12px; border-radius: 8px; margin: 6px 0; text-align: center; max-width: 90%;">
@@ -2286,6 +2293,7 @@ window.simTriggerKeyword = function(keyword) {
         No automated reply for non-product messages. Studio designers chat directly with customer from phone!
       </div>
     `;
+    chatBody.scrollTop = chatBody.scrollHeight;
   }
 
   chatBody.scrollTop = chatBody.scrollHeight;

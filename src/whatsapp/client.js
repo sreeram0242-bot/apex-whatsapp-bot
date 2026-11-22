@@ -60,10 +60,14 @@ export async function initWhatsApp() {
     logger,
     printQRInTerminal: false,
     auth: state,
-    browser: Browsers.windows('Desktop'),
+    browser: Browsers.macOS('Chrome'),
     generateHighQualityLinkPreview: true,
     syncFullHistory: false,
     markOnlineOnConnect: true,
+    connectTimeoutMs: 60_000,
+    defaultQueryTimeoutMs: 60_000,
+    keepAliveIntervalMs: 30_000,
+    emitOwnEvents: false,
     getMessage: async (key) => {
       const msg = getStoredMessage(key?.id);
       return msg || undefined;
@@ -113,10 +117,11 @@ export async function initWhatsApp() {
       if (shouldReconnect) {
         currentStatus = 'connecting';
         if (!reconnectTimer) {
+          const jitterDelay = 3000 + Math.floor(Math.random() * 2000);
           reconnectTimer = setTimeout(() => {
             reconnectTimer = null;
             initWhatsApp();
-          }, 3000);
+          }, jitterDelay);
         }
       } else {
         currentStatus = 'logged_out';
